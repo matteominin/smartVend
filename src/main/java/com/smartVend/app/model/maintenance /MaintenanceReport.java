@@ -1,21 +1,31 @@
-package com.smartVend.app.model;
+package com.smartVend.app.model.maintenance;
 
+import jakarta.persistence.*;
+import java.io.Serializable;
 import java.util.Date;
+import com.smartVend.app.model.vendingmachine.VendingMachine;
 
-public class MaintenanceReport {
-    private String id;
-    private String issueDescription;
-    private Date issueDate;
-    private ConcreteVendingMachine machine;
+@Entity
+public class MaintenanceReport implements Serializable {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    public Long id;
+
+    @Column(nullable = false)
+    public String issueDescription;
+
+    @Temporal(TemporalType.DATE)
+    @Column(nullable = false)
+    public Date issueDate;
+
+    @ManyToOne
+    @JoinColumn(name = "machine_id")
+    public VendingMachine machine;
 
     public MaintenanceReport() {}
-
-    public MaintenanceReport(String id, String issueDescription, Date issueDate, ConcreteVendingMachine machine) {
-        this.id = id;
+    public MaintenanceReport(String issueDescription, Date issueDate, VendingMachine machine) {
         this.issueDescription = issueDescription;
-        this.issueDate = issueDate;
+    this.issueDate = issueDate;
         this.machine = machine;
     }
-
-    // Getter e setter qui...
 }

@@ -6,24 +6,18 @@ import java.io.Serializable;
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
 public abstract class User implements Serializable {
-
     @Id
     public String id;
-
     @Column(nullable = false, unique = true)
     public String email;
-
     @Column(nullable = false)
     public String name;
-
     @Column(nullable = false)
     public String surname;
-
     @Column(nullable = false)
     public String hashedPassword;
 
     public User() {}
-
     public User(String id, String email, String name, String surname, String hashedPassword) {
         this.id = id;
         this.email = email;
