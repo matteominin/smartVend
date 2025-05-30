@@ -34,7 +34,8 @@ class VendingMachineDaoImplTest {
 
     @Test
     void findAll_returnsList() {
-        TypedQuery<ConcreteVendingMachine> query = mock(TypedQuery.class);
+        @SuppressWarnings("unchecked")
+        TypedQuery<ConcreteVendingMachine> query = (TypedQuery<ConcreteVendingMachine>) mock(TypedQuery.class);
         when(entityManager.createQuery(anyString(), eq(ConcreteVendingMachine.class))).thenReturn(query);
         when(query.getResultList()).thenReturn(Collections.emptyList());
 

@@ -3,6 +3,8 @@ package com.smartvend.app.dao;
 import com.smartvend.app.dao.impl.TransactionDaoImpl;
 import com.smartvend.app.model.transaction.Transaction;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.TypedQuery;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -42,7 +44,8 @@ class TransactionDaoImplTest {
     @Test
     void getTransactionsByCustomer_returnsList() {
         long customerId = 123;
-        var query = mock(jakarta.persistence.TypedQuery.class);
+        @SuppressWarnings("unchecked")
+        TypedQuery<Transaction> query = (TypedQuery<Transaction>) mock(TypedQuery.class);
         when(entityManager.createQuery(anyString(), eq(Transaction.class))).thenReturn(query);
         when(query.setParameter(eq("customerId"), eq(customerId))).thenReturn(query);
         when(query.getResultList()).thenReturn(Collections.emptyList());

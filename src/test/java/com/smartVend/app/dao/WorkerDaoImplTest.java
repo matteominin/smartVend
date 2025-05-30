@@ -46,7 +46,8 @@ class WorkerDaoImplTest {
 
     @Test
     void findAllActive_returnsEmptyList() {
-        TypedQuery<Worker> query = mock(TypedQuery.class);
+        @SuppressWarnings("unchecked")
+        TypedQuery<Worker> query = (TypedQuery<Worker>) mock(TypedQuery.class);
         when(entityManager.createQuery(anyString(), eq(Worker.class))).thenReturn(query);
         when(query.getResultList()).thenReturn(Collections.emptyList());
 
