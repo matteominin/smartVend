@@ -47,4 +47,8 @@ public class Item implements Serializable {
         this.position = position;
         this.type = type;
     }
+
+    public long getId() {
+        return id;
+    }
 }

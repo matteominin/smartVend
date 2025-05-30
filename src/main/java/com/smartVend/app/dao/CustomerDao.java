@@ -6,4 +6,8 @@ public class CustomerDao {
     public Customer getUserById(long customerId) {
         return null;
     }
+
+    public Customer updateCustomer(Customer customer) {
+        return customer;
+    }
 }

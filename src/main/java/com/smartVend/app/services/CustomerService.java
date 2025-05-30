@@ -1,6 +1,7 @@
 package com.smartvend.app.services;
 
 import com.smartvend.app.model.connection.Connection;
+import com.smartvend.app.model.transaction.Transaction;
 import com.smartvend.app.model.user.Customer;
 import com.smartvend.app.model.vendingmachine.Inventory;
 import com.smartvend.app.model.vendingmachine.Item;
@@ -20,14 +21,17 @@ public class CustomerService {
     private InventoryDao inventoryDao;
     private ItemDao itemDao;
     private ConcreteVendingMachineDao concreteVendingMachineDao;
+    private TransactionService transactionService;
 
     public CustomerService(CustomerDao customerDao, ConnectionDao connectionDao, InventoryDao inventoryDao,
-            ItemDao itemDao, ConcreteVendingMachineDao concreteVendingMachineDao) {
+            ItemDao itemDao, ConcreteVendingMachineDao concreteVendingMachineDao,
+            TransactionService transactionService) {
         this.customerDao = customerDao;
         this.connectionDao = connectionDao;
         this.inventoryDao = inventoryDao;
         this.itemDao = itemDao;
         this.concreteVendingMachineDao = concreteVendingMachineDao;
+        this.transactionService = transactionService;
     }
 
     public Connection connect(long customerId, String machineId) {
@@ -66,5 +70,27 @@ public class CustomerService {
             throw new IllegalArgumentException("Insufficient balance");
         }
         return balance;
+    }
+
+    public void updateBalance(long customerId, double amount) {
+        Customer customer = customerDao.getUserById(customerId);
+        if (customer == null) {
+            throw new IllegalArgumentException("User not found");
+        }
+
+        double newBalance = customer.getBalance() - amount;
+        if (newBalance < 0) {
+            throw new IllegalArgumentException("Insufficient balance");
+        }
+        customer.setBalance(newBalance);
+        customerDao.updateCustomer(customer);
+    }
+
+    public List<Transaction> getTransactionHistory(long customerId) {
+        Customer customer = customerDao.getUserById(customerId);
+        if (customer == null) {
+            throw new IllegalArgumentException("User not found");
+        }
+        return transactionService.getCustomerTransactions(customerId);
     }
 }

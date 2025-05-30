@@ -12,10 +12,6 @@ public class TransactionItem implements Serializable {
     public Long id;
 
     @ManyToOne
-    @JoinColumn(name = "transaction_id")
-    public Transaction transaction;
-
-    @ManyToOne
     @JoinColumn(name = "machine_id")
     public VendingMachine machine;
 
@@ -29,8 +25,7 @@ public class TransactionItem implements Serializable {
     public TransactionItem() {
     }
 
-    public TransactionItem(Transaction transaction, VendingMachine machine, Item item, int amount) {
-        this.transaction = transaction;
+    public TransactionItem(VendingMachine machine, Item item, int amount) {
         this.machine = machine;
         this.item = item;
         this.amount = amount;
