@@ -2,7 +2,6 @@ package com.smartvend.app.model.vendingmachine;
 
 import jakarta.persistence.*;
 import java.io.Serializable;
-
 @Entity
 public class VendingMachine implements Serializable {
     @Id
