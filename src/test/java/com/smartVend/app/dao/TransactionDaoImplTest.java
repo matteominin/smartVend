@@ -2,7 +2,6 @@ package com.smartvend.app.dao;
 
 import com.smartvend.app.dao.impl.TransactionDaoImpl;
 import com.smartvend.app.model.transaction.Transaction;
-import com.smartvend.app.model.user.Customer;
 import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

@@ -44,7 +44,8 @@ class AdminDaoImplTest {
 
     @Test
     void findAll_returnsEmptyList() {
-        TypedQuery<Admin> query = mock(TypedQuery.class);
+        @SuppressWarnings("unchecked")
+        TypedQuery<Admin> query = (TypedQuery<Admin>) mock(TypedQuery.class);
         when(entityManager.createQuery(anyString(), eq(Admin.class))).thenReturn(query);
         when(query.getResultList()).thenReturn(Collections.emptyList());
 

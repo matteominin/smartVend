@@ -23,7 +23,8 @@ class ItemDaoImplTest {
         entityManager = mock(EntityManager.class);
         itemDao = new ItemDaoImpl();
 
-        // Reflection hack per settare entityManager (puoi sostituire con setter se preferisci)
+        // Reflection hack per settare entityManager (puoi sostituire con setter se
+        // preferisci)
         try {
             var field = ItemDaoImpl.class.getDeclaredField("entityManager");
             field.setAccessible(true);
@@ -36,6 +37,8 @@ class ItemDaoImplTest {
     @Test
     void getInventoryItems_returnsItems() {
         String inventoryId = "123";
+
+        @SuppressWarnings("unchecked")
         TypedQuery<Item> query = mock(TypedQuery.class);
         List<Item> expected = Collections.singletonList(mock(Item.class));
 

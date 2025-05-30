@@ -33,7 +33,8 @@ class InventoryDaoImplTest {
     @Test
     void getMachineInventory_returnsInventory() {
         String machineId = "MACHINE123";
-        TypedQuery<Inventory> query = mock(TypedQuery.class);
+        @SuppressWarnings("unchecked")
+        TypedQuery<Inventory> query = (TypedQuery<Inventory>) mock(TypedQuery.class);
         Inventory expected = mock(Inventory.class);
 
         when(entityManager.createQuery(anyString(), eq(Inventory.class))).thenReturn(query);

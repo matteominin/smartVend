@@ -1,6 +1,8 @@
-package com.smartvend.app.dao.impl;
+package com.smartvend.app.dao;
 
 import com.smartvend.app.model.user.User;
+import com.smartvend.app.dao.impl.UserDaoImpl;
+
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
 import org.junit.jupiter.api.BeforeEach;

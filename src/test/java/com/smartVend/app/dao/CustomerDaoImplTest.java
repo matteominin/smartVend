@@ -43,7 +43,8 @@ class CustomerDaoImplTest {
 
     @Test
     void findAll_returnsEmptyList() {
-        TypedQuery<Customer> query = mock(TypedQuery.class);
+        @SuppressWarnings("unchecked")
+        TypedQuery<Customer> query = (TypedQuery<Customer>) mock(TypedQuery.class);
         when(entityManager.createQuery(anyString(), eq(Customer.class))).thenReturn(query);
         when(query.getResultList()).thenReturn(Collections.emptyList());
 
