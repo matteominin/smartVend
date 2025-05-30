@@ -2,7 +2,7 @@ package com.smartvend.app.model.transaction;
 
 import jakarta.persistence.*;
 import java.io.Serializable;
-import java.util.Date;
+import java.time.Instant;
 import java.util.List;
 import com.smartvend.app.model.user.Customer;
 
@@ -16,9 +16,8 @@ public class Transaction implements Serializable {
     @JoinColumn(name = "customer_id")
     public Customer customer;
 
-    @Temporal(TemporalType.TIMESTAMP)
     @Column(nullable = false)
-    public Date date;
+    public Instant date;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -36,7 +35,7 @@ public class Transaction implements Serializable {
     public Transaction() {
     }
 
-    public Transaction(Customer customer, Date date, PaymentMethod paymentMethod, double initialBalance,
+    public Transaction(Customer customer, Instant date, PaymentMethod paymentMethod, double initialBalance,
             double updatedBalance, List<TransactionItem> transactionItems) {
         this.customer = customer;
         this.date = date;

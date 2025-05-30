@@ -2,7 +2,7 @@ package com.smartvend.app.model.vendingmachine;
 
 import jakarta.persistence.*;
 import java.io.Serializable;
-import java.util.Date;
+import java.time.Instant;
 import java.util.List;
 
 @Entity
@@ -21,13 +21,11 @@ public class ConcreteVendingMachine implements Serializable {
     @Column(nullable = false)
     public int capacity;
 
-    @Temporal(TemporalType.DATE)
     @Column(nullable = false)
-    public Date lastMaintenance;
+    public Instant lastMaintenance;
 
-    @Temporal(TemporalType.DATE)
     @Column(nullable = false)
-    public Date createdAt;
+    public Instant createdAt;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -40,7 +38,7 @@ public class ConcreteVendingMachine implements Serializable {
     }
 
     public ConcreteVendingMachine(String serialNumber, VendingMachine vendingMachine, String location, int capacity,
-            Date lastMaintenance, Date createdAt, MachineStatus status, List<Inventory> items) {
+            Instant lastMaintenance, Instant createdAt, MachineStatus status, List<Inventory> items) {
         this.serialNumber = serialNumber;
         this.vendingMachine = vendingMachine;
         this.location = location;

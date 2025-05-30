@@ -2,7 +2,7 @@ package com.smartvend.app.model.vendingmachine;
 
 import jakarta.persistence.*;
 import java.io.Serializable;
-import java.util.Date;
+import java.time.Instant;
 
 @Entity
 public class Item implements Serializable {
@@ -24,9 +24,8 @@ public class Item implements Serializable {
     @Column(nullable = false)
     public double price;
 
-    @Temporal(TemporalType.DATE)
     @Column(nullable = false)
-    public Date createdAt;
+    public Instant createdAt;
 
     @Column(nullable = false)
     public int position;
@@ -38,7 +37,7 @@ public class Item implements Serializable {
     public Item() {
     }
 
-    public Item(String id, String name, String description, int volume, int quantity, double price, Date createdAt,
+    public Item(String id, String name, String description, int volume, int quantity, double price, Instant createdAt,
             int position, ItemType type) {
         this.id = id;
         this.name = name;

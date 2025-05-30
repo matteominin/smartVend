@@ -2,7 +2,7 @@ package com.smartvend.app.model.connection;
 
 import jakarta.persistence.*;
 import java.io.Serializable;
-import java.util.Date;
+import java.time.Instant;
 import com.smartvend.app.model.user.User;
 import com.smartvend.app.model.vendingmachine.VendingMachine;
 
@@ -20,14 +20,13 @@ public class Connection implements Serializable {
     @JoinColumn(name = "machine_id")
     public VendingMachine machine;
 
-    @Temporal(TemporalType.TIMESTAMP)
     @Column(nullable = false)
-    public Date start;
+    public Instant start;
 
     public Connection() {
     }
 
-    public Connection(User user, VendingMachine machine, Date start) {
+    public Connection(User user, VendingMachine machine, Instant start) {
         this.user = user;
         this.machine = machine;
         this.start = start;
