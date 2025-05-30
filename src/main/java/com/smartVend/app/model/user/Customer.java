@@ -1,16 +1,18 @@
-package com.smartVend.app.model;
+package com.smartVend.app.model.user;
 
-public class Customer {
-    private String id;
-    private double balance;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+
+@Entity
+public class Customer extends User {
+
+    @Column(nullable = false)
+    public double balance;
 
     public Customer() {}
 
-    public Customer(String id, double balance) {
-        this.id = id;
+    public Customer(String id, String email, String name, String surname, String hashedPassword, double balance) {
+        super(id, email, name, surname, hashedPassword);
         this.balance = balance;
     }
-
-    // Getter e setter qui...
 }
-
