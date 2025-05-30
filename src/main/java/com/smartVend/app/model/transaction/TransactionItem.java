@@ -2,45 +2,36 @@ package com.smartVend.app.model.transaction;
 
 import jakarta.persistence.*;
 import java.io.Serializable;
-import java.util.Date;
-import java.util.List;
-import com.smartVend.app.model.user.Customer;
+import com.smartVend.app.model.vendingmachine.VendingMachine;
+import com.smartVend.app.model.vendingmachine.Item;
 
 @Entity
-public class Transaction implements Serializable {
+public class TransactionItem implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     public Long id;
 
     @ManyToOne
-    @JoinColumn(name = "customer_id")
-    public Customer customer;
+    @JoinColumn(name = "transaction_id")
+    public Transaction transaction;
 
-    @Temporal(TemporalType.TIMESTAMP)
-    @Column(nullable = false)
-    public Date date;
+    @ManyToOne
+    @JoinColumn(name = "machine_id")
+    public VendingMachine machine;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    public PaymentMethod paymentMethod;
-
-    @Column(nullable = false)
-    public double initialBalance;
+    @ManyToOne
+    @JoinColumn(name = "item_id")
+    public Item item;
 
     @Column(nullable = false)
-    public double updatedBalance;
+    public int amount;
 
-    @OneToMany(mappedBy = "transaction", cascade = CascadeType.ALL)
-    public List<TransactionItem> transactionItems;
+    public TransactionItem() {}
 
-    public Transaction() {}
-
-    public Transaction(Customer customer, Date date, PaymentMethod paymentMethod, double initialBalance, double updatedBalance, List<TransactionItem> transactionItems) {
-        this.customer = customer;
-        this.date = date;
-        this.paymentMethod = paymentMethod;
-        this.initialBalance = initialBalance;
-        this.updatedBalance = updatedBalance;
-        this.transactionItems = transactionItems;
+    public TransactionItem(Transaction transaction, VendingMachine machine, Item item, int amount) {
+        this.transaction = transaction;
+        this.machine = machine;
+        this.item = item;
+        this.amount = amount;
     }
 }
