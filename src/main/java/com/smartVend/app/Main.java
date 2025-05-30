@@ -1,4 +1,4 @@
-package com.smartVend.app;
+package com.smartvend.app;
 
 public class Main {
     public static void main(String[] args) {

@@ -1,4 +1,4 @@
-package com.smartVend.app.model;
+package com.smartvend.app.model.maintenance;
 
 public enum MaintenanceStatus {
     Reported,

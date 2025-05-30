@@ -1,4 +1,4 @@
-package com.smartVend.app.model;
+package com.smartvend.app.model.vendingmachine;
 
 import java.util.List;
 
@@ -7,7 +7,8 @@ public class Inventory {
     private int occupiedSpace;
     private List<Item> items;
 
-    public Inventory() {}
+    public Inventory() {
+    }
 
     public Inventory(String id, int occupiedSpace, List<Item> items) {
         this.id = id;

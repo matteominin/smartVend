@@ -1,4 +1,4 @@
-package com.smartVend.app.model;
+package com.smartvend.app.model.user;
 
 public class Worker extends User {
     private boolean isActive;

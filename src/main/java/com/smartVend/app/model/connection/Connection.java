@@ -1,5 +1,5 @@
-package com.smartVend.app.model.connection;
+package com.smartvend.app.model.connection;
 
 public class Connection {
-    
+
 }

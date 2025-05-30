@@ -1,4 +1,4 @@
-package com.smartVend.app.model;
+package com.smartvend.app.model.user;
 
 public class Admin extends User {
     public Admin() {

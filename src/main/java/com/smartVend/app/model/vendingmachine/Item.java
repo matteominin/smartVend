@@ -1,4 +1,4 @@
-package com.smartVend.app.model;
+package com.smartvend.app.model.vendingmachine;
 
 import java.util.Date;
 
@@ -12,10 +12,11 @@ public class Item {
     private Date createdAt;
     private ItemType type;
 
-    public Item() {}
+    public Item() {
+    }
 
     public Item(String id, String name, String description, int size, int quantity,
-                double price, Date createdAt, ItemType type) {
+            double price, Date createdAt, ItemType type) {
         this.id = id;
         this.name = name;
         this.description = description;

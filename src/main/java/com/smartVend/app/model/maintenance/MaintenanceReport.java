@@ -1,6 +1,7 @@
-package com.smartVend.app.model;
+package com.smartvend.app.model.maintenance;
 
 import java.util.Date;
+import com.smartvend.app.model.vendingmachine.ConcreteVendingMachine;
 
 public class MaintenanceReport {
     private String id;
@@ -8,7 +9,8 @@ public class MaintenanceReport {
     private Date issueDate;
     private ConcreteVendingMachine machine;
 
-    public MaintenanceReport() {}
+    public MaintenanceReport() {
+    }
 
     public MaintenanceReport(String id, String issueDescription, Date issueDate, ConcreteVendingMachine machine) {
         this.id = id;

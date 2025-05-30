@@ -1,10 +1,11 @@
-package com.smartVend.app.model;
+package com.smartvend.app.model.vendingmachine;
 
 public class VendingMachine {
     private String modelNumber;
     private MachineType type;
 
-    public VendingMachine() {}
+    public VendingMachine() {
+    }
 
     public VendingMachine(String modelNumber, MachineType type) {
         this.modelNumber = modelNumber;

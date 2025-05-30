@@ -1,4 +1,4 @@
-package com.smartVend.app.model;
+package com.smartvend.app.model.vendingmachine;
 
 import java.util.Date;
 
@@ -9,21 +9,20 @@ public class ConcreteVendingMachine {
     private Date lastMaintenance;
     private Date createdAt;
     private MachineStatus status;
-    private MachineBalance balance;
     private Inventory inventory;
 
-    public ConcreteVendingMachine() {}
+    public ConcreteVendingMachine() {
+    }
 
     public ConcreteVendingMachine(String serialNumber, String location, int capacity,
-                                 Date lastMaintenance, Date createdAt,
-                                 MachineStatus status, MachineBalance balance, Inventory inventory) {
+            Date lastMaintenance, Date createdAt,
+            MachineStatus status, Inventory inventory) {
         this.serialNumber = serialNumber;
         this.location = location;
         this.capacity = capacity;
         this.lastMaintenance = lastMaintenance;
         this.createdAt = createdAt;
         this.status = status;
-        this.balance = balance;
         this.inventory = inventory;
     }
 

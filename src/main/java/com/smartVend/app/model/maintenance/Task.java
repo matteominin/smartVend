@@ -1,5 +1,7 @@
-package com.smartVend.app.model;
+package com.smartvend.app.model.maintenance;
 
+import com.smartvend.app.model.user.Worker;
+import com.smartvend.app.model.user.Admin;
 import java.util.Date;
 
 public class Task {
@@ -10,9 +12,11 @@ public class Task {
     private MaintenanceStatus status;
     private MaintenanceReport report;
 
-    public Task() {}
+    public Task() {
+    }
 
-    public Task(String id, Date assignedAt, Worker worker, Admin supervisor, MaintenanceStatus status, MaintenanceReport report) {
+    public Task(String id, Date assignedAt, Worker worker, Admin supervisor, MaintenanceStatus status,
+            MaintenanceReport report) {
         this.id = id;
         this.assignedAt = assignedAt;
         this.worker = worker;

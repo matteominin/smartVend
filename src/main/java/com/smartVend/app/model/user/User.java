@@ -1,5 +1,4 @@
-package com.smartVend.app.model;
-
+package com.smartvend.app.model.user;
 
 public class User {
     private String id;
@@ -8,7 +7,8 @@ public class User {
     private String surname;
     private String hashedPassword;
 
-    public User() {}
+    public User() {
+    }
 
     public User(String id, String email, String name, String surname, String hashedPassword) {
         this.id = id;
