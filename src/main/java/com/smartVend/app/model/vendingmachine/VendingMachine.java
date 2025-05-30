@@ -1,15 +1,20 @@
-package com.smartVend.app.model;
+package com.smartVend.app.model.vendingmachine;
 
-public class VendingMachine {
-    private String modelNumber;
-    private MachineType type;
+import jakarta.persistence.*;
+import java.io.Serializable;
+
+@Entity
+public class VendingMachine implements Serializable {
+    @Id
+    public String modelNumber;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    public MachineType type;
 
     public VendingMachine() {}
-
     public VendingMachine(String modelNumber, MachineType type) {
         this.modelNumber = modelNumber;
         this.type = type;
     }
-
-    // Getter e setter qui...
 }

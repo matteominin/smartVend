@@ -1,29 +1,46 @@
-package com.smartVend.app.model;
+package com.smartVend.app.model.transaction;
 
+import jakarta.persistence.*;
+import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
+import com.smartVend.app.model.user.Customer;
 
-public class Transaction {
-    private String id;
-    private Date date;
-    private double initialBalance;
-    private double updatedBalance;
-    private Customer customer;
-    private PaymentMethod paymentMethod;
-    private List<TransactionItem> transactionItems;
+@Entity
+public class Transaction implements Serializable {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    public Long id;
+
+    @ManyToOne
+    @JoinColumn(name = "customer_id")
+    public Customer customer;
+
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(nullable = false)
+    public Date date;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    public PaymentMethod paymentMethod;
+
+    @Column(nullable = false)
+    public double initialBalance;
+
+    @Column(nullable = false)
+    public double updatedBalance;
+
+    @OneToMany(mappedBy = "transaction", cascade = CascadeType.ALL)
+    public List<TransactionItem> transactionItems;
 
     public Transaction() {}
 
-    public Transaction(String id, Date date, double initialBalance, double updatedBalance,
-                       Customer customer, PaymentMethod paymentMethod, List<TransactionItem> transactionItems) {
-        this.id = id;
+    public Transaction(Customer customer, Date date, PaymentMethod paymentMethod, double initialBalance, double updatedBalance, List<TransactionItem> transactionItems) {
+        this.customer = customer;
         this.date = date;
+        this.paymentMethod = paymentMethod;
         this.initialBalance = initialBalance;
         this.updatedBalance = updatedBalance;
-        this.customer = customer;
-        this.paymentMethod = paymentMethod;
         this.transactionItems = transactionItems;
     }
-
-    // Getter e setter qui...
 }
