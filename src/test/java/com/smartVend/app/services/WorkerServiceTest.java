@@ -22,7 +22,7 @@ import org.mockito.MockitoAnnotations;
 
 import com.smartvend.app.model.maintenance.MaintenanceReport;
 import com.smartvend.app.model.maintenance.MaintenanceStatus;
-import com.smartvend.app.dao.TaskDao;
+import com.smartvend.app.dao.impl.TaskDaoImpl;
 import com.smartvend.app.model.vendingmachine.MachineType;
 import com.smartvend.app.model.vendingmachine.VendingMachine;
 import com.smartvend.app.model.user.*;
@@ -30,7 +30,7 @@ import com.smartvend.app.model.maintenance.Task;
 
 public class WorkerServiceTest {
     @Mock
-    private TaskDao taskDao;
+    private TaskDaoImpl taskDao;
 
     @InjectMocks
     private WorkerService workerService;
@@ -62,7 +62,7 @@ public class WorkerServiceTest {
                 maintenanceReportMock);
 
         List<Task> tasks = List.of(task1, task2);
-        when(taskDao.getWorkerTasks(workerMock.getId())).thenReturn(tasks);
+        when(taskDao.getTasksForWorker(workerMock.getId())).thenReturn(tasks);
 
         List<Task> result = workerService.getWorkerTasks(workerMock.getId());
 
@@ -79,7 +79,7 @@ public class WorkerServiceTest {
         long workerId = workerMock.getId();
         List<Task> expectedTasks = List.of();
 
-        when(taskDao.getWorkerTasks(workerId)).thenReturn(expectedTasks);
+        when(taskDao.getTasksForWorker(workerId)).thenReturn(expectedTasks);
 
         Collection<Task> actualTasks = workerService.getWorkerTasks(workerId);
 
@@ -87,7 +87,7 @@ public class WorkerServiceTest {
         assertTrue(actualTasks.isEmpty());
         assertEquals(0, actualTasks.size());
 
-        verify(taskDao, times(1)).getWorkerTasks(workerId);
+        verify(taskDao, times(1)).getTasksForWorker(workerId);
         verifyNoMoreInteractions(taskDao);
     }
 

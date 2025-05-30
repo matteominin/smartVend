@@ -2,17 +2,10 @@ package com.smartvend.app.dao;
 
 import com.smartvend.app.model.connection.Connection;
 
-public class ConnectionDao {
+public interface ConnectionDao {
+    Connection createConnection(Long userId, String machineId);
 
-    public Connection createConnection(Connection connection) {
-        return null;
-    }
+    void deleteConnection(Long connectionId);
 
-    public Connection getConnectionById(Long id) {
-        return null;
-    }
-
-    public void deleteConnection(Connection connection) {
-        // Implementation to delete the connection
-    }
+    Connection getConnectionById(Long connectionId);
 }

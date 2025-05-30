@@ -21,6 +21,10 @@ public class Inventory implements Serializable {
     @Column(nullable = false)
     public int occupiedSpace;
 
+    public Inventory() {
+        // Default constructor for JPA
+    }
+
     public Inventory(long id, ConcreteVendingMachine machine, List<Item> items, int occupiedSpace) {
         this.id = id;
         this.machine = machine;

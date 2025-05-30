@@ -1,13 +1,13 @@
 package com.smartvend.app.dao;
 
+import java.util.List;
+
 import com.smartvend.app.model.user.Customer;
 
-public class CustomerDao {
-    public Customer getUserById(long customerId) {
-        return null;
-    }
+public interface CustomerDao {
+    Customer getCustomerById(long customerId);
 
-    public Customer updateCustomer(Customer customer) {
-        return customer;
-    }
+    void updateCustomer(Customer customer);
+
+    List<Customer> findAll();
 }

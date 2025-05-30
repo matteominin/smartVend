@@ -19,6 +19,11 @@ public class Connection implements Serializable {
     @Column(nullable = false)
     public Instant start;
 
+    public Connection() {
+        // Default constructor for JPA
+        this.start = Instant.now();
+    }
+
     public Connection(Long customerId, String machineId, Instant start) {
         this.customerId = customerId;
         this.machineId = machineId;

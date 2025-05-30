@@ -12,6 +12,10 @@ public class VendingMachine implements Serializable {
     @Column(nullable = false)
     public MachineType type;
 
+    public VendingMachine() {
+        // Default constructor for JPA
+    }
+
     public VendingMachine(String modelNumber, MachineType type) {
         this.modelNumber = modelNumber;
         this.type = type;

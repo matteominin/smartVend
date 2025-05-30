@@ -23,6 +23,7 @@ public class TransactionItem implements Serializable {
     public int amount;
 
     public TransactionItem() {
+        // Default constructor for JPA
     }
 
     public TransactionItem(ConcreteVendingMachine machine, Item item, int amount) {

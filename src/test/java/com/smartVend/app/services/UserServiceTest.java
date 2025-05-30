@@ -16,13 +16,13 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import com.smartvend.app.dao.UserDao;
+import com.smartvend.app.dao.impl.UserDaoImpl;
 import com.smartvend.app.model.user.User;
 
 public class UserServiceTest {
 
     @Mock
-    private UserDao userDao;
+    private UserDaoImpl userDao;
 
     @InjectMocks
     private UserService userService;

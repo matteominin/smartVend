@@ -34,6 +34,13 @@ public class ConcreteVendingMachine implements Serializable {
     @OneToMany(mappedBy = "machine", cascade = CascadeType.ALL)
     public Inventory inventory;
 
+    public ConcreteVendingMachine() {
+        // Default constructor for JPA
+        this.createdAt = Instant.now();
+        this.lastMaintenance = Instant.now();
+        this.status = MachineStatus.Operative;
+    }
+
     public ConcreteVendingMachine(String serialNumber, VendingMachine vendingMachine, String location, int capacity,
             MachineStatus status, Inventory inventory) {
         this.serialNumber = serialNumber;

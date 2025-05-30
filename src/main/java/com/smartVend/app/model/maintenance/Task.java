@@ -32,6 +32,11 @@ public class Task implements Serializable {
     @JoinColumn(name = "report_id")
     public MaintenanceReport report;
 
+    public Task() {
+        // Default constructor for JPA
+        this.assignedAt = Instant.now();
+    }
+
     public Task(long id, Worker worker, Admin supervisor, MaintenanceStatus status, Instant assignedAt,
             MaintenanceReport report) {
         this.id = id;

@@ -32,6 +32,11 @@ public class Transaction implements Serializable {
     @OneToMany(mappedBy = "transaction", cascade = CascadeType.ALL)
     public List<TransactionItem> transactionItems;
 
+    public Transaction() {
+        // Default constructor for JPA
+        this.date = Instant.now();
+    }
+
     public Transaction(Customer customer, PaymentMethod paymentMethod, double initialBalance,
             double updatedBalance, List<TransactionItem> transactionItems) {
         this.customer = customer;

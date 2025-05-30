@@ -13,7 +13,7 @@ public class WorkerService {
     }
 
     public List<Task> getWorkerTasks(long workerId) {
-        return taskDao.getWorkerTasks(workerId);
+        return taskDao.getTasksForWorker(workerId);
     }
 
     public void changeTaskStatus(long taskId, MaintenanceStatus status) {

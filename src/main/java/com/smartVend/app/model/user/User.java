@@ -17,6 +17,10 @@ public class User implements Serializable {
     @Column(nullable = false)
     public String password;
 
+    public User() {
+        // Default constructor for JPA
+    }
+
     public User(long id, String email, String name, String surname, String password) {
         this.id = id;
         this.email = email;
@@ -33,10 +37,10 @@ public class User implements Serializable {
     }
 
     public long getId() {
-        return id;
+        return this.id;
     }
 
     public String getPassword() {
-        return password;
+        return this.password;
     }
 }

@@ -16,17 +16,27 @@ public class Customer implements Serializable {
     @Column(nullable = false)
     public double balance;
 
+    public Customer() {
+        // Default constructor for JPA
+    }
+
+    public Customer(Long id, User user, double balance) {
+        this.id = id;
+        this.user = user;
+        this.balance = balance;
+    }
+
     public Customer(User user, double balance) {
         this.user = user;
         this.balance = balance;
     }
 
     public Long getId() {
-        return user.getId();
+        return this.id;
     }
 
     public double getBalance() {
-        return balance;
+        return this.balance;
     }
 
     public void setBalance(double balance) {

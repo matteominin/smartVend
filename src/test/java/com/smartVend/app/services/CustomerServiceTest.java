@@ -26,11 +26,11 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import com.smartvend.app.dao.ConnectionDao;
-import com.smartvend.app.dao.CustomerDao;
-import com.smartvend.app.dao.InventoryDao;
-import com.smartvend.app.dao.ItemDao;
-import com.smartvend.app.dao.ConcreteVendingMachineDao;
+import com.smartvend.app.dao.impl.ConnectionDaoImpl;
+import com.smartvend.app.dao.impl.InventoryDaoImpl;
+import com.smartvend.app.dao.impl.ItemDaoImpl;
+import com.smartvend.app.dao.impl.CustomerDaoImpl;
+import com.smartvend.app.dao.impl.ConcreteVendingMachineDaoImpl;
 
 import com.smartvend.app.model.user.User;
 import com.smartvend.app.model.vendingmachine.ConcreteVendingMachine;
@@ -43,20 +43,20 @@ import com.smartvend.app.model.connection.Connection;
 import com.smartvend.app.model.vendingmachine.Item;
 import com.smartvend.app.model.vendingmachine.ItemType;
 import com.smartvend.app.model.transaction.PaymentMethod;
-import com.smartvend.app.model.transaction.Transaction; // New import
+import com.smartvend.app.model.transaction.Transaction;
 
 public class CustomerServiceTest {
     @Mock
-    private CustomerDao customerDao;
+    private CustomerDaoImpl customerDao;
     @Mock
-    private ConnectionDao connectionDao;
+    private ConnectionDaoImpl connectionDao;
     @Mock
-    private InventoryDao inventoryDao;
+    private InventoryDaoImpl inventoryDao;
     @Mock
-    private ItemDao itemDao;
+    private ItemDaoImpl itemDao;
     @Mock
-    private ConcreteVendingMachineDao concreteVendingMachineDao;
-    @Mock // New mock for TransactionService
+    private ConcreteVendingMachineDaoImpl concreteVendingMachineDao;
+    @Mock
     private TransactionService transactionService;
 
     @InjectMocks
@@ -75,7 +75,7 @@ public class CustomerServiceTest {
     public void setUp() {
         MockitoAnnotations.openMocks(this);
 
-        mockCustomer = new Customer(new User(1L, "email@example.com", "Jhon", "Doe", "password"), 100.0);
+        mockCustomer = new Customer(2L, new User(1L, "email@example.com", "Jhon", "Doe", "password"), 100.0);
 
         VendingMachine baseVendingMachine = new VendingMachine("model", MachineType.PizzoneFarcito);
         mockConcreteVendingMachine = new ConcreteVendingMachine(
@@ -132,11 +132,11 @@ public class CustomerServiceTest {
         long customerId = mockCustomer.getId();
         String machineId = mockConcreteVendingMachine.getId();
 
-        when(customerDao.getUserById(customerId)).thenReturn(mockCustomer);
-        when(concreteVendingMachineDao.getMachineById(machineId)).thenReturn(mockConcreteVendingMachine);
+        when(customerDao.getCustomerById(customerId)).thenReturn(mockCustomer);
+        when(concreteVendingMachineDao.findById(machineId)).thenReturn(mockConcreteVendingMachine);
 
         Connection createdConnection = new Connection(customerId, machineId, Instant.now());
-        when(connectionDao.createConnection(any(Connection.class))).thenReturn(createdConnection);
+        when(connectionDao.createConnection(customerId, machineId)).thenReturn(createdConnection);
 
         Connection resultConnection = customerService.connect(customerId, machineId);
 
@@ -145,9 +145,9 @@ public class CustomerServiceTest {
         assertEquals(machineId, resultConnection.getMachineId());
         assertNotNull(resultConnection.getConnectionTime());
 
-        verify(customerDao, times(1)).getUserById(customerId);
-        verify(concreteVendingMachineDao, times(1)).getMachineById(machineId);
-        verify(connectionDao, times(1)).createConnection(any(Connection.class));
+        verify(customerDao, times(1)).getCustomerById(customerId);
+        verify(concreteVendingMachineDao, times(1)).findById(machineId);
+        verify(connectionDao, times(1)).createConnection(customerId, machineId);
         verifyNoMoreInteractions(customerDao, connectionDao, inventoryDao, itemDao, concreteVendingMachineDao,
                 transactionService);
     }
@@ -158,16 +158,16 @@ public class CustomerServiceTest {
         long customerId = 99L;
         String machineId = mockConcreteVendingMachine.getId();
 
-        when(customerDao.getUserById(customerId)).thenReturn(null);
+        when(customerDao.getCustomerById(customerId)).thenReturn(null);
 
         IllegalArgumentException thrown = assertThrows(IllegalArgumentException.class, () -> {
             customerService.connect(customerId, machineId);
         });
 
         assertEquals("Customer not found", thrown.getMessage());
-        verify(customerDao, times(1)).getUserById(customerId);
-        verify(concreteVendingMachineDao, never()).getMachineById(anyString());
-        verify(connectionDao, never()).createConnection(any(Connection.class));
+        verify(customerDao, times(1)).getCustomerById(customerId);
+        verify(concreteVendingMachineDao, never()).findById(anyString());
+        verify(connectionDao, never()).createConnection(anyLong(), anyString());
         verifyNoMoreInteractions(customerDao, connectionDao, inventoryDao, itemDao, concreteVendingMachineDao,
                 transactionService);
     }
@@ -178,17 +178,17 @@ public class CustomerServiceTest {
         long customerId = mockCustomer.getId();
         String machineId = "non-existent";
 
-        when(customerDao.getUserById(customerId)).thenReturn(mockCustomer);
-        when(concreteVendingMachineDao.getMachineById(machineId)).thenReturn(null);
+        when(customerDao.getCustomerById(customerId)).thenReturn(mockCustomer);
+        when(concreteVendingMachineDao.findById(machineId)).thenReturn(null);
 
         IllegalArgumentException thrown = assertThrows(IllegalArgumentException.class, () -> {
             customerService.connect(customerId, machineId);
         });
 
         assertEquals("Machine not found", thrown.getMessage());
-        verify(customerDao, times(1)).getUserById(customerId);
-        verify(concreteVendingMachineDao, times(1)).getMachineById(machineId);
-        verify(connectionDao, never()).createConnection(any(Connection.class));
+        verify(customerDao, times(1)).getCustomerById(customerId);
+        verify(concreteVendingMachineDao, times(1)).findById(machineId);
+        verify(connectionDao, never()).createConnection(anyLong(), anyString());
         verifyNoMoreInteractions(customerDao, connectionDao, inventoryDao, itemDao, concreteVendingMachineDao,
                 transactionService);
     }
@@ -282,13 +282,13 @@ public class CustomerServiceTest {
         long customerId = mockCustomer.getId();
         double amount = 50.0;
 
-        when(customerDao.getUserById(customerId)).thenReturn(mockCustomer);
+        when(customerDao.getCustomerById(customerId)).thenReturn(mockCustomer);
 
         double balance = customerService.checkBalance(customerId, amount);
 
         assertEquals(mockCustomer.getBalance(), balance);
 
-        verify(customerDao, times(1)).getUserById(customerId);
+        verify(customerDao, times(1)).getCustomerById(customerId);
         verifyNoMoreInteractions(customerDao, connectionDao, inventoryDao, itemDao, concreteVendingMachineDao,
                 transactionService);
     }
@@ -299,14 +299,14 @@ public class CustomerServiceTest {
         long customerId = 99L;
         double amount = 10.0;
 
-        when(customerDao.getUserById(customerId)).thenReturn(null);
+        when(customerDao.getCustomerById(customerId)).thenReturn(null);
 
         IllegalArgumentException thrown = assertThrows(IllegalArgumentException.class, () -> {
             customerService.checkBalance(customerId, amount);
         });
 
         assertEquals("User not found", thrown.getMessage());
-        verify(customerDao, times(1)).getUserById(customerId);
+        verify(customerDao, times(1)).getCustomerById(customerId);
         verifyNoMoreInteractions(customerDao, connectionDao, inventoryDao, itemDao, concreteVendingMachineDao,
                 transactionService);
     }
@@ -317,14 +317,14 @@ public class CustomerServiceTest {
         long customerId = mockCustomer.getId();
         double amount = 150.0;
 
-        when(customerDao.getUserById(customerId)).thenReturn(mockCustomer);
+        when(customerDao.getCustomerById(customerId)).thenReturn(mockCustomer);
 
         IllegalArgumentException thrown = assertThrows(IllegalArgumentException.class, () -> {
             customerService.checkBalance(customerId, amount);
         });
 
         assertEquals("Insufficient balance", thrown.getMessage());
-        verify(customerDao, times(1)).getUserById(customerId);
+        verify(customerDao, times(1)).getCustomerById(customerId);
         verifyNoMoreInteractions(customerDao, connectionDao, inventoryDao, itemDao, concreteVendingMachineDao,
                 transactionService);
     }
@@ -338,12 +338,12 @@ public class CustomerServiceTest {
         double amountToDeduct = 30.0;
         double expectedNewBalance = initialBalance - amountToDeduct; // 70.0
 
-        when(customerDao.getUserById(customerId)).thenReturn(mockCustomer);
+        when(customerDao.getCustomerById(customerId)).thenReturn(mockCustomer);
 
         customerService.updateBalance(customerId, amountToDeduct);
 
         assertEquals(expectedNewBalance, mockCustomer.getBalance());
-        verify(customerDao, times(1)).getUserById(customerId);
+        verify(customerDao, times(1)).getCustomerById(customerId);
         verify(customerDao, times(1)).updateCustomer(mockCustomer);
         verifyNoMoreInteractions(customerDao, connectionDao, inventoryDao, itemDao, concreteVendingMachineDao,
                 transactionService);
@@ -355,14 +355,14 @@ public class CustomerServiceTest {
         long customerId = 99L;
         double amountToDeduct = 10.0;
 
-        when(customerDao.getUserById(customerId)).thenReturn(null);
+        when(customerDao.getCustomerById(customerId)).thenReturn(null);
 
         IllegalArgumentException thrown = assertThrows(IllegalArgumentException.class, () -> {
             customerService.updateBalance(customerId, amountToDeduct);
         });
 
         assertEquals("User not found", thrown.getMessage());
-        verify(customerDao, times(1)).getUserById(customerId);
+        verify(customerDao, times(1)).getCustomerById(customerId);
         verify(customerDao, never()).updateCustomer(any(Customer.class));
         verifyNoMoreInteractions(customerDao, connectionDao, inventoryDao, itemDao, concreteVendingMachineDao,
                 transactionService);
@@ -375,7 +375,7 @@ public class CustomerServiceTest {
         double initialBalance = mockCustomer.getBalance(); // 100.0
         double amountToDeduct = 150.0; // More than initial balance
 
-        when(customerDao.getUserById(customerId)).thenReturn(mockCustomer);
+        when(customerDao.getCustomerById(customerId)).thenReturn(mockCustomer);
 
         IllegalArgumentException thrown = assertThrows(IllegalArgumentException.class, () -> {
             customerService.updateBalance(customerId, amountToDeduct);
@@ -383,7 +383,7 @@ public class CustomerServiceTest {
 
         assertEquals("Insufficient balance", thrown.getMessage());
         assertEquals(initialBalance, mockCustomer.getBalance()); // Balance should not change
-        verify(customerDao, times(1)).getUserById(customerId);
+        verify(customerDao, times(1)).getCustomerById(customerId);
         verify(customerDao, never()).updateCustomer(any(Customer.class));
         verifyNoMoreInteractions(customerDao, connectionDao, inventoryDao, itemDao, concreteVendingMachineDao,
                 transactionService);
@@ -396,7 +396,7 @@ public class CustomerServiceTest {
         long customerId = mockCustomer.getId();
         List<Transaction> expectedTransactions = Arrays.asList(mockTransaction1, mockTransaction2);
 
-        when(customerDao.getUserById(customerId)).thenReturn(mockCustomer);
+        when(customerDao.getCustomerById(customerId)).thenReturn(mockCustomer);
         when(transactionService.getCustomerTransactions(customerId)).thenReturn(expectedTransactions);
 
         List<Transaction> actualTransactions = customerService.getTransactionHistory(customerId);
@@ -407,7 +407,7 @@ public class CustomerServiceTest {
         assertTrue(actualTransactions.contains(mockTransaction1));
         assertTrue(actualTransactions.contains(mockTransaction2));
 
-        verify(customerDao, times(1)).getUserById(customerId);
+        verify(customerDao, times(1)).getCustomerById(customerId);
         verify(transactionService, times(1)).getCustomerTransactions(customerId);
         verifyNoMoreInteractions(customerDao, connectionDao, inventoryDao, itemDao, concreteVendingMachineDao,
                 transactionService);
@@ -418,14 +418,14 @@ public class CustomerServiceTest {
     void testGetTransactionHistoryCustomerNotFound() {
         long customerId = 99L;
 
-        when(customerDao.getUserById(customerId)).thenReturn(null);
+        when(customerDao.getCustomerById(customerId)).thenReturn(null);
 
         IllegalArgumentException thrown = assertThrows(IllegalArgumentException.class, () -> {
             customerService.getTransactionHistory(customerId);
         });
 
         assertEquals("User not found", thrown.getMessage());
-        verify(customerDao, times(1)).getUserById(customerId);
+        verify(customerDao, times(1)).getCustomerById(customerId);
         verify(transactionService, never()).getCustomerTransactions(anyLong());
         verifyNoMoreInteractions(customerDao, connectionDao, inventoryDao, itemDao, concreteVendingMachineDao,
                 transactionService);
@@ -437,7 +437,7 @@ public class CustomerServiceTest {
         long customerId = mockCustomer.getId();
         List<Transaction> expectedTransactions = Collections.emptyList();
 
-        when(customerDao.getUserById(customerId)).thenReturn(mockCustomer);
+        when(customerDao.getCustomerById(customerId)).thenReturn(mockCustomer);
         when(transactionService.getCustomerTransactions(customerId)).thenReturn(expectedTransactions);
 
         List<Transaction> actualTransactions = customerService.getTransactionHistory(customerId);
@@ -446,7 +446,7 @@ public class CustomerServiceTest {
         assertTrue(actualTransactions.isEmpty());
         assertEquals(0, actualTransactions.size());
 
-        verify(customerDao, times(1)).getUserById(customerId);
+        verify(customerDao, times(1)).getCustomerById(customerId);
         verify(transactionService, times(1)).getCustomerTransactions(customerId);
         verifyNoMoreInteractions(customerDao, connectionDao, inventoryDao, itemDao, concreteVendingMachineDao,
                 transactionService);
@@ -469,7 +469,7 @@ public class CustomerServiceTest {
 
         // Assert
         verify(connectionDao, times(1)).getConnectionById(inputConnection.getId());
-        verify(connectionDao, times(1)).deleteConnection(foundConnection);
+        verify(connectionDao, times(1)).deleteConnection(foundConnection.getId());
         verifyNoMoreInteractions(customerDao, connectionDao, inventoryDao, itemDao, concreteVendingMachineDao,
                 transactionService);
     }
@@ -484,7 +484,7 @@ public class CustomerServiceTest {
 
         assertEquals("Connection cannot be null", thrown.getMessage());
         verify(connectionDao, never()).getConnectionById(anyLong());
-        verify(connectionDao, never()).deleteConnection(any(Connection.class));
+        verify(connectionDao, never()).deleteConnection(any(Long.class));
         verifyNoMoreInteractions(customerDao, connectionDao, inventoryDao, itemDao, concreteVendingMachineDao,
                 transactionService);
     }
@@ -505,7 +505,7 @@ public class CustomerServiceTest {
 
         assertEquals("Connection not found", thrown.getMessage());
         verify(connectionDao, times(1)).getConnectionById(inputConnection.getId());
-        verify(connectionDao, never()).deleteConnection(any(Connection.class));
+        verify(connectionDao, never()).deleteConnection(any(Long.class));
         verifyNoMoreInteractions(customerDao, connectionDao, inventoryDao, itemDao, concreteVendingMachineDao,
                 transactionService);
     }
@@ -523,8 +523,8 @@ public class CustomerServiceTest {
                 Arrays.asList());
 
         when(connectionDao.getConnectionById(connectionId)).thenReturn(mockConnection);
-        when(customerDao.getUserById(mockCustomer.getId())).thenReturn(mockCustomer);
-        when(concreteVendingMachineDao.getMachineById(mockConcreteVendingMachine.getId()))
+        when(customerDao.getCustomerById(mockCustomer.getId())).thenReturn(mockCustomer);
+        when(concreteVendingMachineDao.findById(mockConcreteVendingMachine.getId()))
                 .thenReturn(mockConcreteVendingMachine);
         when(itemDao.getItemById(30L)).thenReturn(mockItem1);
         when(transactionService.createTransaction(any(Transaction.class))).thenReturn(expectedTransaction);
@@ -538,8 +538,8 @@ public class CustomerServiceTest {
         assertEquals(9, mockItem1.getQuantity()); // Original quantity was 10, should be decremented by 1
 
         verify(connectionDao, times(1)).getConnectionById(connectionId);
-        verify(customerDao, times(3)).getUserById(mockCustomer.getId()); // Called in checkBalance and main method
-        verify(concreteVendingMachineDao, times(1)).getMachineById(mockConcreteVendingMachine.getId());
+        verify(customerDao, times(3)).getCustomerById(mockCustomer.getId()); // Called in checkBalance and main method
+        verify(concreteVendingMachineDao, times(1)).findById(mockConcreteVendingMachine.getId());
         verify(itemDao, times(1)).getItemById(30L);
         verify(itemDao, times(1)).updateItem(mockItem1);
         verify(customerDao, times(1)).updateCustomer(mockCustomer); // Called in updateBalance
@@ -558,8 +558,8 @@ public class CustomerServiceTest {
                 Arrays.asList());
 
         when(connectionDao.getConnectionById(connectionId)).thenReturn(mockConnection);
-        when(customerDao.getUserById(mockCustomer.getId())).thenReturn(mockCustomer);
-        when(concreteVendingMachineDao.getMachineById(mockConcreteVendingMachine.getId()))
+        when(customerDao.getCustomerById(mockCustomer.getId())).thenReturn(mockCustomer);
+        when(concreteVendingMachineDao.findById(mockConcreteVendingMachine.getId()))
                 .thenReturn(mockConcreteVendingMachine);
         when(itemDao.getItemById(30L)).thenReturn(mockItem1); // Price: 1.50
         when(itemDao.getItemById(31L)).thenReturn(mockItem2); // Price: 2.00
@@ -575,8 +575,8 @@ public class CustomerServiceTest {
         assertEquals(4, mockItem2.getQuantity()); // Original quantity was 5, should be decremented by 1
 
         verify(connectionDao, times(1)).getConnectionById(connectionId);
-        verify(customerDao, times(3)).getUserById(mockCustomer.getId());
-        verify(concreteVendingMachineDao, times(1)).getMachineById(mockConcreteVendingMachine.getId());
+        verify(customerDao, times(3)).getCustomerById(mockCustomer.getId());
+        verify(concreteVendingMachineDao, times(1)).findById(mockConcreteVendingMachine.getId());
         verify(itemDao, times(1)).getItemById(30L);
         verify(itemDao, times(1)).getItemById(31L);
         verify(itemDao, times(1)).updateItem(mockItem1);
@@ -601,8 +601,8 @@ public class CustomerServiceTest {
 
         assertEquals("Connection not found", thrown.getMessage());
         verify(connectionDao, times(1)).getConnectionById(connectionId);
-        verify(customerDao, never()).getUserById(anyLong());
-        verify(concreteVendingMachineDao, never()).getMachineById(anyString());
+        verify(customerDao, never()).getCustomerById(anyLong());
+        verify(concreteVendingMachineDao, never()).findById(anyString());
         verify(itemDao, never()).getItemById(anyLong());
         verify(transactionService, never()).createTransaction(any(Transaction.class));
     }
@@ -616,7 +616,7 @@ public class CustomerServiceTest {
         Connection mockConnection = new Connection(999L, mockConcreteVendingMachine.getId(), Instant.now());
 
         when(connectionDao.getConnectionById(connectionId)).thenReturn(mockConnection);
-        when(customerDao.getUserById(999L)).thenReturn(null);
+        when(customerDao.getCustomerById(999L)).thenReturn(null);
 
         // Act & Assert
         IllegalArgumentException thrown = assertThrows(IllegalArgumentException.class, () -> {
@@ -625,8 +625,8 @@ public class CustomerServiceTest {
 
         assertEquals("Customer not found", thrown.getMessage());
         verify(connectionDao, times(1)).getConnectionById(connectionId);
-        verify(customerDao, times(1)).getUserById(999L);
-        verify(concreteVendingMachineDao, never()).getMachineById(anyString());
+        verify(customerDao, times(1)).getCustomerById(999L);
+        verify(concreteVendingMachineDao, never()).findById(anyString());
         verify(itemDao, never()).getItemById(anyLong());
         verify(transactionService, never()).createTransaction(any(Transaction.class));
     }
@@ -640,8 +640,8 @@ public class CustomerServiceTest {
         Connection mockConnection = new Connection(mockCustomer.getId(), "non-existent-machine", Instant.now());
 
         when(connectionDao.getConnectionById(connectionId)).thenReturn(mockConnection);
-        when(customerDao.getUserById(mockCustomer.getId())).thenReturn(mockCustomer);
-        when(concreteVendingMachineDao.getMachineById("non-existent-machine")).thenReturn(null);
+        when(customerDao.getCustomerById(mockCustomer.getId())).thenReturn(mockCustomer);
+        when(concreteVendingMachineDao.findById("non-existent-machine")).thenReturn(null);
 
         // Act & Assert
         IllegalArgumentException thrown = assertThrows(IllegalArgumentException.class, () -> {
@@ -650,8 +650,8 @@ public class CustomerServiceTest {
 
         assertEquals("Machine not found", thrown.getMessage());
         verify(connectionDao, times(1)).getConnectionById(connectionId);
-        verify(customerDao, times(1)).getUserById(mockCustomer.getId());
-        verify(concreteVendingMachineDao, times(1)).getMachineById("non-existent-machine");
+        verify(customerDao, times(1)).getCustomerById(mockCustomer.getId());
+        verify(concreteVendingMachineDao, times(1)).findById("non-existent-machine");
         verify(itemDao, never()).getItemById(anyLong());
         verify(transactionService, never()).createTransaction(any(Transaction.class));
     }
@@ -666,8 +666,8 @@ public class CustomerServiceTest {
                 Instant.now());
 
         when(connectionDao.getConnectionById(connectionId)).thenReturn(mockConnection);
-        when(customerDao.getUserById(mockCustomer.getId())).thenReturn(mockCustomer);
-        when(concreteVendingMachineDao.getMachineById(mockConcreteVendingMachine.getId()))
+        when(customerDao.getCustomerById(mockCustomer.getId())).thenReturn(mockCustomer);
+        when(concreteVendingMachineDao.findById(mockConcreteVendingMachine.getId()))
                 .thenReturn(mockConcreteVendingMachine);
         when(itemDao.getItemById(999L)).thenReturn(null);
 
@@ -678,8 +678,8 @@ public class CustomerServiceTest {
 
         assertEquals("Item not found: 999", thrown.getMessage());
         verify(connectionDao, times(1)).getConnectionById(connectionId);
-        verify(customerDao, times(1)).getUserById(mockCustomer.getId());
-        verify(concreteVendingMachineDao, times(1)).getMachineById(mockConcreteVendingMachine.getId());
+        verify(customerDao, times(1)).getCustomerById(mockCustomer.getId());
+        verify(concreteVendingMachineDao, times(1)).findById(mockConcreteVendingMachine.getId());
         verify(itemDao, times(1)).getItemById(999L);
         verify(itemDao, never()).updateItem(any(Item.class));
         verify(transactionService, never()).createTransaction(any(Transaction.class));
@@ -696,8 +696,8 @@ public class CustomerServiceTest {
         Item outOfStockItem = new Item(30L, "Soda", "Description", 1, 0, 1.50, 3, ItemType.Bottle); // Quantity = 0
 
         when(connectionDao.getConnectionById(connectionId)).thenReturn(mockConnection);
-        when(customerDao.getUserById(mockCustomer.getId())).thenReturn(mockCustomer);
-        when(concreteVendingMachineDao.getMachineById(mockConcreteVendingMachine.getId()))
+        when(customerDao.getCustomerById(mockCustomer.getId())).thenReturn(mockCustomer);
+        when(concreteVendingMachineDao.findById(mockConcreteVendingMachine.getId()))
                 .thenReturn(mockConcreteVendingMachine);
         when(itemDao.getItemById(30L)).thenReturn(outOfStockItem);
 
@@ -708,8 +708,8 @@ public class CustomerServiceTest {
 
         assertEquals("Item not available", thrown.getMessage());
         verify(connectionDao, times(1)).getConnectionById(connectionId);
-        verify(customerDao, times(1)).getUserById(mockCustomer.getId());
-        verify(concreteVendingMachineDao, times(1)).getMachineById(mockConcreteVendingMachine.getId());
+        verify(customerDao, times(1)).getCustomerById(mockCustomer.getId());
+        verify(concreteVendingMachineDao, times(1)).findById(mockConcreteVendingMachine.getId());
         verify(itemDao, times(1)).getItemById(30L);
         verify(itemDao, never()).updateItem(any(Item.class));
         verify(transactionService, never()).createTransaction(any(Transaction.class));
@@ -730,8 +730,8 @@ public class CustomerServiceTest {
                                                                                                                   // price
 
         when(connectionDao.getConnectionById(connectionId)).thenReturn(mockConnection);
-        when(customerDao.getUserById(mockCustomer.getId())).thenReturn(poorCustomer);
-        when(concreteVendingMachineDao.getMachineById(mockConcreteVendingMachine.getId()))
+        when(customerDao.getCustomerById(mockCustomer.getId())).thenReturn(poorCustomer);
+        when(concreteVendingMachineDao.findById(mockConcreteVendingMachine.getId()))
                 .thenReturn(mockConcreteVendingMachine);
         when(itemDao.getItemById(30L)).thenReturn(expensiveItem);
 
@@ -742,9 +742,10 @@ public class CustomerServiceTest {
 
         assertEquals("Insufficient balance", thrown.getMessage());
         verify(connectionDao, times(1)).getConnectionById(connectionId);
-        verify(customerDao, times(2)).getUserById(mockCustomer.getId()); // Called twice: once in main method, once in
-                                                                         // checkBalance
-        verify(concreteVendingMachineDao, times(1)).getMachineById(mockConcreteVendingMachine.getId());
+        verify(customerDao, times(2)).getCustomerById(mockCustomer.getId()); // Called twice: once in main method, once
+                                                                             // in
+        // checkBalance
+        verify(concreteVendingMachineDao, times(1)).findById(mockConcreteVendingMachine.getId());
         verify(itemDao, times(1)).getItemById(30L);
         verify(itemDao, never()).updateItem(any(Item.class)); // Item should not be updated if balance check fails
         verify(customerDao, never()).updateCustomer(any(Customer.class)); // Customer balance should not be updated
@@ -763,8 +764,8 @@ public class CustomerServiceTest {
                 Arrays.asList());
 
         when(connectionDao.getConnectionById(connectionId)).thenReturn(mockConnection);
-        when(customerDao.getUserById(mockCustomer.getId())).thenReturn(mockCustomer);
-        when(concreteVendingMachineDao.getMachineById(mockConcreteVendingMachine.getId()))
+        when(customerDao.getCustomerById(mockCustomer.getId())).thenReturn(mockCustomer);
+        when(concreteVendingMachineDao.findById(mockConcreteVendingMachine.getId()))
                 .thenReturn(mockConcreteVendingMachine);
         when(transactionService.createTransaction(any(Transaction.class))).thenReturn(expectedTransaction);
 
@@ -776,9 +777,10 @@ public class CustomerServiceTest {
         assertEquals(expectedTransaction, result);
 
         verify(connectionDao, times(1)).getConnectionById(connectionId);
-        verify(customerDao, times(3)).getUserById(mockCustomer.getId()); // Called in checkBalance (with amount 0.0) and
-                                                                         // main method
-        verify(concreteVendingMachineDao, times(1)).getMachineById(mockConcreteVendingMachine.getId());
+        verify(customerDao, times(3)).getCustomerById(mockCustomer.getId()); // Called in checkBalance (with amount 0.0)
+                                                                             // and
+        // main method
+        verify(concreteVendingMachineDao, times(1)).findById(mockConcreteVendingMachine.getId());
         verify(itemDao, never()).getItemById(anyLong());
         verify(itemDao, never()).updateItem(any(Item.class));
         verify(customerDao, times(1)).updateCustomer(mockCustomer); // Called in updateBalance with amount 0.0

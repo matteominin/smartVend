@@ -12,6 +12,10 @@ public class Worker implements Serializable {
     @Column(nullable = false)
     public boolean isActive = true;
 
+    public Worker() {
+        // Default constructor for JPA
+    }
+
     public Worker(User user) {
         this.user = user;
     }

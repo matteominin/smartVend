@@ -35,6 +35,11 @@ public class Item implements Serializable {
     @Column(nullable = false)
     public ItemType type;
 
+    public Item() {
+        // Default constructor for JPA
+        this.createdAt = Instant.now();
+    }
+
     public Item(long id, String name, String description, int volume, int quantity, double price,
             int position, ItemType type) {
         this.id = id;
