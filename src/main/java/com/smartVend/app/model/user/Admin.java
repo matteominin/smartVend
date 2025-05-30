@@ -13,9 +13,6 @@ public class Admin implements Serializable {
     @JoinColumn(name = "user_id", nullable = false)
     public User user;
 
-    public Admin() {
-    }
-
     public Admin(User user) {
         this.user = user;
     }

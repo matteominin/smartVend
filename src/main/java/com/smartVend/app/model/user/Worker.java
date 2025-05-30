@@ -5,22 +5,18 @@ import java.io.Serializable;
 
 @Entity
 public class Worker implements Serializable {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    public Long id;
-
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     public User user;
 
     @Column(nullable = false)
-    public boolean isActive;
+    public boolean isActive = true;
 
-    public Worker() {
+    public Worker(User user) {
+        this.user = user;
     }
 
-    public Worker(User user, boolean isActive) {
-        this.user = user;
-        this.isActive = isActive;
+    public Long getId() {
+        return user.getId();
     }
 }

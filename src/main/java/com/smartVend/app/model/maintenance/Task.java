@@ -3,6 +3,8 @@ package com.smartvend.app.model.maintenance;
 import jakarta.persistence.*;
 import java.io.Serializable;
 import java.time.Instant;
+
+import com.smartvend.app.model.user.Admin;
 import com.smartvend.app.model.user.Worker;
 
 @Entity
@@ -17,7 +19,7 @@ public class Task implements Serializable {
 
     @ManyToOne
     @JoinColumn(name = "supervisor_id")
-    public Worker supervisor;
+    public Admin supervisor;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -30,15 +32,16 @@ public class Task implements Serializable {
     @JoinColumn(name = "report_id")
     public MaintenanceReport report;
 
-    public Task() {
-    }
-
-    public Task(Worker worker, Worker supervisor, MaintenanceStatus status, Instant assignedAt,
+    public Task(Worker worker, Admin supervisor, MaintenanceStatus status, Instant assignedAt,
             MaintenanceReport report) {
         this.worker = worker;
         this.supervisor = supervisor;
         this.status = status;
         this.assignedAt = assignedAt;
         this.report = report;
+    }
+
+    public void setStatus(MaintenanceStatus status) {
+        this.status = status;
     }
 }

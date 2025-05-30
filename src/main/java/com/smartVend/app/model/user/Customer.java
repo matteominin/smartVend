@@ -16,9 +16,6 @@ public class Customer implements Serializable {
     @Column(nullable = false)
     public double balance;
 
-    public Customer() {
-    }
-
     public Customer(User user, double balance) {
         this.user = user;
         this.balance = balance;

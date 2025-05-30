@@ -6,7 +6,7 @@ import com.smartvend.app.model.user.User;
 public class UserService {
     private UserDao userDao;
 
-    public UserService(UserDao userDao) {
+    UserService(UserDao userDao) {
         this.userDao = userDao;
     }
 

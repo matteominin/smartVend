@@ -21,9 +21,6 @@ public class MaintenanceReport implements Serializable {
     @JoinColumn(name = "machine_id")
     public VendingMachine machine;
 
-    public MaintenanceReport() {
-    }
-
     public MaintenanceReport(String issueDescription, Instant issueDate, VendingMachine machine) {
         this.issueDescription = issueDescription;
         this.issueDate = issueDate;
