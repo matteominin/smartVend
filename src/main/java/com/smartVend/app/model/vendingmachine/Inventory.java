@@ -2,6 +2,7 @@ package com.smartvend.app.model.vendingmachine;
 
 import jakarta.persistence.*;
 import java.io.Serializable;
+import java.util.List;
 
 @Entity
 public class Inventory implements Serializable {
@@ -15,17 +16,25 @@ public class Inventory implements Serializable {
 
     @ManyToOne
     @JoinColumn(name = "item_id")
-    public Item item;
+    public List<Item> items;
 
     @Column(nullable = false)
     public int occupiedSpace;
 
-    public Inventory() {
+    public Inventory(long id, ConcreteVendingMachine machine, List<Item> items, int occupiedSpace) {
+        this.id = id;
+        this.machine = machine;
+        this.items = items;
+        this.occupiedSpace = occupiedSpace;
     }
 
-    public Inventory(ConcreteVendingMachine machine, Item item, int occupiedSpace) {
+    public Inventory(ConcreteVendingMachine machine, List<Item> items, int occupiedSpace) {
         this.machine = machine;
-        this.item = item;
+        this.items = items;
         this.occupiedSpace = occupiedSpace;
+    }
+
+    public Long getId() {
+        return id;
     }
 }

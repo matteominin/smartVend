@@ -3,8 +3,6 @@ package com.smartvend.app.model.connection;
 import jakarta.persistence.*;
 import java.io.Serializable;
 import java.time.Instant;
-import com.smartvend.app.model.user.User;
-import com.smartvend.app.model.vendingmachine.VendingMachine;
 
 @Entity
 public class Connection implements Serializable {
@@ -12,13 +10,11 @@ public class Connection implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     public Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id")
-    public User user;
+    @Column(name = "customer_id", nullable = false)
+    public Long customerId;
 
-    @ManyToOne
-    @JoinColumn(name = "machine_id")
-    public VendingMachine machine;
+    @Column(name = "machine_id", nullable = false)
+    public String machineId;
 
     @Column(nullable = false)
     public Instant start;
@@ -26,9 +22,21 @@ public class Connection implements Serializable {
     public Connection() {
     }
 
-    public Connection(User user, VendingMachine machine, Instant start) {
-        this.user = user;
-        this.machine = machine;
+    public Connection(Long customerId, String machineId, Instant start) {
+        this.customerId = customerId;
+        this.machineId = machineId;
         this.start = start;
+    }
+
+    public String getMachineId() {
+        return machineId;
+    }
+
+    public Long getCustomerId() {
+        return customerId;
+    }
+
+    public Instant getConnectionTime() {
+        return start;
     }
 }

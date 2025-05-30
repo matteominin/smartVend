@@ -20,4 +20,12 @@ public class Customer implements Serializable {
         this.user = user;
         this.balance = balance;
     }
+
+    public Long getId() {
+        return user.getId();
+    }
+
+    public double getBalance() {
+        return balance;
+    }
 }

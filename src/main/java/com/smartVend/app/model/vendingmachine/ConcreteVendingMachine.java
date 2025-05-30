@@ -1,9 +1,9 @@
 package com.smartvend.app.model.vendingmachine;
 
 import jakarta.persistence.*;
+
 import java.io.Serializable;
 import java.time.Instant;
-import java.util.List;
 
 @Entity
 public class ConcreteVendingMachine implements Serializable {
@@ -32,20 +32,20 @@ public class ConcreteVendingMachine implements Serializable {
     public MachineStatus status;
 
     @OneToMany(mappedBy = "machine", cascade = CascadeType.ALL)
-    public List<Inventory> items;
-
-    public ConcreteVendingMachine() {
-    }
+    public Inventory inventory;
 
     public ConcreteVendingMachine(String serialNumber, VendingMachine vendingMachine, String location, int capacity,
-            Instant lastMaintenance, Instant createdAt, MachineStatus status, List<Inventory> items) {
+            MachineStatus status, Inventory inventory) {
         this.serialNumber = serialNumber;
         this.vendingMachine = vendingMachine;
         this.location = location;
         this.capacity = capacity;
-        this.lastMaintenance = lastMaintenance;
-        this.createdAt = createdAt;
+        this.createdAt = Instant.now();
         this.status = status;
-        this.items = items;
+        this.inventory = inventory;
+    }
+
+    public String getId() {
+        return serialNumber;
     }
 }

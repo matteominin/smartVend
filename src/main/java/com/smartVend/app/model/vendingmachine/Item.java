@@ -7,7 +7,8 @@ import java.time.Instant;
 @Entity
 public class Item implements Serializable {
     @Id
-    public String id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    public long id;
 
     @Column(nullable = false)
     public String name;
@@ -34,10 +35,7 @@ public class Item implements Serializable {
     @Column(nullable = false)
     public ItemType type;
 
-    public Item() {
-    }
-
-    public Item(String id, String name, String description, int volume, int quantity, double price, Instant createdAt,
+    public Item(long id, String name, String description, int volume, int quantity, double price,
             int position, ItemType type) {
         this.id = id;
         this.name = name;
@@ -45,7 +43,7 @@ public class Item implements Serializable {
         this.volume = volume;
         this.quantity = quantity;
         this.price = price;
-        this.createdAt = createdAt;
+        this.createdAt = Instant.now();
         this.position = position;
         this.type = type;
     }
