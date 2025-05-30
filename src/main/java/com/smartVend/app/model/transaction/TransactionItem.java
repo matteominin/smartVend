@@ -1,9 +1,9 @@
-package com.smartVend.app.model.transaction;
+package com.smartvend.app.model.transaction;
 
 import jakarta.persistence.*;
 import java.io.Serializable;
-import com.smartVend.app.model.vendingmachine.VendingMachine;
-import com.smartVend.app.model.vendingmachine.Item;
+import com.smartvend.app.model.vendingmachine.VendingMachine;
+import com.smartvend.app.model.vendingmachine.Item;
 
 @Entity
 public class TransactionItem implements Serializable {
@@ -26,7 +26,8 @@ public class TransactionItem implements Serializable {
     @Column(nullable = false)
     public int amount;
 
-    public TransactionItem() {}
+    public TransactionItem() {
+    }
 
     public TransactionItem(Transaction transaction, VendingMachine machine, Item item, int amount) {
         this.transaction = transaction;

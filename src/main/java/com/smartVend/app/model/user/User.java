@@ -1,4 +1,4 @@
-package com.smartVend.app.model.user;
+package com.smartvend.app.model.user;
 
 import jakarta.persistence.*;
 import java.io.Serializable;
@@ -16,7 +16,9 @@ public class User implements Serializable {
     @Column(nullable = false)
     public String hashedPassword;
 
-    public User() {}
+    public User() {
+    }
+
     public User(String id, String email, String name, String surname, String hashedPassword) {
         this.id = id;
         this.email = email;

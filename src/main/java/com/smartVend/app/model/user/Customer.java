@@ -1,4 +1,4 @@
-package com.smartVend.app.model.user;
+package com.smartvend.app.model.user;
 
 import jakarta.persistence.*;
 import java.io.Serializable;
@@ -16,7 +16,9 @@ public class Customer implements Serializable {
     @Column(nullable = false)
     public double balance;
 
-    public Customer() {}
+    public Customer() {
+    }
+
     public Customer(User user, double balance) {
         this.user = user;
         this.balance = balance;

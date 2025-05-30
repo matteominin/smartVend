@@ -1,4 +1,4 @@
-package com.smartVend.app.model.vendingmachine;
+package com.smartvend.app.model.vendingmachine;
 
 import jakarta.persistence.*;
 import java.io.Serializable;
@@ -35,9 +35,11 @@ public class Item implements Serializable {
     @Column(nullable = false)
     public ItemType type;
 
-    public Item() {}
+    public Item() {
+    }
 
-    public Item(String id, String name, String description, int volume, int quantity, double price, Date createdAt, int position, ItemType type) {
+    public Item(String id, String name, String description, int volume, int quantity, double price, Date createdAt,
+            int position, ItemType type) {
         this.id = id;
         this.name = name;
         this.description = description;

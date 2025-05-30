@@ -1,10 +1,10 @@
-package com.smartVend.app.model.transaction;
+package com.smartvend.app.model.transaction;
 
 import jakarta.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
-import com.smartVend.app.model.user.Customer;
+import com.smartvend.app.model.user.Customer;
 
 @Entity
 public class Transaction implements Serializable {
@@ -33,9 +33,11 @@ public class Transaction implements Serializable {
     @OneToMany(mappedBy = "transaction", cascade = CascadeType.ALL)
     public List<TransactionItem> transactionItems;
 
-    public Transaction() {}
+    public Transaction() {
+    }
 
-    public Transaction(Customer customer, Date date, PaymentMethod paymentMethod, double initialBalance, double updatedBalance, List<TransactionItem> transactionItems) {
+    public Transaction(Customer customer, Date date, PaymentMethod paymentMethod, double initialBalance,
+            double updatedBalance, List<TransactionItem> transactionItems) {
         this.customer = customer;
         this.date = date;
         this.paymentMethod = paymentMethod;

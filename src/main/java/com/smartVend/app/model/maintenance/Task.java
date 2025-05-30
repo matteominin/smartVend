@@ -1,9 +1,9 @@
-package com.smartVend.app.model.maintenance;
+package com.smartvend.app.model.maintenance;
 
 import jakarta.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
-import com.smartVend.app.model.user.Worker;
+import com.smartvend.app.model.user.Worker;
 
 @Entity
 public class Task implements Serializable {
@@ -31,7 +31,9 @@ public class Task implements Serializable {
     @JoinColumn(name = "report_id")
     public MaintenanceReport report;
 
-    public Task() {}
+    public Task() {
+    }
+
     public Task(Worker worker, Worker supervisor, MaintenanceStatus status, Date assignedAt, MaintenanceReport report) {
         this.worker = worker;
         this.supervisor = supervisor;

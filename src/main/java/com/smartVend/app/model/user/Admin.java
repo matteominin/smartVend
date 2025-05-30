@@ -1,8 +1,7 @@
-package com.smartVend.app.model.user;
+package com.smartvend.app.model.user;
 
 import jakarta.persistence.*;
 import java.io.Serializable;
-
 
 @Entity
 public class Admin implements Serializable {
@@ -14,7 +13,9 @@ public class Admin implements Serializable {
     @JoinColumn(name = "user_id", nullable = false)
     public User user;
 
-    public Admin() {}
+    public Admin() {
+    }
+
     public Admin(User user) {
         this.user = user;
     }

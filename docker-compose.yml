@@ -22,7 +22,7 @@ services:
     working_dir: /workspace
     volumes:
       - ./:/workspace
-    command: mvn clean compile exec:java -Dexec.mainClass="com.smartVend.app.Main"
+    command: mvn clean compile exec:java -Dexec.mainClass="com.smartvend.app.Main"
     environment:
       DB_URL: jdbc:postgresql://db:5432/smartvend
       DB_USER: smartuser

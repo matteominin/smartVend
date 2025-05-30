@@ -1,4 +1,4 @@
-package com.smartVend.app.model.user;
+package com.smartvend.app.model.user;
 
 import jakarta.persistence.*;
 import java.io.Serializable;
@@ -16,7 +16,9 @@ public class Worker implements Serializable {
     @Column(nullable = false)
     public boolean isActive;
 
-    public Worker() {}
+    public Worker() {
+    }
+
     public Worker(User user, boolean isActive) {
         this.user = user;
         this.isActive = isActive;

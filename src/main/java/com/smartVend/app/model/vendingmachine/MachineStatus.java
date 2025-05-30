@@ -1,5 +1,4 @@
-package com.smartVend.app.model.vendingmachine;
-
+package com.smartvend.app.model.vendingmachine;
 
 public enum MachineStatus {
     Operative,

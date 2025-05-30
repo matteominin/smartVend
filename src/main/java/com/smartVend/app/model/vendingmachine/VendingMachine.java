@@ -1,4 +1,4 @@
-package com.smartVend.app.model.vendingmachine;
+package com.smartvend.app.model.vendingmachine;
 
 import jakarta.persistence.*;
 import java.io.Serializable;
@@ -12,7 +12,9 @@ public class VendingMachine implements Serializable {
     @Column(nullable = false)
     public MachineType type;
 
-    public VendingMachine() {}
+    public VendingMachine() {
+    }
+
     public VendingMachine(String modelNumber, MachineType type) {
         this.modelNumber = modelNumber;
         this.type = type;

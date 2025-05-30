@@ -1,9 +1,9 @@
-package com.smartVend.app.model.maintenance;
+package com.smartvend.app.model.maintenance;
 
 import jakarta.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
-import com.smartVend.app.model.vendingmachine.VendingMachine;
+import com.smartvend.app.model.vendingmachine.VendingMachine;
 
 @Entity
 public class MaintenanceReport implements Serializable {
@@ -22,10 +22,12 @@ public class MaintenanceReport implements Serializable {
     @JoinColumn(name = "machine_id")
     public VendingMachine machine;
 
-    public MaintenanceReport() {}
+    public MaintenanceReport() {
+    }
+
     public MaintenanceReport(String issueDescription, Date issueDate, VendingMachine machine) {
         this.issueDescription = issueDescription;
-    this.issueDate = issueDate;
+        this.issueDate = issueDate;
         this.machine = machine;
     }
 }

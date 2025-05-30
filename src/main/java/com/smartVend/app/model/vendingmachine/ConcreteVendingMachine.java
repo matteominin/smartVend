@@ -1,4 +1,4 @@
-package com.smartVend.app.model.vendingmachine;
+package com.smartvend.app.model.vendingmachine;
 
 import jakarta.persistence.*;
 import java.io.Serializable;
@@ -36,9 +36,11 @@ public class ConcreteVendingMachine implements Serializable {
     @OneToMany(mappedBy = "machine", cascade = CascadeType.ALL)
     public List<Inventory> items;
 
-    public ConcreteVendingMachine() {}
+    public ConcreteVendingMachine() {
+    }
 
-    public ConcreteVendingMachine(String serialNumber, VendingMachine vendingMachine, String location, int capacity, Date lastMaintenance, Date createdAt, MachineStatus status, List<Inventory> items) {
+    public ConcreteVendingMachine(String serialNumber, VendingMachine vendingMachine, String location, int capacity,
+            Date lastMaintenance, Date createdAt, MachineStatus status, List<Inventory> items) {
         this.serialNumber = serialNumber;
         this.vendingMachine = vendingMachine;
         this.location = location;

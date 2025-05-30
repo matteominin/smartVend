@@ -1,4 +1,4 @@
-package com.smartVend.app.model.vendingmachine;
+package com.smartvend.app.model.vendingmachine;
 
 import jakarta.persistence.*;
 import java.io.Serializable;
@@ -20,7 +20,8 @@ public class Inventory implements Serializable {
     @Column(nullable = false)
     public int occupiedSpace;
 
-    public Inventory() {}
+    public Inventory() {
+    }
 
     public Inventory(ConcreteVendingMachine machine, Item item, int occupiedSpace) {
         this.machine = machine;

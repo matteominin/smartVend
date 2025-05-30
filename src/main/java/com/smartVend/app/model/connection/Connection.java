@@ -1,10 +1,10 @@
-package com.smartVend.app.model.connection;
+package com.smartvend.app.model.connection;
 
 import jakarta.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
-import com.smartVend.app.model.user.User;
-import com.smartVend.app.model.vendingmachine.VendingMachine;
+import com.smartvend.app.model.user.User;
+import com.smartvend.app.model.vendingmachine.VendingMachine;
 
 @Entity
 public class Connection implements Serializable {
@@ -24,7 +24,9 @@ public class Connection implements Serializable {
     @Column(nullable = false)
     public Date start;
 
-    public Connection() {}
+    public Connection() {
+    }
+
     public Connection(User user, VendingMachine machine, Date start) {
         this.user = user;
         this.machine = machine;

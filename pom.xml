@@ -4,10 +4,10 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.smartVend.app</groupId>
-    <artifactId>smartVend</artifactId>
+    <groupId>com.smartvend.app</groupId>
+    <artifactId>smartvend</artifactId>
     <version>1.0-SNAPSHOT</version>
-    <name>smartVend</name>
+    <name>smartvend</name>
     <url>http://www.example.com</url>
 
     <properties>
