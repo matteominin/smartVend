@@ -32,6 +32,16 @@ public class Task implements Serializable {
     @JoinColumn(name = "report_id")
     public MaintenanceReport report;
 
+    public Task(long id, Worker worker, Admin supervisor, MaintenanceStatus status, Instant assignedAt,
+            MaintenanceReport report) {
+        this.id = id;
+        this.worker = worker;
+        this.supervisor = supervisor;
+        this.status = status;
+        this.assignedAt = assignedAt;
+        this.report = report;
+    }
+
     public Task(Worker worker, Admin supervisor, MaintenanceStatus status, Instant assignedAt,
             MaintenanceReport report) {
         this.worker = worker;
@@ -41,7 +51,15 @@ public class Task implements Serializable {
         this.report = report;
     }
 
+    public MaintenanceStatus getStatus() {
+        return status;
+    }
+
     public void setStatus(MaintenanceStatus status) {
         this.status = status;
+    }
+
+    public Long getId() {
+        return this.id;
     }
 }
