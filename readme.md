@@ -14,7 +14,7 @@ Per avviare il database PostgreSQL tramite Docker Compose:
 docker-compose up
 ```
 
-Questo comando avvierà un container PostgreSQL accessibile sulla porta `5432` con le seguenti credenziali (vedi [`docker-compose.yml`](docker-compose.yml)):
+Questo comando avvierà un container PostgreSQL accessibile sulla porta `5432` con le seguenti credenziali (vedi [`docker-compose.yml`](docker-compose.yml)):z
 - **Database:** smartvend
 - **User:** user
 - **Password:** password
@@ -25,7 +25,7 @@ Per compilare ed eseguire l'applicazione Java:
 
 ```sh
 mvn clean package
-java -cp target/smartVend-1.0-SNAPSHOT.jar com.smartVend.app.Main
+java -cp target/smartVend-1.0-SNAPSHOT.jar com.smartvend.app.Main
 ```
 
 ## Test
