@@ -1,20 +1,38 @@
 package com.smartvend.app.model.transaction;
 
-import com.smartvend.app.model.vendingmachine.Item;;
+import jakarta.persistence.*;
+import java.io.Serializable;
+import com.smartvend.app.model.vendingmachine.VendingMachine;
+import com.smartvend.app.model.vendingmachine.Item;
 
-public class TransactionItem {
-    private String id;
-    private double totalPrice;
-    private Item item;
+@Entity
+public class TransactionItem implements Serializable {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    public Long id;
+
+    @ManyToOne
+    @JoinColumn(name = "transaction_id")
+    public Transaction transaction;
+
+    @ManyToOne
+    @JoinColumn(name = "machine_id")
+    public VendingMachine machine;
+
+    @ManyToOne
+    @JoinColumn(name = "item_id")
+    public Item item;
+
+    @Column(nullable = false)
+    public int amount;
 
     public TransactionItem() {
     }
 
-    public TransactionItem(String id, double totalPrice, Item item) {
-        this.id = id;
-        this.totalPrice = totalPrice;
+    public TransactionItem(Transaction transaction, VendingMachine machine, Item item, int amount) {
+        this.transaction = transaction;
+        this.machine = machine;
         this.item = item;
+        this.amount = amount;
     }
-
-    // Getter e setter qui...
 }

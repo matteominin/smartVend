@@ -1,20 +1,31 @@
 package com.smartvend.app.model.vendingmachine;
 
-import java.util.List;
+import jakarta.persistence.*;
+import java.io.Serializable;
 
-public class Inventory {
-    private String id;
-    private int occupiedSpace;
-    private List<Item> items;
+@Entity
+public class Inventory implements Serializable {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    public Long id;
+
+    @ManyToOne
+    @JoinColumn(name = "machine_id")
+    public ConcreteVendingMachine machine;
+
+    @ManyToOne
+    @JoinColumn(name = "item_id")
+    public Item item;
+
+    @Column(nullable = false)
+    public int occupiedSpace;
 
     public Inventory() {
     }
 
-    public Inventory(String id, int occupiedSpace, List<Item> items) {
-        this.id = id;
+    public Inventory(ConcreteVendingMachine machine, Item item, int occupiedSpace) {
+        this.machine = machine;
+        this.item = item;
         this.occupiedSpace = occupiedSpace;
-        this.items = items;
     }
-
-    // Getter e setter qui...
 }

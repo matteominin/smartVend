@@ -1,29 +1,44 @@
 package com.smartvend.app.model.maintenance;
 
-import com.smartvend.app.model.user.Worker;
-import com.smartvend.app.model.user.Admin;
+import jakarta.persistence.*;
+import java.io.Serializable;
 import java.util.Date;
+import com.smartvend.app.model.user.Worker;
 
-public class Task {
-    private String id;
-    private Date assignedAt;
-    private Worker worker;
-    private Admin supervisor;
-    private MaintenanceStatus status;
-    private MaintenanceReport report;
+@Entity
+public class Task implements Serializable {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    public Long id;
+
+    @ManyToOne
+    @JoinColumn(name = "worker_id")
+    public Worker worker;
+
+    @ManyToOne
+    @JoinColumn(name = "supervisor_id")
+    public Worker supervisor;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    public MaintenanceStatus status;
+
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(nullable = false)
+    public Date assignedAt;
+
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "report_id")
+    public MaintenanceReport report;
 
     public Task() {
     }
 
-    public Task(String id, Date assignedAt, Worker worker, Admin supervisor, MaintenanceStatus status,
-            MaintenanceReport report) {
-        this.id = id;
-        this.assignedAt = assignedAt;
+    public Task(Worker worker, Worker supervisor, MaintenanceStatus status, Date assignedAt, MaintenanceReport report) {
         this.worker = worker;
         this.supervisor = supervisor;
         this.status = status;
+        this.assignedAt = assignedAt;
         this.report = report;
     }
-
-    // Getter e setter qui...
 }
