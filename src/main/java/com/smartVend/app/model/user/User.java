@@ -4,8 +4,7 @@ import jakarta.persistence.*;
 import java.io.Serializable;
 
 @Entity
-@Inheritance(strategy = InheritanceType.JOINED)
-public abstract class User implements Serializable {
+public class User implements Serializable {
     @Id
     public String id;
     @Column(nullable = false, unique = true)

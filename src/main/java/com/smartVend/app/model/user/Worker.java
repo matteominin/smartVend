@@ -1,18 +1,23 @@
 package com.smartVend.app.model.user;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
+import jakarta.persistence.*;
 
 @Entity
-public class Worker extends User {
+public class Worker implements Serializable {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    public Long id;
+
+    @ManyToOne
+    @JoinColumn(name = "user_id", nullable = false)
+    public User user;
 
     @Column(nullable = false)
     public boolean isActive;
 
     public Worker() {}
-
-    public Worker(String id, String email, String name, String surname, String hashedPassword, boolean isActive) {
-        super(id, email, name, surname, hashedPassword);
+    public Worker(User user, boolean isActive) {
+        this.user = user;
         this.isActive = isActive;
     }
 }

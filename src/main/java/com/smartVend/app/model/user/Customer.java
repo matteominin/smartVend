@@ -1,16 +1,23 @@
 package com.smartVend.app.model.user;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
+import jakarta.persistence.*;
 
 @Entity
-public class Customer extends User {
+public class Customer implements Serializable {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    public Long id;
+
+    @ManyToOne
+    @JoinColumn(name = "user_id", nullable = false)
+    public User user;
+
     @Column(nullable = false)
     public double balance;
 
     public Customer() {}
-    public Customer(String id, String email, String name, String surname, String hashedPassword, double balance) {
-        super(id, email, name, surname, hashedPassword);
+    public Customer(User user, double balance) {
+        this.user = user;
         this.balance = balance;
     }
 }

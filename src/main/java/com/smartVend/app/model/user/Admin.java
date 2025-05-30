@@ -1,12 +1,19 @@
 package com.smartVend.app.model.user;
 
-import jakarta.persistence.Entity;
-
+import jakarta.persistence.*;
 
 @Entity
-public class Admin extends User {
+public class Admin implements Serializable {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    public Long id;
+
+    @ManyToOne
+    @JoinColumn(name = "user_id", nullable = false)
+    public User user;
+
     public Admin() {}
-    public Admin(String id, String email, String name, String surname, String hashedPassword) {
-        super(id, email, name, surname, hashedPassword);
+    public Admin(User user) {
+        this.user = user;
     }
 }
