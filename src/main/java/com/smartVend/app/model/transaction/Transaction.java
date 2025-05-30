@@ -32,6 +32,15 @@ public class Transaction implements Serializable {
     @OneToMany(mappedBy = "transaction", cascade = CascadeType.ALL)
     public List<TransactionItem> transactionItems;
 
+    public Transaction(Customer customer, PaymentMethod paymentMethod, double initialBalance,
+            double updatedBalance, List<TransactionItem> transactionItems) {
+        this.customer = customer;
+        this.paymentMethod = paymentMethod;
+        this.initialBalance = initialBalance;
+        this.updatedBalance = updatedBalance;
+        this.transactionItems = transactionItems;
+    }
+
     public Transaction(long id, Customer customer, PaymentMethod paymentMethod, double initialBalance,
             double updatedBalance, List<TransactionItem> transactionItems) {
         this.id = id;

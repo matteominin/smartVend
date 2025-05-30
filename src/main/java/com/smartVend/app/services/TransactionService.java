@@ -8,4 +8,8 @@ public class TransactionService {
     public List<Transaction> getCustomerTransactions(long customerId) {
         return null;
     }
+
+    public Transaction createTransaction(Transaction transaction) {
+        return null;
+    }
 }

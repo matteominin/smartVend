@@ -7,4 +7,12 @@ public class ItemDao {
     public List<Item> getInventoryItems(long inventoryId) {
         return null;
     }
+
+    public Item getItemById(long itemId) {
+        return null;
+    }
+
+    public Item updateItem(Item item) {
+        return null;
+    }
 }

@@ -19,13 +19,14 @@ public class Connection implements Serializable {
     @Column(nullable = false)
     public Instant start;
 
-    public Connection() {
-    }
-
     public Connection(Long customerId, String machineId, Instant start) {
         this.customerId = customerId;
         this.machineId = machineId;
         this.start = start;
+    }
+
+    public Long getId() {
+        return id;
     }
 
     public String getMachineId() {
