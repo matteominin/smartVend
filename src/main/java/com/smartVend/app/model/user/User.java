@@ -6,7 +6,8 @@ import java.io.Serializable;
 @Entity
 public class User implements Serializable {
     @Id
-    public String id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    public Long id;
     @Column(nullable = false, unique = true)
     public String email;
     @Column(nullable = false)
@@ -14,16 +15,24 @@ public class User implements Serializable {
     @Column(nullable = false)
     public String surname;
     @Column(nullable = false)
-    public String hashedPassword;
+    public String password;
 
-    public User() {
-    }
-
-    public User(String id, String email, String name, String surname, String hashedPassword) {
+    public User(long id, String email, String name, String surname, String password) {
         this.id = id;
         this.email = email;
         this.name = name;
         this.surname = surname;
-        this.hashedPassword = hashedPassword;
+        this.password = password;
+    }
+
+    public User(String email, String name, String surname, String password) {
+        this.email = email;
+        this.name = name;
+        this.surname = surname;
+        this.password = password;
+    }
+
+    public String getPassword() {
+        return password;
     }
 }
