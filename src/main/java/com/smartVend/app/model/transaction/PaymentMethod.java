@@ -1,5 +1,4 @@
-package com.smartVend.app.model;
-
+package com.smartVend.app.model.transaction;
 
 public enum PaymentMethod {
     Card,
