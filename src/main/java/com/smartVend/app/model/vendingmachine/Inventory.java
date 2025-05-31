@@ -41,4 +41,20 @@ public class Inventory implements Serializable {
     public Long getId() {
         return id;
     }
+
+    public List<Item> getItems() {
+        return items;
+    }
+
+    public void addItem(Item item) {
+        if (this.items != null) {
+            this.items.add(item);
+        }
+    }
+
+    public void removeItem(Item item) {
+        if (this.items != null) {
+            this.items.remove(item);
+        }
+    }
 }
