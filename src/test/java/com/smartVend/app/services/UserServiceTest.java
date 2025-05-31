@@ -3,17 +3,16 @@ package com.smartvend.app.services;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import static org.mockito.ArgumentMatchers.any;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
-
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import com.smartvend.app.dao.impl.UserDaoImpl;
@@ -43,9 +42,9 @@ public class UserServiceTest {
         when(userDao.getUserByEmail(email)).thenReturn(mockUser);
         User loggedInUser = userService.logIn(email, password);
         assertNotNull(loggedInUser);
-        assertEquals(email, loggedInUser.email);
-        assertEquals("John", loggedInUser.name);
-        assertEquals("Doe", loggedInUser.surname);
+        assertEquals(email, loggedInUser.getEmail());
+        assertEquals("John", loggedInUser.getName());
+        assertEquals("Doe", loggedInUser.getSurname());
         assertEquals(password, loggedInUser.getPassword());
 
         verify(userDao, times(1)).getUserByEmail(email);
@@ -97,9 +96,9 @@ public class UserServiceTest {
 
         User signedUpUser = userService.signUp(email, name, surname, password);
         assertNotNull(signedUpUser);
-        assertEquals(email, signedUpUser.email);
-        assertEquals(name, signedUpUser.name);
-        assertEquals(surname, signedUpUser.surname);
+        assertEquals(email, signedUpUser.getEmail());
+        assertEquals(name, signedUpUser.getName());
+        assertEquals(surname, signedUpUser.getSurname());
         assertEquals(password, signedUpUser.getPassword());
         verify(userDao, times(1)).getUserByEmail(email);
         verify(userDao, times(1)).createUser(any(User.class));

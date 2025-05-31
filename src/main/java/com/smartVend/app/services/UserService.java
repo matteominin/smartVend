@@ -37,7 +37,7 @@ public class UserService {
     public void logOut(long userId) throws IllegalArgumentException {
         User user = userDao.getUserById(userId);
         if (user != null) {
-            System.out.println("User " + user.email + " logged out successfully.");
+            System.out.println("User " + user.getEmail() + " logged out successfully.");
         } else {
             throw new IllegalArgumentException("User not found");
         }

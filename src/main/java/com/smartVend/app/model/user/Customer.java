@@ -1,21 +1,25 @@
 package com.smartvend.app.model.user;
 
-import jakarta.persistence.*;
 import java.io.Serializable;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 
 @Entity
 public class Customer implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    public Long id;
-
+    private Long id;
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
-    public User user;
-
+    private User user;
     @Column(nullable = false)
-    public double balance;
-
+    private double balance;
     public Customer() {
         // Default constructor for JPA
     }
@@ -37,6 +41,18 @@ public class Customer implements Serializable {
 
     public double getBalance() {
         return this.balance;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 
     public void setBalance(double balance) {

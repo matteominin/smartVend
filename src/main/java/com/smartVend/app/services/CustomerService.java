@@ -1,5 +1,13 @@
 package com.smartvend.app.services;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import com.smartvend.app.dao.impl.ConcreteVendingMachineDaoImpl;
+import com.smartvend.app.dao.impl.ConnectionDaoImpl;
+import com.smartvend.app.dao.impl.CustomerDaoImpl;
+import com.smartvend.app.dao.impl.InventoryDaoImpl;
+import com.smartvend.app.dao.impl.ItemDaoImpl;
 import com.smartvend.app.model.connection.Connection;
 import com.smartvend.app.model.transaction.PaymentMethod;
 import com.smartvend.app.model.transaction.Transaction;
@@ -8,15 +16,6 @@ import com.smartvend.app.model.user.Customer;
 import com.smartvend.app.model.vendingmachine.ConcreteVendingMachine;
 import com.smartvend.app.model.vendingmachine.Inventory;
 import com.smartvend.app.model.vendingmachine.Item;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import com.smartvend.app.dao.impl.ConcreteVendingMachineDaoImpl;
-import com.smartvend.app.dao.impl.ConnectionDaoImpl;
-import com.smartvend.app.dao.impl.InventoryDaoImpl;
-import com.smartvend.app.dao.impl.ItemDaoImpl;
-import com.smartvend.app.dao.impl.CustomerDaoImpl;
 
 public class CustomerService {
     private CustomerDaoImpl customerDao;
@@ -55,7 +54,7 @@ public class CustomerService {
             throw new IllegalArgumentException("Inventory not found");
         }
 
-        List<Item> items = itemDao.getInventoryItems(inventory.id);
+        List<Item> items = itemDao.getInventoryItems(inventory.getId());
         if (items == null || items.isEmpty()) {
             throw new IllegalArgumentException("No items found in inventory");
         }

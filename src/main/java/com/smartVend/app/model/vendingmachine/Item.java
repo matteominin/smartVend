@@ -1,40 +1,38 @@
 package com.smartvend.app.model.vendingmachine;
 
-import jakarta.persistence.*;
 import java.io.Serializable;
 import java.time.Instant;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 
 @Entity
 public class Item implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    public long id;
-
+    private long id;
     @Column(nullable = false)
-    public String name;
-
+    private String name;
     @Column(nullable = false)
-    public String description;
-
+    private String description;
     @Column(nullable = false)
-    public int volume;
-
+    private int volume;
     @Column(nullable = false)
-    public int quantity;
-
+    private int quantity;
     @Column(nullable = false)
-    public double price;
-
+    private double price;
     @Column(nullable = false)
-    public Instant createdAt;
-
+    private Instant createdAt;
     @Column(nullable = false)
-    public int position;
-
+    private int position;
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    public ItemType type;
-
+    private ItemType type;
     public Item() {
         // Default constructor for JPA
         this.createdAt = Instant.now();
@@ -76,4 +74,53 @@ public class Item implements Serializable {
     public String getName() {
         return name;
     }
+
+    public void setId(long id) {
+        this.id = id;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public int getVolume() {
+        return volume;
+    }
+
+    public void setVolume(int volume) {
+        this.volume = volume;
+    }
+
+    public void setPrice(double price) {
+        this.price = price;
+    }
+
+    public Instant getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(Instant createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public void setPosition(int position) {
+        this.position = position;
+    }
+
+    public ItemType getType() {
+        return type;
+    }
+
+    public void setType(ItemType type) {
+        this.type = type;
+    }
+    
 }

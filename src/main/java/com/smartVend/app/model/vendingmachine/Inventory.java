@@ -1,26 +1,29 @@
 package com.smartvend.app.model.vendingmachine;
 
-import jakarta.persistence.*;
 import java.io.Serializable;
 import java.util.List;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 
 @Entity
 public class Inventory implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    public Long id;
-
+    private Long id;
     @ManyToOne
     @JoinColumn(name = "machine_id")
-    public ConcreteVendingMachine machine;
-
+    private ConcreteVendingMachine machine;
     @ManyToOne
     @JoinColumn(name = "item_id")
-    public List<Item> items;
-
+    private List<Item> items;
     @Column(nullable = false)
-    public int occupiedSpace;
-
+    private int occupiedSpace;
     public Inventory() {
         // Default constructor for JPA
     }
@@ -57,4 +60,29 @@ public class Inventory implements Serializable {
             this.items.remove(item);
         }
     }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public ConcreteVendingMachine getMachine() {
+        return machine;
+    }
+
+    public void setMachine(ConcreteVendingMachine machine) {
+        this.machine = machine;
+    }
+
+    public void setItems(List<Item> items) {
+        this.items = items;
+    }
+
+    public int getOccupiedSpace() {
+        return occupiedSpace;
+    }
+
+    public void setOccupiedSpace(int occupiedSpace) {
+        this.occupiedSpace = occupiedSpace;
+    }
+    
 }

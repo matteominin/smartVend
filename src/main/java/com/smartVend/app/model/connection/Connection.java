@@ -1,24 +1,25 @@
 package com.smartvend.app.model.connection;
 
-import jakarta.persistence.*;
 import java.io.Serializable;
 import java.time.Instant;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 
 @Entity
 public class Connection implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    public Long id;
-
+    private Long id;
     @Column(name = "customer_id", nullable = false)
-    public Long customerId;
-
+    private Long customerId;
     @Column(name = "machine_id", nullable = false)
-    public String machineId;
-
+    private String machineId;
     @Column(nullable = false)
-    public Instant start;
-
+    private Instant start;
     public Connection() {
         // Default constructor for JPA
         this.start = Instant.now();
@@ -45,4 +46,25 @@ public class Connection implements Serializable {
     public Instant getConnectionTime() {
         return start;
     }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public void setCustomerId(Long customerId) {
+        this.customerId = customerId;
+    }
+
+    public void setMachineId(String machineId) {
+        this.machineId = machineId;
+    }
+
+    public Instant getStart() {
+        return start;
+    }
+
+    public void setStart(Instant start) {
+        this.start = start;
+    }
+    
 }
