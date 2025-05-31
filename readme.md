@@ -1,45 +1,25 @@
-# smartVend
+## Avvio dell'applicazione
 
-## Requisiti
+1. **Copia il file di esempio delle variabili d'ambiente:**
 
-- [Docker](https://www.docker.com/get-started)
-- [Java](https://adoptium.net/)
-- [Maven](https://maven.apache.org/)
+   ```sh
+   cp .env.example .env
+   ```
 
-## Avvio del Database
+   Modifica il file `.env` secondo le tue esigenze (ad esempio, credenziali del database).
 
-Per avviare il database PostgreSQL tramite Docker Compose:
+2. **Avvia tutti i servizi (database, backend, ecc.) con Docker Compose:**
 
-```sh
-docker-compose up
-```
+   ```sh
+   docker-compose up
+   ```
 
-Questo comando avvierà un container PostgreSQL accessibile sulla porta `5432` con le seguenti credenziali (vedi [`docker-compose.yml`](docker-compose.yml)):z
-- **Database:** smartvend
-- **User:** user
-- **Password:** password
+   Questo comando utilizzerà le variabili definite in `.env` per configurare i container.
 
-## Avvio rapido con Docker Compose
+3. **Per fermare i servizi:**
 
-Per avviare l'intera applicazione (database e backend) tramite Docker Compose, esegui:
+   ```sh
+   docker-compose down
+   ```
 
-```sh
-docker-compose up
-```
-
-Questo comando avvierà sia il database PostgreSQL sia l'applicazione Java, secondo la configurazione presente in [`docker-compose.yml`](docker-compose.yml).  
-L'applicazione sarà accessibile secondo le impostazioni delle porte definite nel file di compose.
-
-Per fermare i servizi, premi `Ctrl+C` oppure esegui:
-
-```sh
-docker-compose down
-```
-
-## Test
-
-Per eseguire i test:
-
-```sh
-mvn test
-```
+Assicurati di aver creato e configurato il file `.env` prima di avviare Docker Compose.
