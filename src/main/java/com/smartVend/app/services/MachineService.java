@@ -9,6 +9,7 @@ import com.smartvend.app.dao.impl.MaintenanceDaoImpl;
 import com.smartvend.app.model.maintenance.MaintenanceReport;
 import com.smartvend.app.model.vendingmachine.ConcreteVendingMachine;
 import com.smartvend.app.model.vendingmachine.Item;
+import com.smartvend.app.model.vendingmachine.MachineStatus;
 
 public class MachineService {
 
@@ -55,7 +56,7 @@ public class MachineService {
         return report;
     }
 
-    public String runSelfDiagnostic(String machineId, boolean hasIssue) {
+    public MaintenanceReport runSelfDiagnostic(String machineId, boolean hasIssue) {
         if (machineDao == null || maintenanceDao == null) {
             throw new IllegalStateException("Required DAOs are not initialized");
         }
@@ -71,21 +72,21 @@ public class MachineService {
                     machine);
 
             this.reportIssue(report);
-            return "Issue detected during self-diagnostic for machine " + machineId
-                    + ". Maintenance report created.";
+            return report;
         }
-
-        return "Self-diagnostic completed successfully for machine " + machineId;
+        return null;
     }
 
-    public String getStatus(long machineId) {
+    public MachineStatus getStatus(String machineId) {
         if (machineDao == null) {
             throw new IllegalStateException("MachineDao is not initialized");
         }
-        if (machineId <= 0) {
-            throw new IllegalArgumentException("Invalid machine ID");
+        ConcreteVendingMachine machine = machineDao.findById(machineId);
+        if (machine == null) {
+            throw new IllegalArgumentException("Machine with ID " + machineId + " does not exist");
         }
+        MachineStatus status = machine.getStatus();
 
-        return "Machine " + machineId + " is online and operational";
+        return status;
     }
 }

@@ -17,6 +17,7 @@ import com.smartvend.app.dao.impl.MaintenanceDaoImpl;
 import com.smartvend.app.model.vendingmachine.ConcreteVendingMachine;
 import com.smartvend.app.model.vendingmachine.Item;
 import com.smartvend.app.model.vendingmachine.ItemType;
+import com.smartvend.app.model.vendingmachine.MachineStatus;
 
 public class MachinesServiceTest {
     @Mock
@@ -93,8 +94,8 @@ public class MachinesServiceTest {
         ConcreteVendingMachine machine = new ConcreteVendingMachine("SN123", null, "Main Hall", 50, null, null);
         when(machineDao.findById("SN123")).thenReturn(machine);
 
-        String result = machineService.runSelfDiagnostic("SN123", false);
-        assertEquals("Self-diagnostic completed successfully for machine SN123", result);
+        MaintenanceReport result = machineService.runSelfDiagnostic("SN123", false);
+        assertEquals(null, result);
     }
 
     @Test
@@ -105,23 +106,17 @@ public class MachinesServiceTest {
                 "Main Hall", 50, null, null);
         when(machineDao.findById("SN123")).thenReturn(machine);
 
-        String result = machineService.runSelfDiagnostic("SN123", true);
-        assertEquals("Issue detected during self-diagnostic for machine SN123. Maintenance report created.",
-                result);
+        MaintenanceReport result = machineService.runSelfDiagnostic("SN123", true);
+        assertEquals("Self-diagnostic issue detected", result.getIssueDescription());
     }
 
     @Test
     @DisplayName("Test getStatus with valid machine ID")
     public void testGetStatusWithValidMachineId() {
-        String status = machineService.getStatus(123L);
-        assertEquals("Machine 123 is online and operational", status);
-    }
-
-    @Test
-    @DisplayName("Test getStatus with invalid machine ID (zero)")
-    public void testGetStatusWithZeroMachineId() {
-        org.junit.jupiter.api.Assertions.assertThrows(IllegalArgumentException.class, () -> {
-            machineService.getStatus(0L);
-        });
+        ConcreteVendingMachine machine = new ConcreteVendingMachine("123", null, "Location A", 50,
+                MachineStatus.Operative, null);
+        when(machineDao.findById("123")).thenReturn(machine);
+        MachineStatus status = machineService.getStatus("123");
+        assertEquals(MachineStatus.Operative, status);
     }
 }

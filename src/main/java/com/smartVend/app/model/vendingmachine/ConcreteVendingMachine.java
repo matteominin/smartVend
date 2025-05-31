@@ -55,4 +55,8 @@ public class ConcreteVendingMachine implements Serializable {
     public String getId() {
         return serialNumber;
     }
+
+    public MachineStatus getStatus() {
+        return status;
+    }
 }
