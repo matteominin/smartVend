@@ -3,6 +3,7 @@ package com.smartvend.app.dao;
 import com.smartvend.app.dao.impl.InventoryDaoImpl;
 import com.smartvend.app.model.vendingmachine.Inventory;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.NoResultException;
 import jakarta.persistence.TypedQuery;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -47,5 +48,18 @@ class InventoryDaoImplTest {
         verify(entityManager).createQuery(contains("machineId"), eq(Inventory.class));
         verify(query).setParameter("machineId", machineId);
         verify(query).getSingleResult();
+    }
+
+    @Test
+    void getMachineInventory_throwsExceptionIfNotFound() {
+        String machineId = "NOT_EXIST";
+        @SuppressWarnings("unchecked")
+        TypedQuery<Inventory> query = (TypedQuery<Inventory>) mock(TypedQuery.class);
+
+        when(entityManager.createQuery(anyString(), eq(Inventory.class))).thenReturn(query);
+        when(query.setParameter(eq("machineId"), eq(machineId))).thenReturn(query);
+        when(query.getSingleResult()).thenThrow(new NoResultException());
+
+        assertThrows(NoResultException.class, () -> inventoryDao.getMachineInventory(machineId));
     }
 }

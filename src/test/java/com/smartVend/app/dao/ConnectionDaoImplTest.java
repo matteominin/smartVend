@@ -1,5 +1,18 @@
 package com.smartvend.app.dao;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import com.smartvend.app.dao.impl.ConnectionDaoImpl;
 import com.smartvend.app.model.connection.Connection;
 import com.smartvend.app.model.user.Customer;
@@ -7,11 +20,6 @@ import com.smartvend.app.model.user.User;
 import com.smartvend.app.model.vendingmachine.ConcreteVendingMachine;
 
 import jakarta.persistence.EntityManager;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-
-import static org.mockito.Mockito.*;
-import static org.junit.jupiter.api.Assertions.*;
 
 class ConnectionDaoImplTest {
 
@@ -67,4 +75,48 @@ class ConnectionDaoImplTest {
         connectionDao.deleteConnection(20L);
         verify(entityManager, never()).remove(any());
     }
+
+    @Test
+    void getConnectionById_returnsConnection() {
+        Connection connection = mock(Connection.class);
+        when(entityManager.find(Connection.class, 1L)).thenReturn(connection);
+
+        Connection result = connectionDao.getConnectionById(1L);
+
+        assertNotNull(result);
+        assertEquals(connection, result);
+    }
+
+    @Test
+    void getConnectionById_returnsNullIfNotFound() {
+        when(entityManager.find(Connection.class, 2L)).thenReturn(null);
+
+        Connection result = connectionDao.getConnectionById(2L);
+
+        assertNull(result);
+    }
+
+    @Test
+    void createConnection_throwsException_ifCustomerNotFound() {
+        when(entityManager.find(Customer.class, customer.getId())).thenReturn(null);
+
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+            connectionDao.createConnection(customer.getId(), machine.getId());
+        });
+
+        assertTrue(exception.getMessage().contains("User not found"));
+    }
+
+    @Test
+    void createConnection_throwsException_ifMachineNotFound() {
+        when(entityManager.find(Customer.class, customer.getId())).thenReturn(customer);
+        when(entityManager.find(ConcreteVendingMachine.class, machine.getId())).thenReturn(null);
+
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+            connectionDao.createConnection(customer.getId(), machine.getId());
+        });
+
+        assertTrue(exception.getMessage().contains("Machine not found"));
+    }
+
 }
