@@ -23,8 +23,7 @@ import org.mockito.MockitoAnnotations;
 import com.smartvend.app.model.maintenance.MaintenanceReport;
 import com.smartvend.app.model.maintenance.MaintenanceStatus;
 import com.smartvend.app.dao.impl.TaskDaoImpl;
-import com.smartvend.app.model.vendingmachine.MachineType;
-import com.smartvend.app.model.vendingmachine.VendingMachine;
+import com.smartvend.app.model.vendingmachine.ConcreteVendingMachine;
 import com.smartvend.app.model.user.*;
 import com.smartvend.app.model.maintenance.Task;
 
@@ -37,7 +36,7 @@ public class WorkerServiceTest {
 
     private Worker workerMock;
     private Admin adminMock;
-    private VendingMachine vendingMachineMock;
+    private ConcreteVendingMachine vendingMachineMock;
     private MaintenanceReport maintenanceReportMock;
 
     @BeforeEach
@@ -47,7 +46,7 @@ public class WorkerServiceTest {
                 new User(1L, "email1@example.com", "workerName", "workerSurname", "workerPassword"));
         adminMock = new Admin(
                 new User(2L, "email2@example.com", "adminName", "adminSurname", "adminPassword"));
-        vendingMachineMock = new VendingMachine("123", MachineType.Snack);
+        vendingMachineMock = new ConcreteVendingMachine();
         maintenanceReportMock = new MaintenanceReport("Test issue", Instant.now(), vendingMachineMock);
     }
 

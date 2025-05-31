@@ -3,7 +3,8 @@ package com.smartvend.app.model.maintenance;
 import jakarta.persistence.*;
 import java.io.Serializable;
 import java.time.Instant;
-import com.smartvend.app.model.vendingmachine.VendingMachine;
+
+import com.smartvend.app.model.vendingmachine.ConcreteVendingMachine;
 
 @Entity
 public class MaintenanceReport implements Serializable {
@@ -19,16 +20,20 @@ public class MaintenanceReport implements Serializable {
 
     @ManyToOne
     @JoinColumn(name = "machine_id")
-    public VendingMachine machine;
+    public ConcreteVendingMachine machine;
 
     public MaintenanceReport() {
         // Default constructor for JPA
         this.issueDate = Instant.now();
     }
 
-    public MaintenanceReport(String issueDescription, Instant issueDate, VendingMachine machine) {
+    public MaintenanceReport(String issueDescription, Instant issueDate, ConcreteVendingMachine machine) {
         this.issueDescription = issueDescription;
         this.issueDate = issueDate;
         this.machine = machine;
+    }
+
+    public String getMachineId() {
+        return machine != null ? machine.getId() : null;
     }
 }

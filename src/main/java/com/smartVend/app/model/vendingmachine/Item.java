@@ -68,4 +68,12 @@ public class Item implements Serializable {
     public void setQuantity(int quantity) {
         this.quantity = quantity;
     }
+
+    public int getPosition() {
+        return position;
+    }
+
+    public String getName() {
+        return name;
+    }
 }

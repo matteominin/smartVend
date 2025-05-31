@@ -14,7 +14,8 @@ public class MaintenanceDaoImpl implements MaintenanceDao {
 
     @Override
     @Transactional
-    public void createReport(MaintenanceReport report) {
+    public MaintenanceReport createReport(MaintenanceReport report) {
         entityManager.persist(report);
+        return report;
     }
 }
