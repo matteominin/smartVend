@@ -134,13 +134,13 @@ class InventoryServiceTest {
     void getItemsInInventory_success() {
         String machineId = "machine1";
         Inventory inventory = new Inventory();
-        inventory.id = 42L;
+        inventory.setId(42L); // <<--- CAMBIATO
         Item item1 = new Item();
         Item item2 = new Item();
         List<Item> items = Arrays.asList(item1, item2);
 
         when(inventoryDao.getMachineInventory(machineId)).thenReturn(inventory);
-        when(itemDao.getInventoryItems(inventory.id)).thenReturn(items);
+        when(itemDao.getInventoryItems(inventory.getId())).thenReturn(items); // <<--- CAMBIATO
 
         List<Item> result = inventoryService.getItemsInInventory(machineId);
 
@@ -162,10 +162,10 @@ class InventoryServiceTest {
     void getItemsInInventory_noItemsFound() {
         String machineId = "machine1";
         Inventory inventory = new Inventory();
-        inventory.id = 42L;
+        inventory.setId(42L); // <<--- CAMBIATO
 
         when(inventoryDao.getMachineInventory(machineId)).thenReturn(inventory);
-        when(itemDao.getInventoryItems(inventory.id)).thenReturn(Collections.emptyList());
+        when(itemDao.getInventoryItems(inventory.getId())).thenReturn(Collections.emptyList()); // <<--- CAMBIATO
 
         IllegalArgumentException ex = assertThrows(IllegalArgumentException.class,
                 () -> inventoryService.getItemsInInventory(machineId));

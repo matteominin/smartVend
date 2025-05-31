@@ -1,8 +1,9 @@
 package com.smartvend.app.services;
 
 import java.util.List;
-import com.smartvend.app.model.maintenance.MaintenanceStatus;
+
 import com.smartvend.app.dao.TaskDao;
+import com.smartvend.app.model.maintenance.MaintenanceStatus;
 import com.smartvend.app.model.maintenance.Task;
 
 public class WorkerService {
@@ -25,7 +26,7 @@ public class WorkerService {
         if (status == null) {
             throw new IllegalArgumentException("Status cannot be null");
         }
-        if (task.status == MaintenanceStatus.Completed) {
+        if (task.getStatus() == MaintenanceStatus.Completed) {
             throw new IllegalStateException("Cannot change status of a completed task");
         }
 

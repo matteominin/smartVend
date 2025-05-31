@@ -1,37 +1,40 @@
 package com.smartvend.app.model.maintenance;
 
-import jakarta.persistence.*;
 import java.io.Serializable;
 import java.time.Instant;
 
 import com.smartvend.app.model.user.Admin;
 import com.smartvend.app.model.user.Worker;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+
 @Entity
 public class Task implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    public Long id;
-
+    private Long id;
     @ManyToOne
     @JoinColumn(name = "worker_id")
-    public Worker worker;
-
+    private Worker worker;
     @ManyToOne
     @JoinColumn(name = "supervisor_id")
-    public Admin supervisor;
-
+    private Admin supervisor;
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    public MaintenanceStatus status;
-
+    private MaintenanceStatus status;
     @Column(nullable = false)
-    public Instant assignedAt;
-
+    private Instant assignedAt;
     @ManyToOne(optional = false)
     @JoinColumn(name = "report_id")
-    public MaintenanceReport report;
-
+    private MaintenanceReport report;
     public Task() {
         // Default constructor for JPA
         this.assignedAt = Instant.now();
@@ -75,4 +78,37 @@ public class Task implements Serializable {
     public MaintenanceStatus getStatus() {
         return status;
     }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public void setWorker(Worker worker) {
+        this.worker = worker;
+    }
+
+    public Admin getSupervisor() {
+        return supervisor;
+    }
+
+    public void setSupervisor(Admin supervisor) {
+        this.supervisor = supervisor;
+    }
+
+    public Instant getAssignedAt() {
+        return assignedAt;
+    }
+
+    public void setAssignedAt(Instant assignedAt) {
+        this.assignedAt = assignedAt;
+    }
+
+    public MaintenanceReport getReport() {
+        return report;
+    }
+
+    public void setReport(MaintenanceReport report) {
+        this.report = report;
+    }
+    
 }

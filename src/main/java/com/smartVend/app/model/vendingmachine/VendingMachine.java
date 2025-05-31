@@ -1,17 +1,20 @@
 package com.smartvend.app.model.vendingmachine;
 
-import jakarta.persistence.*;
 import java.io.Serializable;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.Id;
 
 @Entity
 public class VendingMachine implements Serializable {
     @Id
-    public String modelNumber;
-
+    private String modelNumber;
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    public MachineType type;
-
+    private MachineType type;
     public VendingMachine() {
         // Default constructor for JPA
     }
@@ -20,4 +23,22 @@ public class VendingMachine implements Serializable {
         this.modelNumber = modelNumber;
         this.type = type;
     }
+
+    public String getModelNumber() {
+        return modelNumber;
+    }
+
+    public void setModelNumber(String modelNumber) {
+        this.modelNumber = modelNumber;
+    }
+
+    public MachineType getType() {
+        return type;
+    }
+
+    public void setType(MachineType type) {
+        this.type = type;
+    }
+
+    
 }

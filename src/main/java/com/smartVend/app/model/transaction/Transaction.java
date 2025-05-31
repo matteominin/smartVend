@@ -1,10 +1,22 @@
 package com.smartvend.app.model.transaction;
 
-import jakarta.persistence.*;
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.List;
+
 import com.smartvend.app.model.user.Customer;
+
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 
 @Entity
 public class Transaction implements Serializable {
@@ -14,24 +26,18 @@ public class Transaction implements Serializable {
 
     @ManyToOne
     @JoinColumn(name = "customer_id")
-    public Customer customer;
-
+    private Customer customer;
     @Column(nullable = false)
-    public Instant date;
-
+    private Instant date;
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    public PaymentMethod paymentMethod;
-
+    private PaymentMethod paymentMethod;
     @Column(nullable = false)
-    public double initialBalance;
-
+    private double initialBalance;
     @Column(nullable = false)
-    public double updatedBalance;
-
+    private double updatedBalance;
     @OneToMany(mappedBy = "transaction", cascade = CascadeType.ALL)
-    public List<TransactionItem> transactionItems;
-
+    private List<TransactionItem> transactionItems;
     public Transaction() {
         // Default constructor for JPA
         this.date = Instant.now();
@@ -61,4 +67,61 @@ public class Transaction implements Serializable {
     public Long getCustomerId() {
         return customer != null ? customer.getId() : null;
     }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public Customer getCustomer() {
+        return customer;
+    }
+
+    public void setCustomer(Customer customer) {
+        this.customer = customer;
+    }
+
+    public Instant getDate() {
+        return date;
+    }
+
+    public void setDate(Instant date) {
+        this.date = date;
+    }
+
+    public PaymentMethod getPaymentMethod() {
+        return paymentMethod;
+    }
+
+    public void setPaymentMethod(PaymentMethod paymentMethod) {
+        this.paymentMethod = paymentMethod;
+    }
+
+    public double getInitialBalance() {
+        return initialBalance;
+    }
+
+    public void setInitialBalance(double initialBalance) {
+        this.initialBalance = initialBalance;
+    }
+
+    public double getUpdatedBalance() {
+        return updatedBalance;
+    }
+
+    public void setUpdatedBalance(double updatedBalance) {
+        this.updatedBalance = updatedBalance;
+    }
+
+    public List<TransactionItem> getTransactionItems() {
+        return transactionItems;
+    }
+
+    public void setTransactionItems(List<TransactionItem> transactionItems) {
+        this.transactionItems = transactionItems;
+    }
+    
 }

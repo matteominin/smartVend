@@ -51,7 +51,7 @@ public class InventoryService {
         if (inventory == null) {
             throw new IllegalArgumentException("Inventory not found for machine: " + machineId);
         }
-        List<Item> items = itemDao.getInventoryItems(inventory.id);
+        List<Item> items = itemDao.getInventoryItems(inventory.getId());
         if (items == null || items.isEmpty()) {
             throw new IllegalArgumentException("No items found in inventory for machine: " + machineId);
         }

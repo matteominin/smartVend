@@ -1,39 +1,39 @@
 package com.smartvend.app.model.vendingmachine;
 
-import jakarta.persistence.*;
-
 import java.io.Serializable;
 import java.time.Instant;
+
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 
 @Entity
 public class ConcreteVendingMachine implements Serializable {
     @Id
     @Column(nullable = false, unique = true)
-    public String serialNumber;
-
+    private String serialNumber;
     @ManyToOne
     @JoinColumn(name = "vending_machine_model")
-    public VendingMachine vendingMachine;
-
+    private VendingMachine vendingMachine;
     @Column(nullable = false)
-    public String location;
-
+    private String location;
     @Column(nullable = false)
-    public int capacity;
-
+    private int capacity;
     @Column(nullable = false)
-    public Instant lastMaintenance;
-
+    private Instant lastMaintenance;
     @Column(nullable = false)
-    public Instant createdAt;
-
+    private Instant createdAt;
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    public MachineStatus status;
-
+    private MachineStatus status;
     @OneToMany(mappedBy = "machine", cascade = CascadeType.ALL)
-    public Inventory inventory;
-
+    private Inventory inventory;
     public ConcreteVendingMachine() {
         // Default constructor for JPA
         this.createdAt = Instant.now();
@@ -59,4 +59,65 @@ public class ConcreteVendingMachine implements Serializable {
     public MachineStatus getStatus() {
         return status;
     }
+
+    public String getSerialNumber() {
+        return serialNumber;
+    }
+
+    public void setSerialNumber(String serialNumber) {
+        this.serialNumber = serialNumber;
+    }
+
+    public VendingMachine getVendingMachine() {
+        return vendingMachine;
+    }
+
+    public void setVendingMachine(VendingMachine vendingMachine) {
+        this.vendingMachine = vendingMachine;
+    }
+
+    public String getLocation() {
+        return location;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
+    }
+
+    public int getCapacity() {
+        return capacity;
+    }
+
+    public void setCapacity(int capacity) {
+        this.capacity = capacity;
+    }
+
+    public Instant getLastMaintenance() {
+        return lastMaintenance;
+    }
+
+    public void setLastMaintenance(Instant lastMaintenance) {
+        this.lastMaintenance = lastMaintenance;
+    }
+
+    public Instant getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(Instant createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public void setStatus(MachineStatus status) {
+        this.status = status;
+    }
+
+    public Inventory getInventory() {
+        return inventory;
+    }
+
+    public void setInventory(Inventory inventory) {
+        this.inventory = inventory;
+    }
+    
 }
