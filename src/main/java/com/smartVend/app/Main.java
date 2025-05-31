@@ -7,7 +7,6 @@ public class Main {
         try {
             DatabaseInitializer.initializeDatabase();
             System.out.println("SmartVend application started successfully!");
-
         } catch (Exception e) {
             System.err.println("Application failed to start: " + e.getMessage());
             e.printStackTrace();
