@@ -10,29 +10,44 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 
 @Entity
 public class Item implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
+
     @Column(nullable = false)
     private String name;
+
     @Column(nullable = false)
     private String description;
+
     @Column(nullable = false)
     private int volume;
+
     @Column(nullable = false)
     private int quantity;
+
     @Column(nullable = false)
     private double price;
+
     @Column(nullable = false)
     private Instant createdAt;
+
     @Column(nullable = false)
     private int position;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private ItemType type;
+
+    @ManyToOne
+    @JoinColumn(name = "inventory_id", nullable = false)
+    private Inventory inventory;
+
     public Item() {
         // Default constructor for JPA
         this.createdAt = Instant.now();
@@ -122,5 +137,5 @@ public class Item implements Serializable {
     public void setType(ItemType type) {
         this.type = type;
     }
-    
+
 }

@@ -1,8 +1,10 @@
 package com.smartvend.app.model.vendingmachine;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -10,6 +12,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 
 @Entity
 public class Inventory implements Serializable {
@@ -19,11 +22,11 @@ public class Inventory implements Serializable {
     @ManyToOne
     @JoinColumn(name = "machine_id")
     private ConcreteVendingMachine machine;
-    @ManyToOne
-    @JoinColumn(name = "item_id")
-    private List<Item> items;
+    @OneToMany(mappedBy = "inventory", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Item> items = new ArrayList<>();
     @Column(nullable = false)
     private int occupiedSpace;
+
     public Inventory() {
         // Default constructor for JPA
     }
@@ -84,5 +87,5 @@ public class Inventory implements Serializable {
     public void setOccupiedSpace(int occupiedSpace) {
         this.occupiedSpace = occupiedSpace;
     }
-    
+
 }

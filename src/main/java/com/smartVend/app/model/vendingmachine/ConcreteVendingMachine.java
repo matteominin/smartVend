@@ -11,7 +11,7 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 
 @Entity
 public class ConcreteVendingMachine implements Serializable {
@@ -32,8 +32,9 @@ public class ConcreteVendingMachine implements Serializable {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private MachineStatus status;
-    @OneToMany(mappedBy = "machine", cascade = CascadeType.ALL)
+    @OneToOne(mappedBy = "machine", cascade = CascadeType.ALL)
     private Inventory inventory;
+
     public ConcreteVendingMachine() {
         // Default constructor for JPA
         this.createdAt = Instant.now();
@@ -119,5 +120,5 @@ public class ConcreteVendingMachine implements Serializable {
     public void setInventory(Inventory inventory) {
         this.inventory = inventory;
     }
-    
+
 }

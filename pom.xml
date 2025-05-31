@@ -13,6 +13,9 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.release>17</maven.compiler.release>
+        <jakarta.jsonb-api.version>3.0.0</jakarta.jsonb-api.version>
+        <jakarta.xml.bind-api.version>4.0.0</jakarta.xml.bind-api.version>
+        <hibernate.version>6.5.2.Final</hibernate.version>
     </properties>
 
     <dependencyManagement>
@@ -59,10 +62,39 @@
             <artifactId>jakarta.transaction-api</artifactId>
             <version>2.0.1</version>
         </dependency>
+
+        <dependency>
+            <groupId>jakarta.json.bind</groupId>
+            <artifactId>jakarta.json.bind-api</artifactId>
+            <version>${jakarta.jsonb-api.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>jakarta.xml.bind</groupId>
+            <artifactId>jakarta.xml.bind-api</artifactId>
+            <version>${jakarta.xml.bind-api.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.hibernate.orm</groupId>
+            <artifactId>hibernate-core</artifactId>
+            <version>${hibernate.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>42.7.3</version>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse</groupId>
+            <artifactId>yasson</artifactId>
+            <version>3.0.4</version>
+            <scope>compile</scope>
+        </dependency>
     </dependencies>
 
     <build>
-        <plugins> <plugin>
+        <plugins>
+            <plugin>
                 <artifactId>maven-clean-plugin</artifactId>
                 <version>3.4.0</version>
             </plugin>
@@ -123,7 +155,7 @@
                             </excludes>
                         </configuration>
                     </execution>
-                    </executions>
+                </executions>
             </plugin>
         </plugins>
     </build>

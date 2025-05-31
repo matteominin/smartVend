@@ -19,13 +19,21 @@ Questo comando avvierà un container PostgreSQL accessibile sulla porta `5432` c
 - **User:** user
 - **Password:** password
 
-## Build ed Esecuzione dell'Applicazione
+## Avvio rapido con Docker Compose
 
-Per compilare ed eseguire l'applicazione Java:
+Per avviare l'intera applicazione (database e backend) tramite Docker Compose, esegui:
 
 ```sh
-mvn clean package
-java -cp target/smartVend-1.0-SNAPSHOT.jar com.smartvend.app.Main
+docker-compose up
+```
+
+Questo comando avvierà sia il database PostgreSQL sia l'applicazione Java, secondo la configurazione presente in [`docker-compose.yml`](docker-compose.yml).  
+L'applicazione sarà accessibile secondo le impostazioni delle porte definite nel file di compose.
+
+Per fermare i servizi, premi `Ctrl+C` oppure esegui:
+
+```sh
+docker-compose down
 ```
 
 ## Test
