@@ -10,7 +10,7 @@ import com.smartvend.app.model.user.Customer;
 public class Transaction implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    public Long id;
+    private Long id;
 
     @ManyToOne
     @JoinColumn(name = "customer_id")
@@ -44,6 +44,7 @@ public class Transaction implements Serializable {
         this.initialBalance = initialBalance;
         this.updatedBalance = updatedBalance;
         this.transactionItems = transactionItems;
+        this.date = Instant.now();
     }
 
     public Transaction(long id, Customer customer, PaymentMethod paymentMethod, double initialBalance,
@@ -54,5 +55,10 @@ public class Transaction implements Serializable {
         this.initialBalance = initialBalance;
         this.updatedBalance = updatedBalance;
         this.transactionItems = transactionItems;
+        this.date = Instant.now();
+    }
+
+    public Long getCustomerId() {
+        return customer != null ? customer.getId() : null;
     }
 }
