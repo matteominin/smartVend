@@ -29,4 +29,17 @@ public class ConcreteVendingMachineDaoImpl implements ConcreteVendingMachineDao 
         entityManager.persist(machine);
         return machine;
     }
+
+    @Override
+    public ConcreteVendingMachine updateMachine(ConcreteVendingMachine machine) {
+        return entityManager.merge(machine);
+    }
+
+    @Override
+    public void deleteMachine(String id) {
+        ConcreteVendingMachine machine = entityManager.find(ConcreteVendingMachine.class, id);
+        if (machine != null) {
+            entityManager.remove(machine);
+        }
+    }
 }

@@ -6,5 +6,14 @@ import com.smartvend.app.model.user.Worker;
 
 public interface WorkerDao {
     Worker getWorkerById(String workerId);
-    List<Worker> findAllActive();
+
+    Worker getWorkerByEmail(String email);
+
+    Worker createWorker(Worker worker);
+
+    Worker updateWorker(Worker worker);
+
+    void deleteWorker(Long id);
+
+    List<Worker> findAllWorkers();
 }

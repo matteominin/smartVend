@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
@@ -54,11 +55,9 @@ public class WorkerServiceTest {
     @Test
     @DisplayName("Test getWorkerTasks method success")
     public void testGetWorkerTasksSuccess() {
-        Task task1 = new Task(workerMock, adminMock, MaintenanceStatus.Assigned, Instant.now(),
-                maintenanceReportMock);
+        Task task1 = mock(Task.class);
 
-        Task task2 = new Task(workerMock, adminMock, MaintenanceStatus.InProgress, Instant.now().plusSeconds(3600),
-                maintenanceReportMock);
+        Task task2 = mock(Task.class);
 
         List<Task> tasks = List.of(task1, task2);
         when(taskDao.getTasksForWorker(workerMock.getId())).thenReturn(tasks);

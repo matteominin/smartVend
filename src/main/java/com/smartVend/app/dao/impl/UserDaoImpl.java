@@ -15,9 +15,9 @@ public class UserDaoImpl implements UserDao {
     @Override
     public User getUserByEmail(String email) {
         return entityManager.createQuery(
-            "SELECT u FROM User u WHERE u.email = :email", User.class)
-            .setParameter("email", email)
-            .getSingleResult();
+                "SELECT u FROM User u WHERE u.email = :email", User.class)
+                .setParameter("email", email)
+                .getSingleResult();
     }
 
     @Override
@@ -30,5 +30,26 @@ public class UserDaoImpl implements UserDao {
     @Override
     public User getUserById(Long userId) {
         return entityManager.find(User.class, userId);
+    }
+
+    @Override
+    public java.util.List<User> findAll() {
+        return entityManager.createQuery("SELECT u FROM User u", User.class)
+                .getResultList();
+    }
+
+    @Override
+    @Transactional
+    public User updateUser(User user) {
+        return entityManager.merge(user);
+    }
+
+    @Override
+    @Transactional
+    public void deleteUser(Long userId) {
+        User user = entityManager.find(User.class, userId);
+        if (user != null) {
+            entityManager.remove(user);
+        }
     }
 }

@@ -17,9 +17,37 @@ public class WorkerDaoImpl implements WorkerDao {
     }
 
     @Override
-    public List<Worker> findAllActive() {
+    public List<Worker> findAllWorkers() {
         return entityManager.createQuery(
-                "SELECT w FROM Worker w WHERE w.isActive = true", Worker.class)
+                "SELECT w FROM Worker w", Worker.class)
                 .getResultList();
+    }
+
+    @Override
+    public Worker getWorkerByEmail(String email) {
+        List<Worker> results = entityManager.createQuery(
+                "SELECT w FROM Worker w WHERE w.email = :email", Worker.class)
+                .setParameter("email", email)
+                .getResultList();
+        return results.isEmpty() ? null : results.get(0);
+    }
+
+    @Override
+    public Worker createWorker(Worker worker) {
+        entityManager.persist(worker);
+        return worker;
+    }
+
+    @Override
+    public Worker updateWorker(Worker worker) {
+        return entityManager.merge(worker);
+    }
+
+    @Override
+    public void deleteWorker(Long id) {
+        Worker worker = entityManager.find(Worker.class, id);
+        if (worker != null) {
+            entityManager.remove(worker);
+        }
     }
 }

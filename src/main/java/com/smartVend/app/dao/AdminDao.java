@@ -6,5 +6,14 @@ import com.smartvend.app.model.user.Admin;
 
 public interface AdminDao {
     Admin getAdminById(String adminId);
+
     List<Admin> findAll();
+
+    Admin getAdminByEmail(String email);
+
+    Admin createAdmin(Admin admin);
+
+    Admin updateAdmin(Admin admin);
+
+    void deleteAdmin(Long id);
 }

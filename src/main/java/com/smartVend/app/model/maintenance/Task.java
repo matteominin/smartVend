@@ -47,12 +47,12 @@ public class Task implements Serializable {
         this.report = report;
     }
 
-    public Task(Worker worker, Admin supervisor, MaintenanceStatus status, Instant assignedAt,
+    public Task(Admin supervisor, Worker worker,
             MaintenanceReport report) {
         this.worker = worker;
         this.supervisor = supervisor;
-        this.status = status;
-        this.assignedAt = assignedAt;
+        this.status = MaintenanceStatus.Assigned;
+        this.assignedAt = Instant.now();
         this.report = report;
     }
 

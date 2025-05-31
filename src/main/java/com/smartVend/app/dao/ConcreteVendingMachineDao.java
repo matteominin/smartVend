@@ -10,4 +10,8 @@ public interface ConcreteVendingMachineDao {
     ConcreteVendingMachine findById(String id);
 
     List<ConcreteVendingMachine> findAll();
+
+    ConcreteVendingMachine updateMachine(ConcreteVendingMachine machine);
+
+    void deleteMachine(String id);
 }

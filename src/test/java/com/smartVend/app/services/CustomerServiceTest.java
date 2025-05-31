@@ -120,8 +120,8 @@ public class CustomerServiceTest {
                 2L,
                 mockCustomer,
                 PaymentMethod.Cash,
-                30.0, // Changed from 30 to 30.0
-                25.0, // Changed from 25 to 25.0
+                30.0,
+                25.0,
                 null);
     }
 

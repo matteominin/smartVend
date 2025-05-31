@@ -9,5 +9,7 @@ public interface TaskDao {
 
     List<Task> getTasksForWorker(long workerId);
 
-    void updateTask(Task task);
+    Task updateTask(Task task);
+
+    Task createTask(Task task);
 }

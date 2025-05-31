@@ -21,7 +21,6 @@ public class TaskDaoImpl implements TaskDao {
 
     @Override
     public List<Task> getTasksForWorker(long workerId) {
-        // Assumiamo che Task abbia: @ManyToOne Worker worker -> worker.id
         return entityManager.createQuery(
                 "SELECT t FROM Task t WHERE t.worker.id = :workerId", Task.class)
                 .setParameter("workerId", workerId)
@@ -30,7 +29,14 @@ public class TaskDaoImpl implements TaskDao {
 
     @Override
     @Transactional
-    public void updateTask(Task task) {
-        entityManager.merge(task);
+    public Task updateTask(Task task) {
+        return entityManager.merge(task);
+    }
+
+    @Override
+    @Transactional
+    public Task createTask(Task task) {
+        entityManager.persist(task);
+        return task;
     }
 }

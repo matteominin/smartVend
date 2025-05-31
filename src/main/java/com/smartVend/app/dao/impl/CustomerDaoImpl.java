@@ -19,8 +19,14 @@ public class CustomerDaoImpl implements CustomerDao {
     }
 
     @Override
-    public void updateCustomer(Customer customer) {
-        entityManager.merge(customer);
+    public Customer createCustomer(Customer customer) {
+        entityManager.persist(customer);
+        return customer;
+    }
+
+    @Override
+    public Customer updateCustomer(Customer customer) {
+        return entityManager.merge(customer);
     }
 
     @Override
@@ -28,5 +34,13 @@ public class CustomerDaoImpl implements CustomerDao {
         return entityManager.createQuery(
                 "SELECT c FROM Customer c", Customer.class)
                 .getResultList();
+    }
+
+    @Override
+    public void deleteCustomer(long customerId) {
+        Customer customer = entityManager.find(Customer.class, customerId);
+        if (customer != null) {
+            entityManager.remove(customer);
+        }
     }
 }
