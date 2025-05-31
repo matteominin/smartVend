@@ -16,7 +16,7 @@ public class WorkerService {
         return taskDao.getTasksForWorker(workerId);
     }
 
-    public void changeTaskStatus(long taskId, MaintenanceStatus status) {
+    public boolean changeTaskStatus(long taskId, MaintenanceStatus status) {
         Task task = taskDao.getTaskById(taskId);
 
         if (task == null) {
@@ -30,6 +30,7 @@ public class WorkerService {
         }
 
         task.setStatus(status);
-        taskDao.updateTask(task);
+        Task updatedTask = taskDao.updateTask(task);
+        return updatedTask != null;
     }
 }

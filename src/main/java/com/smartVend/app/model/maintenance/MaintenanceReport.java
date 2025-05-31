@@ -36,4 +36,8 @@ public class MaintenanceReport implements Serializable {
     public String getMachineId() {
         return machine != null ? machine.getId() : null;
     }
+
+    public String getIssueDescription() {
+        return issueDescription;
+    }
 }

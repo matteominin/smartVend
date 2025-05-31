@@ -43,4 +43,17 @@ public class User implements Serializable {
     public String getPassword() {
         return this.password;
     }
+
+    public String getEmail() {
+        return this.email;
+    }
+
+    public String getName() {
+        return this.name;
+    }
+
+    public String getSurname() {
+        return this.surname;
+    }
+
 }

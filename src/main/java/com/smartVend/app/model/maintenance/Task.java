@@ -56,15 +56,23 @@ public class Task implements Serializable {
         this.report = report;
     }
 
-    public MaintenanceStatus getStatus() {
-        return status;
-    }
-
     public void setStatus(MaintenanceStatus status) {
         this.status = status;
     }
 
     public Long getId() {
         return this.id;
+    }
+
+    public Worker getWorker() {
+        return worker;
+    }
+
+    public String getDescription() {
+        return report.getIssueDescription();
+    }
+
+    public MaintenanceStatus getStatus() {
+        return status;
     }
 }

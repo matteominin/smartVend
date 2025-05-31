@@ -23,4 +23,8 @@ public class Worker implements Serializable {
     public Long getId() {
         return user.getId();
     }
+
+    public String getFullName() {
+        return user.getName() + " " + user.getSurname();
+    }
 }
