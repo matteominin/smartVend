@@ -1,13 +1,11 @@
-version: '3.8'
-
 services:
   db:
     image: postgres:16
     container_name: smartvend-db
     environment:
-      POSTGRES_DB: smartvend
-      POSTGRES_USER: smartuser
-      POSTGRES_PASSWORD: smartpass
+      POSTGRES_DB: javabrew
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
     ports:
       - "5434:5432"
     volumes:
@@ -23,9 +21,9 @@ services:
       - ./:/workspace
     command: mvn clean compile exec:java -Dexec.mainClass="com.smartvend.app.Main"
     environment:
-      DB_URL: jdbc:postgresql://db:5432/smartvend
-      DB_USER: smartuser
-      DB_PASS: smartpass
+      DB_URL: jdbc:postgresql://db:5432/javabrew
+      DB_USER: postgres
+      DB_PASS: postgres
 
   # (opzionale) Adminer per DB browser
   adminer:

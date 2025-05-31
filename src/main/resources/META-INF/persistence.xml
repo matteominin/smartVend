@@ -6,11 +6,11 @@
     <persistence-unit name="smartvendPU" transaction-type="RESOURCE_LOCAL">
         <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
         <class>com.smartvend.app.model.user.User</class>
-        <!-- puoi aggiungere qui altre classi @Entity, oppure usa "exclude-unlisted-classes" -->
+        <class>com.smartvend.app.model.user.Admin</class>
         <exclude-unlisted-classes>false</exclude-unlisted-classes>
         <properties>
             <property name="jakarta.persistence.jdbc.driver" value="org.postgresql.Driver"/>
-            <property name="jakarta.persistence.jdbc.url" value="jdbc:postgresql://localhost:5432/javabrew"/>
+            <property name="jakarta.persistence.jdbc.url" value="jdbc:postgresql://db:5432/javabrew"/>
             <property name="jakarta.persistence.jdbc.user" value="postgres"/>
             <property name="jakarta.persistence.jdbc.password" value="postgres"/>
             <property name="hibernate.hbm2ddl.auto" value="update"/>

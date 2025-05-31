@@ -67,7 +67,8 @@ class AdminDaoImplTest {
 
     @Test
     void getAdminByEmail_returnsAdmin_whenFound() {
-        TypedQuery<Admin> query = mock(TypedQuery.class);
+        @SuppressWarnings("unchecked")
+        TypedQuery<Admin> query = (TypedQuery<Admin>) mock(TypedQuery.class);
         Admin admin = new Admin(new User(null, null, null, null));
         when(entityManager.createQuery(anyString(), eq(Admin.class))).thenReturn(query);
         when(query.setParameter(eq("email"), eq("test@example.com"))).thenReturn(query);
@@ -81,6 +82,7 @@ class AdminDaoImplTest {
 
     @Test
     void getAdminByEmail_returnsNull_whenNotFound() {
+        @SuppressWarnings("unchecked")
         TypedQuery<Admin> query = mock(TypedQuery.class);
         when(entityManager.createQuery(anyString(), eq(Admin.class))).thenReturn(query);
         when(query.setParameter(eq("email"), any())).thenReturn(query);
