@@ -1,11 +1,12 @@
 package com.smartvend.app.dao.impl;
 
+import java.util.List;
+
 import com.smartvend.app.dao.WorkerDao;
 import com.smartvend.app.model.user.Worker;
+
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
-
-import java.util.List;
 
 public class WorkerDaoImpl implements WorkerDao {
     private final EntityManagerFactory emf;
@@ -40,7 +41,7 @@ public class WorkerDaoImpl implements WorkerDao {
         EntityManager em = emf.createEntityManager();
         try {
             List<Worker> results = em.createQuery(
-                    "SELECT w FROM Worker w WHERE w.email = :email", Worker.class)
+                    "SELECT w FROM Worker w WHERE w.user.email = :email", Worker.class)
                     .setParameter("email", email)
                     .getResultList();
             return results.isEmpty() ? null : results.get(0);
