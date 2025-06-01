@@ -6,24 +6,89 @@ import com.smartvend.app.model.transaction.PaymentMethod;
 import com.smartvend.app.model.user.Customer;
 import com.smartvend.app.model.user.User;
 
-import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityManagerFactory;
+import jakarta.persistence.EntityTransaction;
 import jakarta.persistence.Persistence;
+import jakarta.persistence.TypedQuery;
 
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 
 import java.time.Instant;
 import java.util.Collections;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.*;
 
 class TransactionDaoImplTest {
 
+    /*──────────────────────────── UNIT TESTS (Mockito) ───────────────────────────*/
+    @Nested
+    class Unit {
+
+        @Mock EntityManagerFactory emf;
+        @Mock EntityManager em;
+        @Mock EntityTransaction tx;
+        @InjectMocks TransactionDaoImpl dao;
+
+        @BeforeEach
+        void setUp() {
+            MockitoAnnotations.openMocks(this);
+            when(emf.createEntityManager()).thenReturn(em);
+            when(em.getTransaction()).thenReturn(tx);
+        }
+
+        @Test
+        void createTransaction_persistsTransaction() {
+            Transaction transaction = mock(Transaction.class);
+            when(tx.isActive()).thenReturn(false);
+
+            Transaction result = dao.createTransaction(transaction);
+
+            verify(em).persist(transaction);
+            verify(tx).begin();
+            verify(tx).commit();
+            assertEquals(transaction, result);
+        }
+
+        @Test
+        void createTransaction_rollsBackOnException() {
+            Transaction transaction = mock(Transaction.class);
+            doThrow(new RuntimeException("fail")).when(em).persist(transaction);
+            when(tx.isActive()).thenReturn(true);
+
+            assertThrows(RuntimeException.class, () -> dao.createTransaction(transaction));
+            verify(tx).rollback();
+        }
+
+        @Test
+        void getTransactionsByCustomer_returnsList() {
+            long customerId = 123;
+            @SuppressWarnings("unchecked")
+            TypedQuery<Transaction> query = (TypedQuery<Transaction>) mock(TypedQuery.class);
+            when(em.createQuery(anyString(), eq(Transaction.class))).thenReturn(query);
+            when(query.setParameter(eq("customerId"), eq(customerId))).thenReturn(query);
+            when(query.getResultList()).thenReturn(Collections.emptyList());
+
+            List<Transaction> result = dao.getTransactionsByCustomer(customerId);
+            assertTrue(result.isEmpty());
+            verify(em).createQuery(contains("customerId"), eq(Transaction.class));
+            verify(query).setParameter("customerId", customerId);
+            verify(query).getResultList();
+        }
+    }
+
+    /*──────────────────────────── INTEGRATION TESTS (H2) ─────────────────────────*/
     @Nested
     class Integration {
 
