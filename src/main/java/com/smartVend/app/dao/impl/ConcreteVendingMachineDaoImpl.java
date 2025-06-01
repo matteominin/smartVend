@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.smartvend.app.dao.ConcreteVendingMachineDao;
 import com.smartvend.app.model.vendingmachine.ConcreteVendingMachine;
+import com.smartvend.app.model.vendingmachine.MachineStatus;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
@@ -17,21 +18,21 @@ public class ConcreteVendingMachineDaoImpl implements ConcreteVendingMachineDao 
     }
 
     @Override
-    public List<ConcreteVendingMachine> findAll() {
+    public ConcreteVendingMachine findById(String id) {
         EntityManager em = emf.createEntityManager();
         try {
-            return em.createQuery("SELECT v FROM ConcreteVendingMachine v", ConcreteVendingMachine.class)
-                    .getResultList();
+            return em.find(ConcreteVendingMachine.class, id);
         } finally {
             em.close();
         }
     }
 
     @Override
-    public ConcreteVendingMachine findById(String id) {
+    public List<ConcreteVendingMachine> findAll() {
         EntityManager em = emf.createEntityManager();
         try {
-            return em.find(ConcreteVendingMachine.class, id);
+            return em.createQuery("SELECT v FROM ConcreteVendingMachine v", ConcreteVendingMachine.class)
+                    .getResultList();
         } finally {
             em.close();
         }
@@ -88,6 +89,34 @@ public class ConcreteVendingMachineDaoImpl implements ConcreteVendingMachineDao 
                 em.getTransaction().rollback();
             }
             throw e;
+        } finally {
+            em.close();
+        }
+    }
+
+    @Override
+    public List<ConcreteVendingMachine> findByStatus(MachineStatus status) {
+        EntityManager em = emf.createEntityManager();
+        try {
+            return em.createQuery(
+                    "SELECT v FROM ConcreteVendingMachine v WHERE v.status = :status",
+                    ConcreteVendingMachine.class)
+                    .setParameter("status", status)
+                    .getResultList();
+        } finally {
+            em.close();
+        }
+    }
+
+    @Override
+    public List<ConcreteVendingMachine> findByLocation(String location) {
+        EntityManager em = emf.createEntityManager();
+        try {
+            return em.createQuery(
+                    "SELECT v FROM ConcreteVendingMachine v WHERE v.location = :location",
+                    ConcreteVendingMachine.class)
+                    .setParameter("location", location)
+                    .getResultList();
         } finally {
             em.close();
         }

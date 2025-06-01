@@ -28,6 +28,13 @@ public class Worker implements Serializable {
         // Default constructor for JPA
     }
 
+    public Worker(long id, User user) {
+        this.id = id;
+        this.user = user;
+        this.user.role = Role.Worker;
+        this.isActive = true;
+    }
+
     public Worker(User user) {
         this.user = user;
         this.user.role = Role.Worker;
@@ -35,7 +42,7 @@ public class Worker implements Serializable {
     }
 
     public Long getId() {
-        return user.getId();
+        return id;
     }
 
     public User getUser() {

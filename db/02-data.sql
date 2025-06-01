@@ -75,7 +75,6 @@ INSERT INTO TransactionItem (amount, item_id, transaction_id, machine_id) VALUES
 (1, (SELECT id FROM Item WHERE name = 'Bottled Water' LIMIT 1), (SELECT id FROM Transaction WHERE initialBalance = 50.25 LIMIT 1), 'COFFEE-LA-001'),
 (1, (SELECT id FROM Item WHERE name = 'Pepperoni Pizza' LIMIT 1), (SELECT id FROM Transaction WHERE initialBalance = 25.00 LIMIT 1), 'PIZZONE-CHI-001');
 
--- Insert data into Connection
-INSERT INTO Connection (customer_id, start, machine_id) VALUES
-((SELECT id FROM Customer WHERE user_id = (SELECT id FROM app_user WHERE email = 'customer1@example.com')), '2024-05-28 13:58:00', 'SNACK-NYC-001'),
-((SELECT id FROM Customer WHERE user_id = (SELECT id FROM app_user WHERE email = 'customer2@example.com')), '2024-05-28 14:13:00', 'COFFEE-LA-001');
+INSERT INTO Connection (user_id, start, machine_id) VALUES
+((SELECT user_id FROM Customer WHERE user_id = (SELECT id FROM app_user WHERE email = 'customer1@example.com')), '2024-05-28 13:58:00', 'SNACK-NYC-001'),
+((SELECT user_id FROM Customer WHERE user_id = (SELECT id FROM app_user WHERE email = 'customer2@example.com')), '2024-05-28 14:13:00', 'COFFEE-LA-001');

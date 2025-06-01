@@ -141,7 +141,7 @@ public class CustomerServiceTest {
         Connection resultConnection = customerService.connect(customerId, machineId);
 
         assertNotNull(resultConnection);
-        assertEquals(customerId, resultConnection.getCustomerId());
+        assertEquals(customerId, resultConnection.getUserId());
         assertEquals(machineId, resultConnection.getMachineId());
         assertNotNull(resultConnection.getConnectionTime());
 

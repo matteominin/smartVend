@@ -17,8 +17,8 @@ public class WorkerService {
         this.workerDao = workerDao;
     }
 
-    public Worker getWorkerById(long workerId) {
-        Worker worker = workerDao.getWorkerById(workerId);
+    public Worker getWorkerByUserId(long userId) {
+        Worker worker = workerDao.getWorkerByUserId(userId);
         if (worker == null) {
             throw new IllegalArgumentException("Worker not found");
         }

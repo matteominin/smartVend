@@ -43,7 +43,7 @@ public class WorkerServiceTest {
     @BeforeEach
     public void setUp() {
         MockitoAnnotations.openMocks(this);
-        workerMock = new Worker(
+        workerMock = new Worker(2L,
                 new User(1L, "email1@example.com", "workerName", "workerSurname", "workerPassword"));
         adminMock = new Admin(
                 new User(2L, "email2@example.com", "adminName", "adminSurname", "adminPassword"));

@@ -20,11 +20,11 @@ public class WorkerController {
         this.taskService = taskService;
     }
 
-    public Worker getWorker(long workerId) {
-        if (workerId <= 0) {
+    public Worker getWorkerByUserId(long userId) {
+        if (userId <= 0) {
             throw new IllegalArgumentException("Worker ID must be positive");
         }
-        return workerService.getWorkerById(workerId);
+        return workerService.getWorkerByUserId(userId);
     }
 
     public List<Task> getTasks(long workerId) {

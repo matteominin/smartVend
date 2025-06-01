@@ -71,6 +71,7 @@ public class TaskDaoImpl implements TaskDao {
             query.setParameter("workerId", workerId);
             return query.getResultList();
         } finally {
+            System.out.println("Retrieving tasks for worker ID: " + workerId);
             em.close();
         }
     }

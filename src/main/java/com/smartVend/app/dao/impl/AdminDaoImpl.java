@@ -1,11 +1,12 @@
 package com.smartvend.app.dao.impl;
 
+import java.util.List;
+
 import com.smartvend.app.dao.AdminDao;
 import com.smartvend.app.model.user.Admin;
+
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
-
-import java.util.List;
 
 public class AdminDaoImpl implements AdminDao {
     private final EntityManagerFactory emf;
@@ -40,7 +41,7 @@ public class AdminDaoImpl implements AdminDao {
         EntityManager em = emf.createEntityManager();
         try {
             List<Admin> admins = em.createQuery(
-                    "SELECT a FROM Admin a WHERE a.email = :email", Admin.class)
+                    "SELECT a FROM Admin a WHERE a.user.email = :email", Admin.class)
                     .setParameter("email", email)
                     .getResultList();
             return admins.isEmpty() ? null : admins.get(0);

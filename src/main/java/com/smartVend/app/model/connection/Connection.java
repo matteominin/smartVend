@@ -14,57 +14,37 @@ public class Connection implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(name = "customer_id", nullable = false)
-    private Long customerId;
+
+    @Column(name = "user_id", nullable = false)
+    private Long userId;
+
     @Column(name = "machine_id", nullable = false)
     private String machineId;
+
     @Column(nullable = false)
     private Instant start;
+
     public Connection() {
-        // Default constructor for JPA
         this.start = Instant.now();
     }
 
-    public Connection(Long customerId, String machineId, Instant start) {
-        this.customerId = customerId;
+    public Connection(Long userId, String machineId, Instant start) {
+        this.userId = userId;
         this.machineId = machineId;
         this.start = start;
     }
 
-    public Long getId() {
-        return id;
-    }
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
 
-    public String getMachineId() {
-        return machineId;
-    }
+    public Long getUserId() { return userId; }
+    public void setUserId(Long userId) { this.userId = userId; }
 
-    public Long getCustomerId() {
-        return customerId;
-    }
+    public String getMachineId() { return machineId; }
+    public void setMachineId(String machineId) { this.machineId = machineId; }
 
-    public Instant getConnectionTime() {
-        return start;
-    }
+    public Instant getConnectionTime() { return start; }
+    public void setConnectionTime(Instant start) { this.start = start; }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public void setCustomerId(Long customerId) {
-        this.customerId = customerId;
-    }
-
-    public void setMachineId(String machineId) {
-        this.machineId = machineId;
-    }
-
-    public Instant getStart() {
-        return start;
-    }
-
-    public void setStart(Instant start) {
-        this.start = start;
-    }
     
 }

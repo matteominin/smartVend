@@ -5,6 +5,8 @@ import java.util.List;
 import com.smartvend.app.model.user.Worker;
 
 public interface WorkerDao {
+    Worker getWorkerByUserId(Long userId);
+
     Worker getWorkerById(Long workerId);
 
     Worker getWorkerByEmail(String email);

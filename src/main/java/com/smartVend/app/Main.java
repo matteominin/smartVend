@@ -31,7 +31,7 @@ public class Main {
 
             Scanner scanner = new Scanner(System.in);
 
-            System.out.println("Welcome to SmartVend! Please log in or sign up.");
+            System.out.println("\n\n\nWelcome to SmartVend! Please log in or sign up.");
             System.out.print("Enter your email: ");
             String email = scanner.nextLine();
             System.out.print("Enter your password: ");
@@ -46,34 +46,39 @@ public class Main {
                 return;
             }
 
-            System.out.println("Login successful! Welcome, " + user.getName() + " " + user.getSurname());
+            System.out.println("\n\nLogin successful! Welcome, " + user.getName() + " " + user.getSurname());
 
             switch (user.getRole()) {
                 case Admin:
-                    System.out.println("You have admin privileges.");
+                    System.out.println("You have admin privileges.\n\n");
                     // Admin specific logic can be added here
                     break;
                 case Worker:
-                    System.out.println("You are logged in as a worker.");
+                    System.out.println("You are logged in as a worker.\n");
 
                     // Initialize WorkerController and services
                     TaskService taskService = new TaskService(new TaskDaoImpl(emf));
                     WorkerService workerService = new WorkerService(new WorkerDaoImpl(emf), new TaskDaoImpl(emf));
                     WorkerController workerController = new WorkerController(workerService, taskService);
 
-                    Worker worker = workerController.getWorker(user.getId());
+                    Worker worker = workerController.getWorkerByUserId(user.getId());
 
                     List<Task> tasks = workerController.getTasks(worker.getId());
+
                     System.out.println("Tasks assigned to you:");
-                    for (Task task : tasks) {
-                        System.out.println("Task ID: " + task.getId() + ", Description: " + task.getDescription()
-                                + ", Status: " + task.getStatus());
+                    if (tasks.isEmpty()) {
+                        System.out.println("No tasks assigned.");
+                    } else {
+                        for (Task task : tasks) {
+                            System.out.println("Task ID: " + task.getId() + ", Description: " + task.getDescription()
+                                    + ", Status: " + task.getStatus());
+                        }
                     }
 
                     break;
                 case Customer:
                     System.out.println("You are logged in as a customer.");
-                    // Customer specific logic can be added here
+
                     break;
                 case User:
                     System.out.println("You are logged in as a user.");
@@ -86,8 +91,8 @@ public class Main {
             System.err.println("Application failed to start: " + e.getMessage());
             e.printStackTrace();
         } finally {
-            DatabaseInitializer.shutdown();
             System.out.println("\nMain application logic finished.\n\n\n");
+            DatabaseInitializer.shutdown();
         }
     }
 }

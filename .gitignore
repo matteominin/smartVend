@@ -2,5 +2,5 @@
 target/
 .mvn/
 *~
-.vscode/
+.vscode
 .env

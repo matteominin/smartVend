@@ -472,7 +472,7 @@ public class AdminServiceTest {
 
         Admin supervisor = mock(Admin.class);
         when(adminDao.getAdminById(supervisorId)).thenReturn(supervisor);
-        when(workerDao.getWorkerById(workerId)).thenReturn(null);
+        when(workerDao.getWorkerByUserId(workerId)).thenReturn(null);
 
         assertThrows(IllegalArgumentException.class,
                 () -> adminService.createTaskForWorker(supervisorId, workerId, reportId, status, AssignedAt));
@@ -490,7 +490,7 @@ public class AdminServiceTest {
         Worker worker = mock(Worker.class);
 
         when(adminDao.getAdminById(supervisorId)).thenReturn(supervisor);
-        when(workerDao.getWorkerById(workerId)).thenReturn(worker);
+        when(workerDao.getWorkerByUserId(workerId)).thenReturn(worker);
         when(maintenanceService.getReportById(reportId)).thenReturn(null);
 
         assertThrows(IllegalArgumentException.class,

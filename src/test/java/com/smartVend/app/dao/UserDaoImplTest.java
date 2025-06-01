@@ -1,28 +1,24 @@
 package com.smartvend.app.dao;
 
 import java.util.Collections;
-import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.junit.jupiter.api.AfterAll;
+import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.contains;
 import static org.mockito.ArgumentMatchers.eq;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import org.mockito.MockitoAnnotations;
 
 import com.smartvend.app.dao.impl.UserDaoImpl;
 import com.smartvend.app.model.user.User;
@@ -31,136 +27,181 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.EntityTransaction;
 import jakarta.persistence.NoResultException;
+import jakarta.persistence.Persistence;
 import jakarta.persistence.TypedQuery;
 
+/**
+ * • Unit tests → Mockito, nessun DB<br>
+ * • Integration tests → H2 in-memory, persistence-unit «test-pu»
+ */
 class UserDaoImplTest {
-    @Mock
-    private EntityManagerFactory entityManagerFactory;
-    @Mock
-    private EntityManager entityManager;
-    @Mock
-    private EntityTransaction transaction;
 
-    @InjectMocks
-    private UserDaoImpl userDao;
+    /*
+     * ────────────────────────────── UNIT TESTS (Mockito)
+     * ──────────────────────────────
+     */
+    @Nested
+    class Unit {
 
-    @BeforeEach
-    void setUp() {
-        MockitoAnnotations.openMocks(this);
+        @Mock
+        EntityManagerFactory emf;
+        @Mock
+        EntityManager em;
+        @Mock
+        EntityTransaction tx;
 
-        when(entityManagerFactory.createEntityManager()).thenReturn(entityManager);
-        when(entityManager.getTransaction()).thenReturn(transaction);
+        @InjectMocks
+        UserDaoImpl dao;
+
+        @BeforeEach
+        void init() {
+            MockitoAnnotations.openMocks(this);
+            when(emf.createEntityManager()).thenReturn(em);
+            when(em.getTransaction()).thenReturn(tx);
+        }
+
+        @Test
+        void getUserByEmail_returnsUser() {
+            User expected = new User("a@b.com", "Mario", "Rossi", "pwd");
+
+            @SuppressWarnings("unchecked")
+            TypedQuery<User> q = mock(TypedQuery.class);
+            when(em.createQuery(anyString(), eq(User.class))).thenReturn(q);
+            when(q.setParameter("email", "a@b.com")).thenReturn(q);
+            when(q.getSingleResult()).thenReturn(expected);
+
+            User result = dao.getUserByEmail("a@b.com");
+            assertSame(expected, result);
+            verify(q).getSingleResult();
+        }
+
+        @Test
+        void getUserByEmail_throwsWhenNotFound() {
+            @SuppressWarnings("unchecked")
+            TypedQuery<User> q = mock(TypedQuery.class);
+            when(em.createQuery(anyString(), eq(User.class))).thenReturn(q);
+            when(q.setParameter(anyString(), anyString())).thenReturn(q);
+            when(q.getSingleResult()).thenThrow(NoResultException.class);
+
+            assertNull(dao.getUserByEmail("missing@mail"));
+        }
+
+        @Test
+        void createUser_persistsAndReturns() {
+            User u = new User("new@mail", "Anna", "Bianchi", "pwd");
+            doNothing().when(em).persist(u);
+
+            User res = dao.createUser(u);
+            verify(em).persist(u);
+            assertSame(u, res);
+        }
+
+        @Test
+        void getUserById_found() {
+            User u = new User("x@y", "X", "Y", "pwd");
+            when(em.find(User.class, 3L)).thenReturn(u);
+
+            assertSame(u, dao.getUserById(3L));
+        }
+
+        @Test
+        void getUserById_nullWhenMissing() {
+            when(em.find(User.class, 9L)).thenReturn(null);
+            assertNull(dao.getUserById(9L));
+        }
+
+        @Test
+        void findAll_empty() {
+            @SuppressWarnings("unchecked")
+            TypedQuery<User> q = mock(TypedQuery.class);
+            when(em.createQuery(anyString(), eq(User.class))).thenReturn(q);
+            when(q.getResultList()).thenReturn(Collections.emptyList());
+
+            assertTrue(dao.findAll().isEmpty());
+        }
+
+        @Test
+        void updateUser_merges() {
+            User u = new User("up@mail", "Up", "User", "pwd");
+            User merged = new User("up@mail", "Up", "User", "pwd");
+            when(em.merge(u)).thenReturn(merged);
+
+            User res = dao.updateUser(u);
+            verify(em).merge(u);
+            assertSame(merged, res);
+        }
+
+        @Test
+        void deleteUser_removesWhenExists() {
+            User u = new User("del@mail", "Del", "User", "pwd");
+            when(em.find(User.class, 7L)).thenReturn(u);
+
+            dao.deleteUser(7L);
+            verify(em).remove(u);
+        }
+
+        @Test
+        void deleteUser_noRemoveWhenMissing() {
+            when(em.find(User.class, 8L)).thenReturn(null);
+
+            dao.deleteUser(8L);
+            verify(em, never()).remove(any());
+        }
     }
 
-    @Test
-    void getUserByEmail_returnsUser() {
-        User fakeUser = new User(null, null, null, null);
+    /*
+     * ─────────────────────────── INTEGRATION TESTS (H2)
+     * ───────────────────────────────
+     */
+    @Nested
+    class Integration {
 
-        @SuppressWarnings("unchecked")
-        TypedQuery<User> queryMock = mock(TypedQuery.class);
+        private static EntityManagerFactory emf;
+        private UserDaoImpl intDao;
 
-        when(entityManager.createQuery(anyString(), eq(User.class))).thenReturn(queryMock);
-        when(queryMock.setParameter(eq("email"), anyString())).thenReturn(queryMock);
-        when(queryMock.getSingleResult()).thenReturn(fakeUser);
+        @BeforeAll
+        static void startPU() {
+            emf = Persistence.createEntityManagerFactory("test-pu");
+        }
 
-        User result = userDao.getUserByEmail("email@example.com");
-        assertSame(fakeUser, result);
-        verify(entityManager).createQuery(contains("email"), eq(User.class));
-        verify(queryMock).setParameter(eq("email"), eq("email@example.com"));
-        verify(queryMock).getSingleResult();
-    }
+        @AfterAll
+        static void stopPU() {
+            if (emf != null)
+                emf.close();
+        }
 
-    @Test
-    void getUserByEmail_throwsIfNotFound() {
-        @SuppressWarnings("unchecked")
-        TypedQuery<User> queryMock = mock(TypedQuery.class);
+        @BeforeEach
+        void initDao() {
+            intDao = new UserDaoImpl(emf);
+        }
 
-        when(entityManager.createQuery(anyString(), eq(User.class))).thenReturn(queryMock);
-        when(queryMock.setParameter(eq("email"), anyString())).thenReturn(queryMock);
-        when(queryMock.getSingleResult()).thenThrow(new NoResultException());
+        @Test
+        void integration_CRUD_flow() {
+            /* CREATE */
+            User user = new User("admin@email.com", "Mario", "Rossi", "pwd");
+            intDao.createUser(user);
+            assertNotNull(user.getId());
 
-        User user = userDao.getUserByEmail("notfound@example.com");
-        assertNull(user);
-    }
+            /* READ by id & email */
+            User byId = intDao.getUserById(user.getId());
+            User byEmail = intDao.getUserByEmail("admin@email.com");
+            assertEquals("Mario", byId.getName());
+            assertEquals(byId.getId(), byEmail.getId());
 
-    @Test
-    void createUser_persistsAndReturnsUser() {
-        User user = new User(null, null, null, null);
-        doNothing().when(entityManager).persist(user);
-        User result = userDao.createUser(user);
-        verify(entityManager).persist(user);
-        assertSame(user, result);
-    }
+            /* UPDATE */
+            byId.setEmail("new@email.com");
+            intDao.updateUser(byId);
 
-    @Test
-    void getUserById_returnsUser() {
-        User fakeUser = new User(null, null, null, null);
-        when(entityManager.find(User.class, 5L)).thenReturn(fakeUser);
+            User afterUpd = intDao.getUserByEmail("new@email.com");
+            assertEquals("new@email.com", afterUpd.getEmail());
 
-        User result = userDao.getUserById(5L);
-        verify(entityManager).find(User.class, 5L);
-        assertSame(fakeUser, result);
-    }
+            /* FIND ALL (≥1) */
+            assertFalse(intDao.findAll().isEmpty());
 
-    @Test
-    void getUserById_returnsNullIfNotFound() {
-        when(entityManager.find(User.class, 10L)).thenReturn(null);
-
-        User result = userDao.getUserById(10L);
-        verify(entityManager).find(User.class, 10L);
-        assertNull(result);
-    }
-
-    @Test
-    void findAll_returnsEmptyList() {
-        @SuppressWarnings("unchecked")
-        TypedQuery<User> queryMock = mock(TypedQuery.class);
-        when(entityManager.createQuery(anyString(), eq(User.class))).thenReturn(queryMock);
-        when(queryMock.getResultList()).thenReturn(Collections.emptyList());
-
-        List<User> result = userDao.findAll();
-        assertNotNull(result);
-        assertTrue(result.isEmpty());
-    }
-
-    @Test
-    void findAll_returnsListWithUsers() {
-        @SuppressWarnings("unchecked")
-        TypedQuery<User> queryMock = mock(TypedQuery.class);
-        User user = new User(null, null, null, null);
-        when(entityManager.createQuery(anyString(), eq(User.class))).thenReturn(queryMock);
-        when(queryMock.getResultList()).thenReturn(List.of(user));
-
-        List<User> result = userDao.findAll();
-        assertEquals(1, result.size());
-        assertEquals(user, result.get(0));
-    }
-
-    @Test
-    void updateUser_mergesAndReturnsUser() {
-        User user = new User(null, null, null, null);
-        User merged = new User(null, null, null, null);
-        when(entityManager.merge(user)).thenReturn(merged);
-
-        User result = userDao.updateUser(user);
-        verify(entityManager).merge(user);
-        assertSame(merged, result);
-    }
-
-    @Test
-    void deleteUser_removesIfExists() {
-        User user = new User(null, null, null, null);
-        when(entityManager.find(User.class, 123L)).thenReturn(user);
-
-        userDao.deleteUser(123L);
-        verify(entityManager).remove(user);
-    }
-
-    @Test
-    void deleteUser_doesNothingIfUserNotFound() {
-        when(entityManager.find(User.class, 456L)).thenReturn(null);
-
-        userDao.deleteUser(456L);
-        verify(entityManager, never()).remove(any());
+            /* DELETE */
+            intDao.deleteUser(afterUpd.getId());
+            assertNull(intDao.getUserById(afterUpd.getId()));
+            assertNull(intDao.getUserByEmail("new@email.com"));
+        }
     }
 }

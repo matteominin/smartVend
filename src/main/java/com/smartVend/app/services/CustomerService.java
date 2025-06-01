@@ -115,7 +115,7 @@ public class CustomerService {
         }
 
         // Get customer
-        long customerId = connection.getCustomerId();
+        long customerId = connection.getUserId();
         Customer customer = customerDao.getCustomerById(customerId);
         if (customer == null) {
             throw new IllegalArgumentException("Customer not found");

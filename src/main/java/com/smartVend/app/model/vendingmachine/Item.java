@@ -137,5 +137,9 @@ public class Item implements Serializable {
     public void setType(ItemType type) {
         this.type = type;
     }
+    public void setInventory(Inventory inventory) {
+        this.inventory = inventory;
+    }
+
 
 }

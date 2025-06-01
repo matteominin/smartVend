@@ -67,12 +67,28 @@ public class User implements Serializable {
         return this.email;
     }
 
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
     public String getName() {
         return this.name;
     }
 
     public String getSurname() {
         return this.surname;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setSurname(String surname) {
+        this.surname = surname;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     public Role getRole() {
