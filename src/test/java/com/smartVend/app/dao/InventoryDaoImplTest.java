@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -84,7 +85,7 @@ class InventoryDaoImplTest {
         }
 
         @Test
-        void removeItemFromInventory_throwsIfInventoryNotFound() {
+        void removeItemFromInventory_throwsIfInventoryNotFound_andRollsBack() {
             Item item = mock(Item.class);
             TypedQuery<Inventory> query = mock(TypedQuery.class);
 
@@ -93,8 +94,24 @@ class InventoryDaoImplTest {
             when(query.getSingleResult()).thenThrow(new NoResultException());
             when(tx.isActive()).thenReturn(true);
 
-            assertThrows(IllegalArgumentException.class,
+            IllegalArgumentException ex = assertThrows(IllegalArgumentException.class,
                     () -> dao.removeItemFromInventory("notfound", item));
+            assertTrue(ex.getMessage().contains("Inventory not found"));
+            verify(tx).rollback();
+        }
+
+        @Test
+        void removeItemFromInventory_rollsBackOnOtherException() {
+            Item item = mock(Item.class);
+            TypedQuery<Inventory> query = mock(TypedQuery.class);
+
+            when(em.createQuery(anyString(), eq(Inventory.class))).thenReturn(query);
+            when(query.setParameter("machineId", "fail")).thenReturn(query);
+            when(query.getSingleResult()).thenThrow(new RuntimeException("Other error"));
+            when(tx.isActive()).thenReturn(true);
+
+            assertThrows(RuntimeException.class,
+                    () -> dao.removeItemFromInventory("fail", item));
             verify(tx).rollback();
         }
 
@@ -117,7 +134,7 @@ class InventoryDaoImplTest {
         }
 
         @Test
-        void addItemToInventory_throwsIfInventoryNotFound() {
+        void addItemToInventory_throwsIfInventoryNotFound_andRollsBack() {
             Item item = mock(Item.class);
             TypedQuery<Inventory> query = mock(TypedQuery.class);
 
@@ -126,8 +143,24 @@ class InventoryDaoImplTest {
             when(query.getSingleResult()).thenThrow(new NoResultException());
             when(tx.isActive()).thenReturn(true);
 
-            assertThrows(IllegalArgumentException.class,
+            IllegalArgumentException ex = assertThrows(IllegalArgumentException.class,
                     () -> dao.addItemToInventory("notfound", item));
+            assertTrue(ex.getMessage().contains("Inventory not found"));
+            verify(tx).rollback();
+        }
+
+        @Test
+        void addItemToInventory_rollsBackOnOtherException() {
+            Item item = mock(Item.class);
+            TypedQuery<Inventory> query = mock(TypedQuery.class);
+
+            when(em.createQuery(anyString(), eq(Inventory.class))).thenReturn(query);
+            when(query.setParameter("machineId", "fail")).thenReturn(query);
+            when(query.getSingleResult()).thenThrow(new RuntimeException("Other error"));
+            when(tx.isActive()).thenReturn(true);
+
+            assertThrows(RuntimeException.class,
+                    () -> dao.addItemToInventory("fail", item));
             verify(tx).rollback();
         }
 
@@ -179,6 +212,7 @@ class InventoryDaoImplTest {
             ConcreteVendingMachine machine = new ConcreteVendingMachine(
                 "ABC123", null, "Milano", 30, MachineStatus.Operative, null
             );
+            // Aggiungi lastMaintenance (obbligatorio!)
             machine.setLastMaintenance(java.time.Instant.now());
             em.persist(machine);
 
@@ -212,10 +246,10 @@ class InventoryDaoImplTest {
             loaded.setOccupiedSpace(10);
             dao.updateItemInInventory(loaded);
 
-            // REMOVE: rimuovi item (da coverage a branch exception, puoi commentare per coverage 100%)
+            // REMOVE: rimuovi item
             dao.removeItemFromInventory(machine.getId(), item);
 
-            // ADD: riaggiungi (per completare coverage metodi)
+            // ADD: riaggiungi
             dao.addItemToInventory(machine.getId(), item);
         }
     }
