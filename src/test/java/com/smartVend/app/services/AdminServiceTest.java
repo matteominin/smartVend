@@ -10,6 +10,7 @@ import com.smartvend.app.model.maintenance.MaintenanceReport;
 import com.smartvend.app.model.maintenance.MaintenanceStatus;
 import com.smartvend.app.model.maintenance.Task;
 import com.smartvend.app.model.user.Admin;
+import com.smartvend.app.model.user.Customer;
 import com.smartvend.app.model.user.User;
 import com.smartvend.app.model.user.Worker;
 import com.smartvend.app.model.vendingmachine.ConcreteVendingMachine;
@@ -495,5 +496,241 @@ public class AdminServiceTest {
 
         assertThrows(IllegalArgumentException.class,
                 () -> adminService.createTaskForWorker(supervisorId, workerId, reportId, status, AssignedAt));
+    }
+
+    // Customer CRUD tests
+
+    @Test
+    void testGetCustomersReturnsList() {
+        Customer customer1 = mock(Customer.class);
+        Customer customer2 = mock(Customer.class);
+        when(customerDao.findAll()).thenReturn(Arrays.asList(customer1, customer2));
+
+        List<Customer> result = adminService.getCustomers();
+
+        assertEquals(2, result.size());
+        verify(customerDao).findAll();
+    }
+
+    @Test
+    void testGetCustomersThrowsIfDaoNull() {
+        adminService = new AdminService(machineDao, userDao, workerDao, null, adminDao, taskDao, maintenanceService);
+        assertThrows(IllegalStateException.class, () -> adminService.getCustomers());
+    }
+
+    @Test
+    void testGetCustomerByIdReturnsCustomer() {
+        Customer customer = mock(Customer.class);
+        when(customerDao.getCustomerById(1L)).thenReturn(customer);
+
+        Customer result = adminService.getCustomerById(1L);
+
+        assertEquals(customer, result);
+        verify(customerDao).getCustomerById(1L);
+    }
+
+    @Test
+    void testGetCustomerByIdThrowsIfIdNull() {
+        assertThrows(IllegalArgumentException.class, () -> adminService.getCustomerById(null));
+    }
+
+    @Test
+    void testGetCustomerByIdThrowsIfIdZeroOrNegative() {
+        assertThrows(IllegalArgumentException.class, () -> adminService.getCustomerById(0L));
+        assertThrows(IllegalArgumentException.class, () -> adminService.getCustomerById(-1L));
+    }
+
+    @Test
+    void testCreateCustomerReturnsCreatedCustomer() {
+        Customer customer = mock(Customer.class);
+        when(customerDao.createCustomer(customer)).thenReturn(customer);
+
+        Customer result = adminService.createCustomer(customer);
+
+        assertEquals(customer, result);
+        verify(customerDao).createCustomer(customer);
+    }
+
+    @Test
+    void testCreateCustomerThrowsIfDaoNull() {
+        adminService = new AdminService(machineDao, userDao, workerDao, null, adminDao, taskDao, maintenanceService);
+        Customer customer = mock(Customer.class);
+        assertThrows(IllegalStateException.class, () -> adminService.createCustomer(customer));
+    }
+
+    @Test
+    void testCreateCustomerThrowsIfCustomerNull() {
+        assertThrows(IllegalArgumentException.class, () -> adminService.createCustomer(null));
+    }
+
+    @Test
+    void testUpdateCustomerReturnsUpdatedCustomer() {
+        Customer customer = mock(Customer.class);
+        when(customer.getId()).thenReturn(1L);
+        when(customerDao.updateCustomer(customer)).thenReturn(customer);
+
+        Customer result = adminService.updateCustomer(customer);
+
+        assertEquals(customer, result);
+        verify(customerDao).updateCustomer(customer);
+    }
+
+    @Test
+    void testUpdateCustomerThrowsIfDaoNull() {
+        adminService = new AdminService(machineDao, userDao, workerDao, null, adminDao, taskDao, maintenanceService);
+        Customer customer = mock(Customer.class);
+        when(customer.getId()).thenReturn(1L);
+        assertThrows(IllegalStateException.class, () -> adminService.updateCustomer(customer));
+    }
+
+    @Test
+    void testUpdateCustomerThrowsIfCustomerNull() {
+        assertThrows(IllegalArgumentException.class, () -> adminService.updateCustomer(null));
+    }
+
+    @Test
+    void testUpdateCustomerThrowsIfCustomerIdNull() {
+        Customer customer = mock(Customer.class);
+        when(customer.getId()).thenReturn(null);
+        assertThrows(IllegalArgumentException.class, () -> adminService.updateCustomer(customer));
+    }
+
+    @Test
+    void testDeleteCustomerCallsDao() {
+        adminService.deleteCustomer(1L);
+        verify(customerDao).deleteCustomer(1L);
+    }
+
+    @Test
+    void testDeleteCustomerThrowsIfDaoNull() {
+        adminService = new AdminService(machineDao, userDao, workerDao, null, adminDao, taskDao, maintenanceService);
+        assertThrows(IllegalStateException.class, () -> adminService.deleteCustomer(1L));
+    }
+
+    @Test
+    void testDeleteCustomerThrowsIfIdNull() {
+        assertThrows(IllegalArgumentException.class, () -> adminService.deleteCustomer(null));
+    }
+
+    @Test
+    void testDeleteCustomerThrowsIfIdZeroOrNegative() {
+        assertThrows(IllegalArgumentException.class, () -> adminService.deleteCustomer(0L));
+        assertThrows(IllegalArgumentException.class, () -> adminService.deleteCustomer(-1L));
+    }
+
+    // Admin CRUD tests
+
+    @Test
+    void testGetAdminsReturnsList() {
+        Admin admin1 = mock(Admin.class);
+        Admin admin2 = mock(Admin.class);
+        when(adminDao.findAll()).thenReturn(Arrays.asList(admin1, admin2));
+
+        List<Admin> result = adminService.getAdmins();
+
+        assertEquals(2, result.size());
+        verify(adminDao).findAll();
+    }
+
+    @Test
+    void testGetAdminsThrowsIfDaoNull() {
+        adminService = new AdminService(machineDao, userDao, workerDao, customerDao, null, taskDao, maintenanceService);
+        assertThrows(IllegalStateException.class, () -> adminService.getAdmins());
+    }
+
+    @Test
+    void testGetAdminByEmailReturnsAdmin() {
+        Admin admin = mock(Admin.class);
+        when(adminDao.getAdminByEmail("admin@example.com")).thenReturn(admin);
+
+        Admin result = adminService.getAdminByEmail("admin@example.com");
+
+        assertEquals(admin, result);
+        verify(adminDao).getAdminByEmail("admin@example.com");
+    }
+
+    @Test
+    void testGetAdminByEmailThrowsIfDaoNull() {
+        adminService = new AdminService(machineDao, userDao, workerDao, customerDao, null, taskDao, maintenanceService);
+        assertThrows(IllegalStateException.class, () -> adminService.getAdminByEmail("admin@example.com"));
+    }
+
+    @Test
+    void testGetAdminByEmailThrowsIfEmailNull() {
+        assertThrows(IllegalArgumentException.class, () -> adminService.getAdminByEmail(null));
+    }
+
+    @Test
+    void testGetAdminByEmailThrowsIfEmailEmpty() {
+        assertThrows(IllegalArgumentException.class, () -> adminService.getAdminByEmail("   "));
+    }
+
+    @Test
+    void testCreateAdminReturnsCreatedAdmin() {
+        Admin admin = mock(Admin.class);
+        when(adminDao.createAdmin(admin)).thenReturn(admin);
+
+        Admin result = adminService.createAdmin(admin);
+
+        assertEquals(admin, result);
+        verify(adminDao).createAdmin(admin);
+    }
+
+    @Test
+    void testCreateAdminThrowsIfDaoNull() {
+        adminService = new AdminService(machineDao, userDao, workerDao, customerDao, null, taskDao, maintenanceService);
+        Admin admin = mock(Admin.class);
+        assertThrows(IllegalStateException.class, () -> adminService.createAdmin(admin));
+    }
+
+    @Test
+    void testCreateAdminThrowsIfAdminNull() {
+        assertThrows(IllegalArgumentException.class, () -> adminService.createAdmin(null));
+    }
+
+    @Test
+    void testUpdateAdminReturnsUpdatedAdmin() {
+        Admin admin = mock(Admin.class);
+        when(adminDao.updateAdmin(admin)).thenReturn(admin);
+
+        Admin result = adminService.updateAdmin(admin);
+
+        assertEquals(admin, result);
+        verify(adminDao).updateAdmin(admin);
+    }
+
+    @Test
+    void testUpdateAdminThrowsIfDaoNull() {
+        adminService = new AdminService(machineDao, userDao, workerDao, customerDao, null, taskDao, maintenanceService);
+        Admin admin = mock(Admin.class);
+        assertThrows(IllegalStateException.class, () -> adminService.updateAdmin(admin));
+    }
+
+    @Test
+    void testUpdateAdminThrowsIfAdminNull() {
+        assertThrows(IllegalArgumentException.class, () -> adminService.updateAdmin(null));
+    }
+
+    @Test
+    void testDeleteAdminCallsDao() {
+        adminService.deleteAdmin(1L);
+        verify(adminDao).deleteAdmin(1L);
+    }
+
+    @Test
+    void testDeleteAdminThrowsIfDaoNull() {
+        adminService = new AdminService(machineDao, userDao, workerDao, customerDao, null, taskDao, maintenanceService);
+        assertThrows(IllegalStateException.class, () -> adminService.deleteAdmin(1L));
+    }
+
+    @Test
+    void testDeleteAdminThrowsIfIdNull() {
+        assertThrows(IllegalArgumentException.class, () -> adminService.deleteAdmin(null));
+    }
+
+    @Test
+    void testDeleteAdminThrowsIfIdZeroOrNegative() {
+        assertThrows(IllegalArgumentException.class, () -> adminService.deleteAdmin(0L));
+        assertThrows(IllegalArgumentException.class, () -> adminService.deleteAdmin(-1L));
     }
 }

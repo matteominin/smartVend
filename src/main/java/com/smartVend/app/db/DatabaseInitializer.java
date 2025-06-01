@@ -10,7 +10,8 @@ public class DatabaseInitializer {
 
     public static void initializeDatabase() {
         try {
-            emf = Persistence.createEntityManagerFactory("smartvendPU");
+            // Modificato il nome della persistence unit da "smartvendPU" a "test-pu"
+            emf = Persistence.createEntityManagerFactory("test-pu");
 
             EntityManager em = emf.createEntityManager();
             em.getTransaction().begin();
@@ -20,6 +21,8 @@ public class DatabaseInitializer {
         } catch (Exception e) {
             System.err.println("Database initialization failed: " + e.getMessage());
             e.printStackTrace();
+            // Rilancia l'eccezione per rendere più visibili gli errori nei test
+            throw new RuntimeException("Failed to initialize database persistence unit.", e);
         }
     }
 

@@ -53,40 +53,30 @@ public class Admin implements Serializable {
     }
 
     public String getEmail() {
-        return user != null ? user.getEmail() : null;
+        return user.email;
     }
 
     public void setEmail(String email) {
-        if (user != null) {
-            user.setEmail(email);
-        }
+        user.email = email;
     }
 
     public String getName() {
-        return user != null ? user.getName() : null;
+        return user.name;
     }
 
     public void setName(String name) {
-        if (user != null)
-            user.setName(name);
+        user.name = name;
     }
 
     public String getSurname() {
-        return user != null ? user.getSurname() : null;
+        return user.surname;
     }
 
     public void setSurname(String surname) {
-        if (user != null)
-            user.setSurname(surname);
+        user.surname = surname;
     }
 
     public String getPassword() {
-        return user != null ? user.getPassword() : null;
+        return user.password;
     }
-
-    public void setPassword(String password) {
-        if (user != null)
-            user.setPassword(password);
-    }
-
 }

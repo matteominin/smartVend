@@ -3,6 +3,8 @@ package com.smartvend.app.services;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 
+import java.util.List;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -118,5 +120,45 @@ public class MachinesServiceTest {
         when(machineDao.findById("123")).thenReturn(machine);
         MachineStatus status = machineService.getStatus("123");
         assertEquals(MachineStatus.Operative, status);
+    }
+
+    @Test
+    @DisplayName("Test getAllAvailableMachines returns only operative machines")
+    public void testGetAllAvailableMachinesReturnsOperative() {
+        ConcreteVendingMachine machine1 = new ConcreteVendingMachine("M1", null, "Loc1", 10, MachineStatus.Operative,
+                null);
+        ConcreteVendingMachine machine2 = new ConcreteVendingMachine("M2", null, "Loc2", 20, MachineStatus.OutOfService,
+                null);
+        ConcreteVendingMachine machine3 = new ConcreteVendingMachine("M3", null, "Loc3", 30, MachineStatus.Operative,
+                null);
+
+        when(machineDao.findAll()).thenReturn(java.util.Arrays.asList(machine1, machine2, machine3));
+
+        List<String> result = machineService.getAllAvailableMachines();
+
+        assertEquals(2, result.size());
+        assertEquals(true, result.contains("M1"));
+        assertEquals(true, result.contains("M3"));
+        assertEquals(false, result.contains("M2"));
+    }
+
+    @Test
+    @DisplayName("Test getAllAvailableMachines throws when machineDao is null")
+    public void testGetAllAvailableMachinesThrowsWhenDaoNull() {
+        machineService = new MachineService(itemDao, null, maintenanceDao); // machineDao is null
+
+        org.junit.jupiter.api.Assertions.assertThrows(IllegalStateException.class, () -> {
+            machineService.getAllAvailableMachines();
+        });
+    }
+
+    @Test
+    @DisplayName("Test getAllAvailableMachines returns empty list when no machines")
+    public void testGetAllAvailableMachinesReturnsEmptyWhenNoMachines() {
+        when(machineDao.findAll()).thenReturn(java.util.Collections.emptyList());
+
+        List<String> result = machineService.getAllAvailableMachines();
+
+        assertEquals(0, result.size());
     }
 }
