@@ -12,6 +12,14 @@ import jakarta.persistence.Table;
 @Entity
 @Table(name = "app_user")
 public class User implements Serializable {
+
+    public enum Role {
+        User,
+        Admin,
+        Worker,
+        Customer
+    }
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -23,6 +31,8 @@ public class User implements Serializable {
     private String surname;
     @Column(nullable = false)
     private String password;
+    @Column(nullable = false)
+    Role role;
 
     public User() {
         // Default constructor for JPA
@@ -34,6 +44,7 @@ public class User implements Serializable {
         this.name = name;
         this.surname = surname;
         this.password = password;
+        this.role = Role.User;
     }
 
     public User(String email, String name, String surname, String password) {
@@ -41,6 +52,7 @@ public class User implements Serializable {
         this.name = name;
         this.surname = surname;
         this.password = password;
+        this.role = Role.User;
     }
 
     public long getId() {
@@ -63,4 +75,11 @@ public class User implements Serializable {
         return this.surname;
     }
 
+    public Role getRole() {
+        return this.role;
+    }
+
+    public void setRole(Role role) {
+        this.role = role;
+    }
 }

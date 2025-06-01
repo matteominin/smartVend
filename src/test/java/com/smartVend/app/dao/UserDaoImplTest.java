@@ -7,7 +7,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -80,7 +79,8 @@ class UserDaoImplTest {
         when(queryMock.setParameter(eq("email"), anyString())).thenReturn(queryMock);
         when(queryMock.getSingleResult()).thenThrow(new NoResultException());
 
-        assertThrows(NoResultException.class, () -> userDao.getUserByEmail("notfound@example.com"));
+        User user = userDao.getUserByEmail("notfound@example.com");
+        assertNull(user);
     }
 
     @Test

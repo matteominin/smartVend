@@ -2,6 +2,8 @@ package com.smartvend.app.model.user;
 
 import java.io.Serializable;
 
+import com.smartvend.app.model.user.User.Role;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -20,6 +22,7 @@ public class Customer implements Serializable {
     private User user;
     @Column(nullable = false)
     private double balance;
+
     public Customer() {
         // Default constructor for JPA
     }
@@ -28,11 +31,13 @@ public class Customer implements Serializable {
         this.id = id;
         this.user = user;
         this.balance = balance;
+        this.user.role = Role.Customer;
     }
 
     public Customer(User user, double balance) {
         this.user = user;
         this.balance = balance;
+        this.user.role = Role.Customer;
     }
 
     public Long getId() {

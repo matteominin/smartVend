@@ -20,11 +20,12 @@ public class UserDaoImpl implements UserDao {
     public User getUserByEmail(String email) {
         EntityManager em = emf.createEntityManager();
         try {
-            // Removed the try-catch for NoResultException to allow it to propagate
             return em.createQuery(
                     "SELECT u FROM User u WHERE u.email = :email", User.class)
                     .setParameter("email", email)
                     .getSingleResult();
+        } catch (jakarta.persistence.NoResultException e) {
+            return null;
         } finally {
             em.close();
         }
