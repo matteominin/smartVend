@@ -8,18 +8,10 @@
 
    Modifica il file `.env` secondo le tue esigenze (ad esempio, credenziali del database).
 
-2. **Avvia tutti i servizi (database, backend, ecc.) con Docker Compose:**
+2. **Avvia l'applicazione:**
 
    ```sh
-   docker-compose up
+   ./run-app.sh
    ```
 
-   Questo comando utilizzerà le variabili definite in `.env` per configurare i container.
-
-3. **Per fermare i servizi:**
-
-   ```sh
-   docker-compose down
-   ```
-
-Assicurati di aver creato e configurato il file `.env` prima di avviare Docker Compose.
+Assicurati di aver creato e configurato il file `.env` prima di avviare l'applicazione.

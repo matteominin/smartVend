@@ -7,6 +7,12 @@ public class Main {
         try {
             DatabaseInitializer.initializeDatabase();
             System.out.println("SmartVend application started successfully!");
+
+            System.out.print("Please enter your input: ");
+            java.util.Scanner scanner = new java.util.Scanner(System.in);
+            String userInput = scanner.nextLine();
+            System.out.println("You entered: " + userInput);
+            scanner.close();
         } catch (Exception e) {
             System.err.println("Application failed to start: " + e.getMessage());
             e.printStackTrace();

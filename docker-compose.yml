@@ -3,7 +3,7 @@ services:
     image: postgres:16
     container_name: smartvend-db
     environment:
-      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_DB: ${DB_NAME}
       POSTGRES_USER: ${DB_USER}
       POSTGRES_PASSWORD: ${DB_PASS}
     ports:
@@ -11,22 +11,6 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
-
-  app:
-    image: maven:3.9-eclipse-temurin-21
-    container_name: smartvend-app
-    depends_on:
-      - db
-    working_dir: /workspace
-    volumes:
-      - ./:/workspace
-    command: mvn clean compile exec:java -Dexec.mainClass="com.smartvend.app.Main" -DDB_URL=$DB_URL -DDB_USER=$DB_USER -DDB_PASS=$DB_PASS
-    environment:
-      DB_URL: ${DB_URL}
-      DB_USER: ${DB_USER}
-      DB_PASS: ${DB_PASS}
-    stdin_open: true
-    tty: true
 
   # (opzionale) Adminer per DB browser
   adminer:
