@@ -1,136 +1,168 @@
 package com.smartvend.app.dao;
 
-import java.util.Collections;
-import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
 import com.smartvend.app.dao.impl.CustomerDaoImpl;
 import com.smartvend.app.model.user.Customer;
 import com.smartvend.app.model.user.User;
 
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.EntityManagerFactory;
-import jakarta.persistence.EntityTransaction;
-import jakarta.persistence.TypedQuery;
+import jakarta.persistence.*;
+
+import org.junit.jupiter.api.*;
+import org.mockito.*;
+
+import java.util.Collections;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 class CustomerDaoImplTest {
-    @Mock
-    private EntityManagerFactory entityManagerFactory;
-    @Mock
-    private EntityManager entityManager;
-    @Mock
-    private EntityTransaction transaction;
 
-    @InjectMocks
-    private CustomerDaoImpl customerDao;
+    // ------------------------ UNIT TESTS ------------------------
+    @Nested
+    class Unit {
 
-    @BeforeEach
-    void setUp() {
-        MockitoAnnotations.openMocks(this);
+        @Mock EntityManagerFactory entityManagerFactory;
+        @Mock EntityManager entityManager;
+        @Mock EntityTransaction transaction;
 
-        when(entityManagerFactory.createEntityManager()).thenReturn(entityManager);
-        when(entityManager.getTransaction()).thenReturn(transaction);
+        @InjectMocks CustomerDaoImpl customerDao;
+
+        @BeforeEach
+        void setUp() {
+            MockitoAnnotations.openMocks(this);
+            when(entityManagerFactory.createEntityManager()).thenReturn(entityManager);
+            when(entityManager.getTransaction()).thenReturn(transaction);
+        }
+
+        @Test
+        void getCustomerById_returnsCustomer() {
+            Customer customer = new Customer(123L, new User(1L, null, null, null, null), 10);
+            when(entityManager.find(Customer.class, 123L)).thenReturn(customer);
+            Customer result = customerDao.getCustomerById(123L);
+            assertNotNull(result);
+            assertEquals(customer, result);
+        }
+
+        @Test
+        void getCustomerById_returnsNullIfNotFound() {
+            when(entityManager.find(Customer.class, 456L)).thenReturn(null);
+            Customer result = customerDao.getCustomerById(456L);
+            assertNull(result);
+        }
+
+        @Test
+        void findAll_returnsEmptyList() {
+            @SuppressWarnings("unchecked")
+            TypedQuery<Customer> query = (TypedQuery<Customer>) mock(TypedQuery.class);
+            when(entityManager.createQuery(anyString(), eq(Customer.class))).thenReturn(query);
+            when(query.getResultList()).thenReturn(Collections.emptyList());
+            List<Customer> result = customerDao.findAll();
+            assertNotNull(result);
+            assertTrue(result.isEmpty());
+        }
+
+        @Test
+        void findAll_returnsListWithCustomers() {
+            @SuppressWarnings("unchecked")
+            TypedQuery<Customer> query = (TypedQuery<Customer>) mock(TypedQuery.class);
+            Customer customer = new Customer(123L, new User(1L, null, null, null, null), 10);
+            when(entityManager.createQuery(anyString(), eq(Customer.class))).thenReturn(query);
+            when(query.getResultList()).thenReturn(List.of(customer));
+            List<Customer> result = customerDao.findAll();
+            assertNotNull(result);
+            assertEquals(1, result.size());
+            assertEquals(customer, result.get(0));
+        }
+
+        @Test
+        void createCustomer_persistsCustomer() {
+            Customer customer = new Customer(123L, new User(1L, null, null, null, null), 10);
+            Customer result = customerDao.createCustomer(customer);
+            verify(entityManager).persist(customer);
+            assertEquals(customer, result);
+        }
+
+        @Test
+        void updateCustomer_mergesCustomer() {
+            Customer customer = new Customer(123L, new User(1L, null, null, null, null), 10);
+            Customer merged = new Customer(123L, new User(1L, null, null, null, null), 15);
+            when(entityManager.merge(customer)).thenReturn(merged);
+            Customer result = customerDao.updateCustomer(customer);
+            verify(entityManager).merge(customer);
+            assertEquals(merged, result);
+        }
+
+        @Test
+        void deleteCustomer_removesCustomerIfExists() {
+            Customer customer = new Customer(123L, new User(1L, null, null, null, null), 10);
+            when(entityManager.find(Customer.class, 123L)).thenReturn(customer);
+            customerDao.deleteCustomer(123L);
+            verify(entityManager).remove(customer);
+        }
+
+        @Test
+        void deleteCustomer_doesNothingIfCustomerNotFound() {
+            when(entityManager.find(Customer.class, 456L)).thenReturn(null);
+            customerDao.deleteCustomer(456L);
+            verify(entityManager, never()).remove(any());
+        }
     }
 
-    @Test
-    void getCustomerById_returnsCustomer() {
-        Customer customer = new Customer(123L, new User(1L, null, null, null, null), 10);
-        when(entityManager.find(Customer.class, 123L)).thenReturn(customer);
+    // ------------------------ INTEGRATION TESTS ------------------------
+    @Nested
+    @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+    class Integration {
+        private EntityManagerFactory emf;
+        private CustomerDaoImpl customerDao;
 
-        Customer result = customerDao.getCustomerById(123L);
-        assertNotNull(result);
-        assertEquals(customer, result);
-    }
+        @BeforeAll
+        void setupAll() {
+            emf = Persistence.createEntityManagerFactory("test-pu"); // usa il tuo persistence-unit di test
+            customerDao = new CustomerDaoImpl(emf);
+        }
 
-    @Test
-    void getCustomerById_returnsNullIfNotFound() {
-        when(entityManager.find(Customer.class, 456L)).thenReturn(null);
+        @AfterAll
+        void tearDownAll() {
+            if (emf != null) emf.close();
+        }
 
-        Customer result = customerDao.getCustomerById(456L);
-        assertNull(result);
-    }
+        @Test
+        void integration_CRUD_flow() {
+            // Prima crea e salva l'utente collegato!
+            User user = new User("customer@email.com", "Alice", "Bianchi", "pwd");
+            var em = emf.createEntityManager();
+            em.getTransaction().begin();
+            em.persist(user);
+            em.getTransaction().commit();
+            em.close();
 
-    @Test
-    void findAll_returnsEmptyList() {
-        @SuppressWarnings("unchecked")
-        TypedQuery<Customer> query = (TypedQuery<Customer>) mock(TypedQuery.class);
-        when(entityManager.createQuery(anyString(), eq(Customer.class))).thenReturn(query);
-        when(query.getResultList()).thenReturn(Collections.emptyList());
+            // Collega User a Customer
+            Customer customer = new Customer(user, 0.0);
 
-        List<Customer> result = customerDao.findAll();
-        assertNotNull(result);
-        assertTrue(result.isEmpty());
-    }
+            // CREATE
+            customerDao.createCustomer(customer);
+            assertNotNull(customer.getId());
 
-    @Test
-    void findAll_returnsListWithCustomers() {
-        @SuppressWarnings("unchecked")
-        TypedQuery<Customer> query = (TypedQuery<Customer>) mock(TypedQuery.class);
-        Customer customer = new Customer(123L, new User(1L, null, null, null, null), 10);
-        when(entityManager.createQuery(anyString(), eq(Customer.class))).thenReturn(query);
-        when(query.getResultList()).thenReturn(List.of(customer));
+            // READ
+            Customer loaded = customerDao.getCustomerById(customer.getId());
+            assertNotNull(loaded);
+            assertEquals("customer@email.com", loaded.getUser().getEmail());
 
-        List<Customer> result = customerDao.findAll();
-        assertNotNull(result);
-        assertEquals(1, result.size());
-        assertEquals(customer, result.get(0));
-    }
+            // UPDATE (modifica balance)
+            loaded.setBalance(42.0);
+            customerDao.updateCustomer(loaded);
 
-    @Test
-    void createCustomer_persistsCustomer() {
-        Customer customer = new Customer(123L, new User(1L, null, null, null, null), 10);
+            Customer afterUpdate = customerDao.getCustomerById(loaded.getId());
+            assertEquals(42.0, afterUpdate.getBalance());
 
-        Customer result = customerDao.createCustomer(customer);
+            // FIND ALL
+            List<Customer> all = customerDao.findAll();
+            assertFalse(all.isEmpty());
 
-        verify(entityManager).persist(customer);
-        assertEquals(customer, result);
-    }
-
-    @Test
-    void updateCustomer_mergesCustomer() {
-        Customer customer = new Customer(123L, new User(1L, null, null, null, null), 10);
-        Customer merged = new Customer(123L, new User(1L, null, null, null, null), 15);
-        when(entityManager.merge(customer)).thenReturn(merged);
-
-        Customer result = customerDao.updateCustomer(customer);
-
-        verify(entityManager).merge(customer);
-        assertEquals(merged, result);
-    }
-
-    @Test
-    void deleteCustomer_removesCustomerIfExists() {
-        Customer customer = new Customer(123L, new User(1L, null, null, null, null), 10);
-        when(entityManager.find(Customer.class, 123L)).thenReturn(customer);
-
-        customerDao.deleteCustomer(123L);
-
-        verify(entityManager).remove(customer);
-    }
-
-    @Test
-    void deleteCustomer_doesNothingIfCustomerNotFound() {
-        when(entityManager.find(Customer.class, 456L)).thenReturn(null);
-
-        customerDao.deleteCustomer(456L);
-
-        verify(entityManager, never()).remove(any());
+            // DELETE
+            customerDao.deleteCustomer(customer.getId());
+            Customer afterDelete = customerDao.getCustomerById(customer.getId());
+            assertNull(afterDelete);
+        }
     }
 }
