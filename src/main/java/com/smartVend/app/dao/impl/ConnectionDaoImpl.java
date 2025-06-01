@@ -4,7 +4,7 @@ import java.time.Instant;
 
 import com.smartvend.app.dao.ConnectionDao;
 import com.smartvend.app.model.connection.Connection;
-import com.smartvend.app.model.user.Customer;
+import com.smartvend.app.model.user.User;
 import com.smartvend.app.model.vendingmachine.ConcreteVendingMachine;
 
 import jakarta.persistence.EntityManager;
@@ -24,9 +24,9 @@ public class ConnectionDaoImpl implements ConnectionDao {
         try {
             em.getTransaction().begin();
 
-            Customer customer = em.find(Customer.class, userId);
+            User user = em.find(User.class, userId);
             ConcreteVendingMachine machine = em.find(ConcreteVendingMachine.class, machineId);
-            if (customer == null) {
+            if (user == null) {
                 throw new IllegalArgumentException("User not found with ID: " + userId);
             } else if (machine == null) {
                 throw new IllegalArgumentException("Machine not found with ID: " + machineId);

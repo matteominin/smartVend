@@ -6,7 +6,7 @@
     <persistence-unit name="test-pu" transaction-type="RESOURCE_LOCAL">
         <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
 
-        <!-- ENTITY VENDINGMACHINE (aggiungi qui tutte quelle in vendingmachine se esistono) -->
+        <!-- ENTITY VENDINGMACHINE -->
         <class>com.smartvend.app.model.vendingmachine.ConcreteVendingMachine</class>
         <class>com.smartvend.app.model.vendingmachine.Inventory</class>
         <class>com.smartvend.app.model.vendingmachine.Item</class>
@@ -35,15 +35,22 @@
         <exclude-unlisted-classes>true</exclude-unlisted-classes>
 
         <properties>
+            <!-- Cambia il nome del DB per ogni test JVM (o suite) se vuoi isolare di più -->
+            <!-- Puoi lasciare testdb, ma è meglio: testdb_${random} -->
             <property name="jakarta.persistence.jdbc.driver"  value="org.h2.Driver"/>
-            <property name="jakarta.persistence.jdbc.url"     value="jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1"/>
+            <property name="jakarta.persistence.jdbc.url"     value="jdbc:h2:mem:testdb_${random};DB_CLOSE_DELAY=0;DB_CLOSE_ON_EXIT=TRUE;MODE=LEGACY"/>
             <property name="jakarta.persistence.jdbc.user"    value="sa"/>
             <property name="jakarta.persistence.jdbc.password" value=""/>
 
+            <!-- auto create-drop così riparte sempre da zero -->
             <property name="hibernate.hbm2ddl.auto" value="create-drop"/>
             <property name="hibernate.show_sql"    value="false"/>
             <property name="hibernate.format_sql"  value="true"/>
             <property name="hibernate.dialect" value="org.hibernate.dialect.H2Dialect"/>
+            <!-- Aggiunta per evitare cache lock -->
+            <property name="hibernate.temp.use_jdbc_metadata_defaults" value="false"/>
+            <property name="hibernate.connection.provider_disables_autocommit" value="true"/>
+            <!-- Queste due sopra evitano alcuni lock/timeout strani di H2 con Hibernate -->
         </properties>
     </persistence-unit>
 </persistence>

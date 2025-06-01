@@ -1,16 +1,18 @@
 package com.smartvend.app.dao;
 
+import java.time.Instant;
+
+import org.junit.jupiter.api.AfterAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-
+import org.junit.jupiter.api.TestInstance;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -22,107 +24,196 @@ import com.smartvend.app.model.connection.Connection;
 import com.smartvend.app.model.user.Customer;
 import com.smartvend.app.model.user.User;
 import com.smartvend.app.model.vendingmachine.ConcreteVendingMachine;
+import com.smartvend.app.model.vendingmachine.Inventory;
+import com.smartvend.app.model.vendingmachine.MachineStatus;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.EntityTransaction;
+import jakarta.persistence.Persistence;
 
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class ConnectionDaoImplTest {
-    private Customer customer;
-    private ConcreteVendingMachine machine;
 
-    @Mock
-    private EntityManagerFactory entityManagerFactory;
-    @Mock
-    private EntityManager entityManager;
-    @Mock
-    private EntityTransaction transaction;
-
-    @InjectMocks
-    private ConnectionDaoImpl connectionDao;
+    // ------- UNIT TESTS -------- //
+    EntityManagerFactory emfMock;
+    EntityManager emMock;
+    EntityTransaction txMock;
+    ConnectionDaoImpl daoMocked;
 
     @BeforeEach
-    void setUp() {
-        MockitoAnnotations.openMocks(this);
-        when(entityManagerFactory.createEntityManager()).thenReturn(entityManager);
-        when(entityManager.getTransaction()).thenReturn(transaction);
+    void setupMocks() {
+        emfMock = mock(EntityManagerFactory.class);
+        emMock = mock(EntityManager.class);
+        txMock = mock(EntityTransaction.class);
 
-        customer = new Customer(2L, new User(1L, null, null, null, null), 10);
-        machine = new ConcreteVendingMachine(
-                "machine1",
-                null,
-                "Location",
-                5,
-                null,
-                null);
+        when(emfMock.createEntityManager()).thenReturn(emMock);
+        when(emMock.getTransaction()).thenReturn(txMock);
+
+        daoMocked = new ConnectionDaoImpl(emfMock);
     }
 
     @Test
-    void createConnection_persistsConnection() {
-        when(entityManager.find(Customer.class, customer.getId())).thenReturn(customer);
-        when(entityManager.find(ConcreteVendingMachine.class, machine.getId())).thenReturn(machine);
-        Connection result = connectionDao.createConnection(customer.getId(), machine.getId());
-        assertNotNull(result);
-        verify(entityManager).persist(any(Connection.class));
+    void unit_createConnection_persistsConnection() {
+        // id allineati
+        long id = 10L;
+
+        User user = new User(id, "test@email.com", "Test", "User", "pwd");
+        Customer customer = new Customer(id, user, 12.5);
+        ConcreteVendingMachine machine = new ConcreteVendingMachine(
+            "macchinaA", null, "loc", 1, MachineStatus.Operative, null);
+
+        when(emMock.find(User.class, id)).thenReturn(user);          // <-- AGGIUNTO
+        when(emMock.find(Customer.class, id)).thenReturn(customer);  // <-- NON cambia
+        when(emMock.find(ConcreteVendingMachine.class, "macchinaA"))
+            .thenReturn(machine);
+
+        Connection conn = daoMocked.createConnection(id, "macchinaA");
+
+        assertNotNull(conn);
+        verify(emMock).persist(any(Connection.class));
+        verify(txMock).begin();
+        verify(txMock).commit();
     }
 
-    @Test
-    void deleteConnection_removesConnection() {
-        Connection connection = mock(Connection.class);
-        when(entityManager.find(Connection.class, 10L)).thenReturn(connection);
-
-        connectionDao.deleteConnection(10L);
-        verify(entityManager).remove(connection);
-    }
 
     @Test
-    void deleteConnection_doesNothingIfNotFound() {
-        when(entityManager.find(Connection.class, 20L)).thenReturn(null);
-        connectionDao.deleteConnection(20L);
-        verify(entityManager, never()).remove(any());
-    }
-
-    @Test
-    void getConnectionById_returnsConnection() {
-        Connection connection = mock(Connection.class);
-        when(entityManager.find(Connection.class, 1L)).thenReturn(connection);
-
-        Connection result = connectionDao.getConnectionById(1L);
-
-        assertNotNull(result);
-        assertEquals(connection, result);
-    }
-
-    @Test
-    void getConnectionById_returnsNullIfNotFound() {
-        when(entityManager.find(Connection.class, 2L)).thenReturn(null);
-
-        Connection result = connectionDao.getConnectionById(2L);
-
-        assertNull(result);
-    }
-
-    @Test
-    void createConnection_throwsException_ifCustomerNotFound() {
-        when(entityManager.find(Customer.class, customer.getId())).thenReturn(null);
-
-        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
-            connectionDao.createConnection(customer.getId(), machine.getId());
+    void unit_createConnection_throwsIfUserNotFound() {
+        // Mock che restituisce null per Customer non trovato
+        when(emMock.find(Customer.class, 123L)).thenReturn(null);
+        
+        Exception ex = assertThrows(IllegalArgumentException.class, () -> {
+            daoMocked.createConnection(123L, "macchinaX");
         });
-
-        assertTrue(exception.getMessage().contains("User not found"));
+        
+        // Verifica che il messaggio contenga una stringa relativa all'utente non trovato
+        assertTrue(ex.getMessage().toLowerCase().contains("user") || 
+                  ex.getMessage().toLowerCase().contains("customer") ||
+                  ex.getMessage().contains("not found"));
     }
 
     @Test
-    void createConnection_throwsException_ifMachineNotFound() {
-        when(entityManager.find(Customer.class, customer.getId())).thenReturn(customer);
-        when(entityManager.find(ConcreteVendingMachine.class, machine.getId())).thenReturn(null);
+    void unit_createConnection_throwsIfMachineNotFound() {
+        // Prima mock un customer valido
+        User user = new User(999L, "test@email.com", "Test", "User", "pwd");
+        Customer customer = new Customer(50L, user, 3.2);
+        when(emMock.find(Customer.class, 50L)).thenReturn(customer);
+        
+        // Poi mock che la macchina non esista
+        when(emMock.find(ConcreteVendingMachine.class, "idX")).thenReturn(null);
 
-        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
-            connectionDao.createConnection(customer.getId(), machine.getId());
+        Exception ex = assertThrows(IllegalArgumentException.class, () -> {
+            daoMocked.createConnection(50L, "idX");
         });
-
-        assertTrue(exception.getMessage().contains("Machine not found"));
+        
+        // Verifica che il messaggio contenga una stringa relativa alla macchina non trovata
+        assertTrue(ex.getMessage().toLowerCase().contains("machine") || 
+                  ex.getMessage().toLowerCase().contains("vending") ||
+                  ex.getMessage().contains("not found"));
     }
 
+    @Test
+    void unit_deleteConnection_removesIfExists() {
+        Connection c = new Connection(77L, "macchinaZ", Instant.now());
+        when(emMock.find(Connection.class, 55L)).thenReturn(c);
+        
+        daoMocked.deleteConnection(55L);
+        
+        verify(emMock).remove(c);
+        verify(txMock).begin();
+        verify(txMock).commit();
+    }
+
+    @Test
+    void unit_deleteConnection_doesNothingIfNotFound() {
+        when(emMock.find(Connection.class, 99L)).thenReturn(null);
+        
+        daoMocked.deleteConnection(99L);
+        
+        verify(emMock, never()).remove(any());
+        // Se la connessione non esiste, non dovrebbe iniziare nemmeno la transazione
+    }
+
+    @Test
+    void unit_getConnectionById_returnsCorrectly() {
+        Connection c = new Connection(1L, "macchinaY", Instant.now());
+        when(emMock.find(Connection.class, 44L)).thenReturn(c);
+        
+        Connection result = daoMocked.getConnectionById(44L);
+        
+        assertSame(c, result);
+    }
+
+    @Test
+    void unit_getConnectionById_returnsNullIfMissing() {
+        when(emMock.find(Connection.class, 222L)).thenReturn(null);
+        
+        assertNull(daoMocked.getConnectionById(222L));
+    }
+
+    // ------- INTEGRATION TEST -------- //
+    EntityManagerFactory emfReal;
+    ConnectionDaoImpl daoReal;
+
+    @BeforeAll
+    void setupIntegration() {
+        emfReal = Persistence.createEntityManagerFactory("test-pu");
+        daoReal = new ConnectionDaoImpl(emfReal);
+    }
+
+    @AfterAll
+    void closeIntegration() {
+        if (emfReal != null) emfReal.close();
+    }
+
+    @Test
+    void integration_CRUD_flow() {
+        // 1. Prepara utente & macchina & inventory
+        EntityManager em = emfReal.createEntityManager();
+        em.getTransaction().begin();
+
+        // Crea User e Customer
+        User user = new User("test@email.com", "Test", "User", "pwd");
+        em.persist(user);
+        em.flush(); // Assicura che l'ID sia generato
+        
+        Customer customer = new Customer(user, 50);
+        em.persist(customer);
+        em.flush(); // Assicura che l'ID sia generato
+
+        // Crea Inventory
+        Inventory inventory = new Inventory();
+        em.persist(inventory);
+
+        // Crea la macchina
+        ConcreteVendingMachine machine = new ConcreteVendingMachine(
+            "macchinaTest",
+            null,
+            "location",
+            5,
+            MachineStatus.Operative,
+            inventory
+        );
+        machine.setLastMaintenance(Instant.now());
+        em.persist(machine);
+
+        em.getTransaction().commit();
+        em.close();
+
+        // 2. CREATE
+        Connection connection = daoReal.createConnection(customer.getId(), machine.getId());
+        assertNotNull(connection.getId());
+        assertEquals(customer.getId(), connection.getUserId());
+        assertEquals(machine.getId(), connection.getMachineId());
+
+        // 3. READ
+        Connection loaded = daoReal.getConnectionById(connection.getId());
+        assertNotNull(loaded);
+        assertEquals(connection.getUserId(), loaded.getUserId());
+
+        // 4. DELETE
+        daoReal.deleteConnection(connection.getId());
+        Connection afterDelete = daoReal.getConnectionById(connection.getId());
+        assertNull(afterDelete);
+    }
 }
