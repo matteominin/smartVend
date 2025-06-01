@@ -13,7 +13,7 @@ public class UserController {
         this.userService = userService;
     }
 
-    public User login(String email, String password) {
+    public User login(String email, String password) throws IllegalArgumentException {
         if (email == null || email.trim().isEmpty()) {
             throw new IllegalArgumentException("Email cannot be null or empty");
         }

@@ -2,6 +2,8 @@ package com.smartvend.app.model.user;
 
 import java.io.Serializable;
 
+import com.smartvend.app.model.user.User.Role;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -28,6 +30,7 @@ public class Worker implements Serializable {
 
     public Worker(User user) {
         this.user = user;
+        this.user.role = Role.Worker;
         this.isActive = true;
     }
 

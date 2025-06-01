@@ -20,22 +20,11 @@ public class WorkerController {
         this.taskService = taskService;
     }
 
-    public Worker login(String email, String password) {
-        if (email == null || email.trim().isEmpty()) {
-            throw new IllegalArgumentException("Email cannot be null or empty");
+    public Worker getWorker(long workerId) {
+        if (workerId <= 0) {
+            throw new IllegalArgumentException("Worker ID must be positive");
         }
-        if (password == null || password.trim().isEmpty()) {
-            throw new IllegalArgumentException("Password cannot be null or empty");
-        }
-        return workerService.logIn(email, password);
-    }
-
-    public Worker signUp(Worker worker) {
-        if (worker == null) {
-            throw new IllegalArgumentException("Worker cannot be null");
-        }
-        return workerService.signUp(worker.getUser().getEmail(), worker.getUser().getName(),
-                worker.getUser().getSurname(), worker.getUser().getPassword());
+        return workerService.getWorkerById(workerId);
     }
 
     public List<Task> getTasks(long workerId) {

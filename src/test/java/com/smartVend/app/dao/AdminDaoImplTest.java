@@ -9,6 +9,10 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
@@ -22,25 +26,28 @@ import com.smartvend.app.model.user.Admin;
 import com.smartvend.app.model.user.User;
 
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityManagerFactory;
+import jakarta.persistence.EntityTransaction;
 import jakarta.persistence.TypedQuery;
 
 class AdminDaoImplTest {
 
+    @Mock
+    private EntityManagerFactory entityManagerFactory;
+    @Mock
     private EntityManager entityManager;
+    @Mock
+    private EntityTransaction transaction;
+
+    @InjectMocks
     private AdminDaoImpl adminDao;
 
     @BeforeEach
     void setUp() {
-        entityManager = mock(EntityManager.class);
-        adminDao = new AdminDaoImpl();
-        // Iniettiamo l'EntityManager tramite reflection
-        try {
-            var field = AdminDaoImpl.class.getDeclaredField("entityManager");
-            field.setAccessible(true);
-            field.set(adminDao, entityManager);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        MockitoAnnotations.openMocks(this);
+
+        when(entityManagerFactory.createEntityManager()).thenReturn(entityManager);
+        when(entityManager.getTransaction()).thenReturn(transaction);
     }
 
     @Test

@@ -8,40 +8,73 @@ import com.smartvend.app.model.user.Customer;
 import com.smartvend.app.model.vendingmachine.ConcreteVendingMachine;
 
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
-import jakarta.transaction.Transactional;
+import jakarta.persistence.EntityManagerFactory;
 
 public class ConnectionDaoImpl implements ConnectionDao {
 
-    @PersistenceContext
-    private EntityManager entityManager;
+    private final EntityManagerFactory emf;
+
+    public ConnectionDaoImpl(EntityManagerFactory entityManagerFactory) {
+        this.emf = entityManagerFactory;
+    }
 
     @Override
-    @Transactional
     public Connection createConnection(Long userId, String machineId) {
-        Customer customer = entityManager.find(Customer.class, userId);
-        ConcreteVendingMachine machine = entityManager.find(ConcreteVendingMachine.class, machineId);
-        if (customer == null) {
-            throw new IllegalArgumentException("User not found with ID: " + userId);
-        } else if (machine == null) {
-            throw new IllegalArgumentException("Machine not found with ID: " + machineId);
+        EntityManager em = emf.createEntityManager();
+        try {
+            em.getTransaction().begin();
+
+            Customer customer = em.find(Customer.class, userId);
+            ConcreteVendingMachine machine = em.find(ConcreteVendingMachine.class, machineId);
+            if (customer == null) {
+                throw new IllegalArgumentException("User not found with ID: " + userId);
+            } else if (machine == null) {
+                throw new IllegalArgumentException("Machine not found with ID: " + machineId);
+            }
+            Connection connection = new Connection(userId, machineId, Instant.now());
+            em.persist(connection);
+
+            em.getTransaction().commit();
+            return connection;
+        } catch (Exception e) {
+            if (em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            throw e;
+        } finally {
+            em.close();
         }
-        Connection connection = new Connection(userId, machineId, Instant.now());
-        entityManager.persist(connection);
-        return connection;
     }
 
     @Override
     public Connection getConnectionById(Long connectionId) {
-        return entityManager.find(Connection.class, connectionId);
+        EntityManager em = emf.createEntityManager();
+        try {
+            return em.find(Connection.class, connectionId);
+        } finally {
+            em.close();
+        }
     }
 
     @Override
-    @Transactional
     public void deleteConnection(Long connectionId) {
-        Connection connection = entityManager.find(Connection.class, connectionId);
-        if (connection != null) {
-            entityManager.remove(connection);
+        EntityManager em = emf.createEntityManager();
+        try {
+            em.getTransaction().begin();
+
+            Connection connection = em.find(Connection.class, connectionId);
+            if (connection != null) {
+                em.remove(connection);
+            }
+
+            em.getTransaction().commit();
+        } catch (Exception e) {
+            if (em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            throw e;
+        } finally {
+            em.close();
         }
     }
 }

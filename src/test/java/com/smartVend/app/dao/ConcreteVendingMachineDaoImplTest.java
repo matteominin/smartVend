@@ -3,33 +3,42 @@ package com.smartvend.app.dao;
 import com.smartvend.app.dao.impl.ConcreteVendingMachineDaoImpl;
 import com.smartvend.app.model.vendingmachine.ConcreteVendingMachine;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityManagerFactory;
+import jakarta.persistence.EntityTransaction;
 import jakarta.persistence.TypedQuery;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 
 import java.util.Collections;
 import java.util.List;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 class ConcreteVendingMachineDaoImplTest {
 
+    @Mock
+    private EntityManagerFactory entityManagerFactory;
+    @Mock
     private EntityManager entityManager;
+    @Mock
+    private EntityTransaction transaction;
+
+    @InjectMocks
     private ConcreteVendingMachineDaoImpl vendingMachineDao;
 
     @BeforeEach
     void setUp() {
-        entityManager = mock(EntityManager.class);
-        vendingMachineDao = new ConcreteVendingMachineDaoImpl();
-        // Reflection to inject EntityManager
-        try {
-            var field = ConcreteVendingMachineDaoImpl.class.getDeclaredField("entityManager");
-            field.setAccessible(true);
-            field.set(vendingMachineDao, entityManager);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        MockitoAnnotations.openMocks(this);
+
+        when(entityManagerFactory.createEntityManager()).thenReturn(entityManager);
+        when(entityManager.getTransaction()).thenReturn(transaction);
     }
 
     @Test

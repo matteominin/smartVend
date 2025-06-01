@@ -7,6 +7,10 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -20,18 +24,29 @@ import com.smartvend.app.model.user.User;
 import com.smartvend.app.model.vendingmachine.ConcreteVendingMachine;
 
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityManagerFactory;
+import jakarta.persistence.EntityTransaction;
 
 class ConnectionDaoImplTest {
-
-    private EntityManager entityManager;
-    private ConnectionDaoImpl connectionDao;
     private Customer customer;
     private ConcreteVendingMachine machine;
 
+    @Mock
+    private EntityManagerFactory entityManagerFactory;
+    @Mock
+    private EntityManager entityManager;
+    @Mock
+    private EntityTransaction transaction;
+
+    @InjectMocks
+    private ConnectionDaoImpl connectionDao;
+
     @BeforeEach
     void setUp() {
-        entityManager = mock(EntityManager.class);
-        connectionDao = new ConnectionDaoImpl();
+        MockitoAnnotations.openMocks(this);
+        when(entityManagerFactory.createEntityManager()).thenReturn(entityManager);
+        when(entityManager.getTransaction()).thenReturn(transaction);
+
         customer = new Customer(2L, new User(1L, null, null, null, null), 10);
         machine = new ConcreteVendingMachine(
                 "machine1",
@@ -40,15 +55,6 @@ class ConnectionDaoImplTest {
                 5,
                 null,
                 null);
-
-        // Inject EntityManager via reflection
-        try {
-            var field = ConnectionDaoImpl.class.getDeclaredField("entityManager");
-            field.setAccessible(true);
-            field.set(connectionDao, entityManager);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
     }
 
     @Test

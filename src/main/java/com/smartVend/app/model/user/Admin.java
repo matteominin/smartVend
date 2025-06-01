@@ -2,6 +2,8 @@ package com.smartvend.app.model.user;
 
 import java.io.Serializable;
 
+import com.smartvend.app.model.user.User.Role;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -25,6 +27,7 @@ public class Admin implements Serializable {
 
     public Admin(User user) {
         this.user = user;
+        this.user.role = Role.Admin;
     }
 
     public Long getId() {
