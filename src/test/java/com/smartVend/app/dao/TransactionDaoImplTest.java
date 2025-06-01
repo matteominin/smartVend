@@ -32,14 +32,20 @@ import static org.mockito.Mockito.*;
 
 class TransactionDaoImplTest {
 
-    /*──────────────────────────── UNIT TESTS (Mockito) ───────────────────────────*/
+    /*
+     * ──────────────────────────── UNIT TESTS (Mockito) ───────────────────────────
+     */
     @Nested
     class Unit {
 
-        @Mock EntityManagerFactory emf;
-        @Mock EntityManager em;
-        @Mock EntityTransaction tx;
-        @InjectMocks TransactionDaoImpl dao;
+        @Mock
+        EntityManagerFactory emf;
+        @Mock
+        EntityManager em;
+        @Mock
+        EntityTransaction tx;
+        @InjectMocks
+        TransactionDaoImpl dao;
 
         @BeforeEach
         void setUp() {
@@ -88,7 +94,9 @@ class TransactionDaoImplTest {
         }
     }
 
-    /*──────────────────────────── INTEGRATION TESTS (H2) ─────────────────────────*/
+    /*
+     * ──────────────────────────── INTEGRATION TESTS (H2) ─────────────────────────
+     */
     @Nested
     class Integration {
 
@@ -102,7 +110,8 @@ class TransactionDaoImplTest {
 
         @AfterAll
         static void stopPU() {
-            if (emf != null) emf.close();
+            if (emf != null)
+                emf.close();
         }
 
         @BeforeEach

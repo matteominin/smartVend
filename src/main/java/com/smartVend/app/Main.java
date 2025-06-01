@@ -23,16 +23,14 @@ public class Main {
 
             Scanner scanner = new Scanner(System.in);
 
-            System.out.println("Welcome to SmartVend! Please log in or sign up.");
+            System.out.println("\n\n\nWelcome to SmartVend! Please log in or sign up.");
             System.out.print("Enter your email: ");
             String email = scanner.nextLine();
             System.out.print("Enter your password: ");
             String password = scanner.nextLine();
 
             User user = userController.login(email, password);
-            if (user != null) {
-                System.out.println("Login successful! Welcome, " + user.getName() + " " + user.getSurname());
-            } else {
+            if (user == null) {
                 System.out.println("Login failed. Please check your credentials.");
                 scanner.close();
                 return;
@@ -44,7 +42,7 @@ public class Main {
             e.printStackTrace();
         } finally {
             DatabaseInitializer.shutdown();
-            System.out.println("Main application logic finished.");
+            System.out.println("Main application logic finished.\n\n\n");
         }
     }
 }

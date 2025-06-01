@@ -42,13 +42,19 @@ import jakarta.persistence.TypedQuery;
  */
 class UserDaoImplTest {
 
-    /*────────────────────────────── UNIT TESTS (Mockito) ──────────────────────────────*/
+    /*
+     * ────────────────────────────── UNIT TESTS (Mockito)
+     * ──────────────────────────────
+     */
     @Nested
     class Unit {
 
-        @Mock  EntityManagerFactory emf;
-        @Mock  EntityManager         em;
-        @Mock  EntityTransaction     tx;
+        @Mock
+        EntityManagerFactory emf;
+        @Mock
+        EntityManager em;
+        @Mock
+        EntityTransaction tx;
 
         @InjectMocks
         UserDaoImpl dao;
@@ -62,11 +68,12 @@ class UserDaoImplTest {
 
         @Test
         void getUserByEmail_returnsUser() {
-            User expected = new User("a@b.com","Mario","Rossi","pwd");
+            User expected = new User("a@b.com", "Mario", "Rossi", "pwd");
 
+            @SuppressWarnings("unchecked")
             TypedQuery<User> q = mock(TypedQuery.class);
             when(em.createQuery(anyString(), eq(User.class))).thenReturn(q);
-            when(q.setParameter("email","a@b.com")).thenReturn(q);
+            when(q.setParameter("email", "a@b.com")).thenReturn(q);
             when(q.getSingleResult()).thenReturn(expected);
 
             User result = dao.getUserByEmail("a@b.com");
@@ -76,18 +83,19 @@ class UserDaoImplTest {
 
         @Test
         void getUserByEmail_throwsWhenNotFound() {
+            @SuppressWarnings("unchecked")
             TypedQuery<User> q = mock(TypedQuery.class);
             when(em.createQuery(anyString(), eq(User.class))).thenReturn(q);
             when(q.setParameter(anyString(), anyString())).thenReturn(q);
             when(q.getSingleResult()).thenThrow(NoResultException.class);
 
             assertThrows(NoResultException.class,
-                         () -> dao.getUserByEmail("missing@mail"));
+                    () -> dao.getUserByEmail("missing@mail"));
         }
 
         @Test
         void createUser_persistsAndReturns() {
-            User u = new User("new@mail","Anna","Bianchi","pwd");
+            User u = new User("new@mail", "Anna", "Bianchi", "pwd");
             doNothing().when(em).persist(u);
 
             User res = dao.createUser(u);
@@ -97,7 +105,7 @@ class UserDaoImplTest {
 
         @Test
         void getUserById_found() {
-            User u = new User("x@y","X","Y","pwd");
+            User u = new User("x@y", "X", "Y", "pwd");
             when(em.find(User.class, 3L)).thenReturn(u);
 
             assertSame(u, dao.getUserById(3L));
@@ -111,6 +119,7 @@ class UserDaoImplTest {
 
         @Test
         void findAll_empty() {
+            @SuppressWarnings("unchecked")
             TypedQuery<User> q = mock(TypedQuery.class);
             when(em.createQuery(anyString(), eq(User.class))).thenReturn(q);
             when(q.getResultList()).thenReturn(Collections.emptyList());
@@ -120,8 +129,8 @@ class UserDaoImplTest {
 
         @Test
         void updateUser_merges() {
-            User u = new User("up@mail","Up","User","pwd");
-            User merged = new User("up@mail","Up","User","pwd");
+            User u = new User("up@mail", "Up", "User", "pwd");
+            User merged = new User("up@mail", "Up", "User", "pwd");
             when(em.merge(u)).thenReturn(merged);
 
             User res = dao.updateUser(u);
@@ -131,7 +140,7 @@ class UserDaoImplTest {
 
         @Test
         void deleteUser_removesWhenExists() {
-            User u = new User("del@mail","Del","User","pwd");
+            User u = new User("del@mail", "Del", "User", "pwd");
             when(em.find(User.class, 7L)).thenReturn(u);
 
             dao.deleteUser(7L);
@@ -147,31 +156,41 @@ class UserDaoImplTest {
         }
     }
 
-    /*─────────────────────────── INTEGRATION TESTS (H2) ───────────────────────────────*/
+    /*
+     * ─────────────────────────── INTEGRATION TESTS (H2)
+     * ───────────────────────────────
+     */
     @Nested
     class Integration {
 
         private static EntityManagerFactory emf;
-        private        UserDaoImpl          intDao;
+        private UserDaoImpl intDao;
 
         @BeforeAll
-        static void startPU() { emf = Persistence.createEntityManagerFactory("test-pu"); }
+        static void startPU() {
+            emf = Persistence.createEntityManagerFactory("test-pu");
+        }
 
         @AfterAll
-        static void stopPU()  { if (emf != null) emf.close(); }
+        static void stopPU() {
+            if (emf != null)
+                emf.close();
+        }
 
         @BeforeEach
-        void initDao() { intDao = new UserDaoImpl(emf); }
+        void initDao() {
+            intDao = new UserDaoImpl(emf);
+        }
 
         @Test
         void integration_CRUD_flow() {
             /* CREATE */
-            User user = new User("admin@email.com","Mario","Rossi","pwd");
+            User user = new User("admin@email.com", "Mario", "Rossi", "pwd");
             intDao.createUser(user);
             assertNotNull(user.getId());
 
             /* READ by id & email */
-            User byId    = intDao.getUserById(user.getId());
+            User byId = intDao.getUserById(user.getId());
             User byEmail = intDao.getUserByEmail("admin@email.com");
             assertEquals("Mario", byId.getName());
             assertEquals(byId.getId(), byEmail.getId());
@@ -190,7 +209,7 @@ class UserDaoImplTest {
             intDao.deleteUser(afterUpd.getId());
             assertNull(intDao.getUserById(afterUpd.getId()));
             assertThrows(NoResultException.class,
-                         () -> intDao.getUserByEmail("new@email.com"));
+                    () -> intDao.getUserByEmail("new@email.com"));
         }
     }
 }

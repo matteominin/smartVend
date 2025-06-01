@@ -36,14 +36,20 @@ import jakarta.persistence.TypedQuery;
 
 class InventoryDaoImplTest {
 
-    /*──────────────────────────── UNIT TESTS (Mockito) ───────────────────────────*/
+    /*
+     * ──────────────────────────── UNIT TESTS (Mockito) ───────────────────────────
+     */
     @Nested
     class Unit {
 
-        @Mock EntityManagerFactory emf;
-        @Mock EntityManager em;
-        @Mock EntityTransaction tx;
-        @InjectMocks InventoryDaoImpl dao;
+        @Mock
+        EntityManagerFactory emf;
+        @Mock
+        EntityManager em;
+        @Mock
+        EntityTransaction tx;
+        @InjectMocks
+        InventoryDaoImpl dao;
 
         @BeforeEach
         void setUp() {
@@ -55,6 +61,7 @@ class InventoryDaoImplTest {
         @Test
         void getMachineInventory_returnsInventory() {
             Inventory inventory = new Inventory();
+            @SuppressWarnings("unchecked")
             TypedQuery<Inventory> query = mock(TypedQuery.class);
 
             when(em.createQuery(anyString(), eq(Inventory.class))).thenReturn(query);
@@ -70,6 +77,7 @@ class InventoryDaoImplTest {
         void removeItemFromInventory_removesAndMerges() {
             Inventory inventory = mock(Inventory.class);
             Item item = mock(Item.class);
+            @SuppressWarnings("unchecked")
             TypedQuery<Inventory> query = mock(TypedQuery.class);
 
             when(em.createQuery(anyString(), eq(Inventory.class))).thenReturn(query);
@@ -87,6 +95,7 @@ class InventoryDaoImplTest {
         @Test
         void removeItemFromInventory_throwsIfInventoryNotFound_andRollsBack() {
             Item item = mock(Item.class);
+            @SuppressWarnings("unchecked")
             TypedQuery<Inventory> query = mock(TypedQuery.class);
 
             when(em.createQuery(anyString(), eq(Inventory.class))).thenReturn(query);
@@ -103,6 +112,7 @@ class InventoryDaoImplTest {
         @Test
         void removeItemFromInventory_rollsBackOnOtherException() {
             Item item = mock(Item.class);
+            @SuppressWarnings("unchecked")
             TypedQuery<Inventory> query = mock(TypedQuery.class);
 
             when(em.createQuery(anyString(), eq(Inventory.class))).thenReturn(query);
@@ -119,6 +129,7 @@ class InventoryDaoImplTest {
         void addItemToInventory_addsAndMerges() {
             Inventory inventory = mock(Inventory.class);
             Item item = mock(Item.class);
+            @SuppressWarnings("unchecked")
             TypedQuery<Inventory> query = mock(TypedQuery.class);
 
             when(em.createQuery(anyString(), eq(Inventory.class))).thenReturn(query);
@@ -136,6 +147,7 @@ class InventoryDaoImplTest {
         @Test
         void addItemToInventory_throwsIfInventoryNotFound_andRollsBack() {
             Item item = mock(Item.class);
+            @SuppressWarnings("unchecked")
             TypedQuery<Inventory> query = mock(TypedQuery.class);
 
             when(em.createQuery(anyString(), eq(Inventory.class))).thenReturn(query);
@@ -152,6 +164,7 @@ class InventoryDaoImplTest {
         @Test
         void addItemToInventory_rollsBackOnOtherException() {
             Item item = mock(Item.class);
+            @SuppressWarnings("unchecked")
             TypedQuery<Inventory> query = mock(TypedQuery.class);
 
             when(em.createQuery(anyString(), eq(Inventory.class))).thenReturn(query);
@@ -187,7 +200,9 @@ class InventoryDaoImplTest {
         }
     }
 
-    /*───────────────────────── INTEGRATION TESTS (H2 DB) ─────────────────────────*/
+    /*
+     * ───────────────────────── INTEGRATION TESTS (H2 DB) ─────────────────────────
+     */
     @Nested
     class Integration {
 
@@ -195,23 +210,30 @@ class InventoryDaoImplTest {
         private InventoryDaoImpl dao;
 
         @BeforeAll
-        static void startPU() { emf = Persistence.createEntityManagerFactory("test-pu"); }
+        static void startPU() {
+            emf = Persistence.createEntityManagerFactory("test-pu");
+        }
 
         @AfterAll
-        static void stopPU() { if (emf != null) emf.close(); }
+        static void stopPU() {
+            if (emf != null)
+                emf.close();
+        }
 
         @BeforeEach
-        void setup() { dao = new InventoryDaoImpl(emf); }
+        void setup() {
+            dao = new InventoryDaoImpl(emf);
+        }
 
         @Test
         void integration_CRUD_flow() {
-            // Prepara una ConcreteVendingMachine, Inventory, Item e collega tutto correttamente
+            // Prepara una ConcreteVendingMachine, Inventory, Item e collega tutto
+            // correttamente
             EntityManager em = emf.createEntityManager();
             em.getTransaction().begin();
 
             ConcreteVendingMachine machine = new ConcreteVendingMachine(
-                "ABC123", null, "Milano", 30, MachineStatus.Operative, null
-            );
+                    "ABC123", null, "Milano", 30, MachineStatus.Operative, null);
             // Aggiungi lastMaintenance (obbligatorio!)
             machine.setLastMaintenance(java.time.Instant.now());
             em.persist(machine);
@@ -226,8 +248,7 @@ class InventoryDaoImplTest {
 
             // Crea un item associato a questo inventory
             Item item = new Item(
-                0L, "Mars", "Barretta", 100, 5, 1.2, 1, ItemType.Snack
-            );
+                    0L, "Mars", "Barretta", 100, 5, 1.2, 1, ItemType.Snack);
             item.setInventory(inventory);
             em.persist(item);
 
