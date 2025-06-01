@@ -28,6 +28,7 @@ public class Worker implements Serializable {
 
     public Worker(User user) {
         this.user = user;
+        this.isActive = true;
     }
 
     public Long getId() {

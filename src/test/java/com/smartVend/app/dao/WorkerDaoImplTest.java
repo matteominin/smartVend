@@ -9,6 +9,10 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
@@ -22,42 +26,45 @@ import com.smartvend.app.model.user.User;
 import com.smartvend.app.model.user.Worker;
 
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityManagerFactory;
+import jakarta.persistence.EntityTransaction;
 import jakarta.persistence.TypedQuery;
 
 class WorkerDaoImplTest {
 
+    @Mock
+    private EntityManagerFactory entityManagerFactory;
+    @Mock
     private EntityManager entityManager;
+    @Mock
+    private EntityTransaction transaction;
+
+    @InjectMocks
     private WorkerDaoImpl workerDao;
 
     @BeforeEach
     void setUp() {
-        entityManager = mock(EntityManager.class);
-        workerDao = new WorkerDaoImpl();
-        // inject entityManager
-        try {
-            var field = WorkerDaoImpl.class.getDeclaredField("entityManager");
-            field.setAccessible(true);
-            field.set(workerDao, entityManager);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        MockitoAnnotations.openMocks(this);
+
+        when(entityManagerFactory.createEntityManager()).thenReturn(entityManager);
+        when(entityManager.getTransaction()).thenReturn(transaction);
     }
 
     @Test
     void getWorkerById_returnsWorker() {
         Worker worker = new Worker(new User(null, null, null, null));
-        when(entityManager.find(Worker.class, "123")).thenReturn(worker);
+        when(entityManager.find(Worker.class, 123L)).thenReturn(worker);
 
-        Worker result = workerDao.getWorkerById("123");
+        Worker result = workerDao.getWorkerById(123L);
         assertNotNull(result);
         assertEquals(worker, result);
     }
 
     @Test
     void getWorkerById_returnsNullIfNotFound() {
-        when(entityManager.find(Worker.class, "999")).thenReturn(null);
+        when(entityManager.find(Worker.class, 999L)).thenReturn(null);
 
-        Worker result = workerDao.getWorkerById("999");
+        Worker result = workerDao.getWorkerById(999L);
         assertNull(result);
     }
 

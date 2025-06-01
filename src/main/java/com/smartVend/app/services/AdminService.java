@@ -284,8 +284,8 @@ public class AdminService {
         if (supervisorId == null || workerId == null || reportId == null || status == null || assignedAt == null)
             throw new IllegalArgumentException("Arguments cannot be null");
 
-        Admin supervisor = adminDao.getAdminById(supervisorId.toString());
-        Worker worker = workerDao.getWorkerById(workerId.toString());
+        Admin supervisor = adminDao.getAdminById(supervisorId);
+        Worker worker = workerDao.getWorkerById(workerId);
         MaintenanceReport report = maintenanceService.getReportById(reportId);
 
         if (supervisor == null)

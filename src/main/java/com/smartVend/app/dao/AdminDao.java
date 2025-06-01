@@ -5,7 +5,7 @@ import java.util.List;
 import com.smartvend.app.model.user.Admin;
 
 public interface AdminDao {
-    Admin getAdminById(String adminId);
+    Admin getAdminById(Long adminId);
 
     List<Admin> findAll();
 

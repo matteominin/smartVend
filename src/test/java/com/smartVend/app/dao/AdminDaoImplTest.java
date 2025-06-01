@@ -46,9 +46,9 @@ class AdminDaoImplTest {
     @Test
     void getAdminById_returnsAdmin() {
         Admin admin = new Admin(new User(null, null, null, null));
-        when(entityManager.find(Admin.class, "123")).thenReturn(admin);
+        when(entityManager.find(Admin.class, 123L)).thenReturn(admin);
 
-        Admin result = adminDao.getAdminById("123");
+        Admin result = adminDao.getAdminById(123L);
         assertNotNull(result);
         assertEquals(admin, result);
     }
