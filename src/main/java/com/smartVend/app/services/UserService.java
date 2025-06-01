@@ -1,12 +1,12 @@
 package com.smartvend.app.services;
 
-import com.smartvend.app.dao.UserDao;
+import com.smartvend.app.dao.impl.UserDaoImpl;
 import com.smartvend.app.model.user.User;
 
 public class UserService {
-    private UserDao userDao;
+    private UserDaoImpl userDao;
 
-    UserService(UserDao userDao) {
+    public UserService(UserDaoImpl userDao) {
         this.userDao = userDao;
     }
 

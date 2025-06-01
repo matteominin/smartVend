@@ -15,7 +15,7 @@ public class AdminDaoImpl implements AdminDao {
     private EntityManager entityManager;
 
     @Override
-    public Admin getAdminById(String adminId) {
+    public Admin getAdminById(Long adminId) {
         return entityManager.find(Admin.class, adminId);
     }
 

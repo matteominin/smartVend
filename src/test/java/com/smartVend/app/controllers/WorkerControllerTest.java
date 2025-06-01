@@ -4,7 +4,6 @@ import com.smartvend.app.model.maintenance.MaintenanceStatus;
 import com.smartvend.app.model.maintenance.Task;
 import com.smartvend.app.model.user.Worker;
 import com.smartvend.app.services.TaskService;
-import com.smartvend.app.services.UserService;
 import com.smartvend.app.services.WorkerService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -14,23 +13,20 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 class WorkerControllerTest {
-
-    private UserService userService;
     private WorkerService workerService;
     private TaskService taskService;
     private WorkerController workerController;
 
     @BeforeEach
     void setUp() {
-        userService = mock(UserService.class);
         workerService = mock(WorkerService.class);
         taskService = mock(TaskService.class);
-        workerController = new WorkerController(userService, workerService, taskService);
+        workerController = new WorkerController(workerService, taskService);
     }
 
     @Test
     void constructor_throwsException_whenWorkerServiceIsNull() {
-        assertThrows(IllegalArgumentException.class, () -> new WorkerController(userService, null, taskService));
+        assertThrows(IllegalArgumentException.class, () -> new WorkerController(null, taskService));
     }
 
     @Test

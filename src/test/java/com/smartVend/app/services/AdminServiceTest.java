@@ -412,16 +412,16 @@ public class AdminServiceTest {
         MaintenanceReport report = mock(MaintenanceReport.class);
         Task task = mock(Task.class);
 
-        when(adminDao.getAdminById(supervisorId.toString())).thenReturn(supervisor);
-        when(workerDao.getWorkerById(workerId.toString())).thenReturn(worker);
+        when(adminDao.getAdminById(supervisorId)).thenReturn(supervisor);
+        when(workerDao.getWorkerById(workerId)).thenReturn(worker);
         when(maintenanceService.getReportById(reportId)).thenReturn(report);
         when(taskDao.createTask(any(Task.class))).thenReturn(task);
 
         Task result = adminService.createTaskForWorker(supervisorId, workerId, reportId, status, AssignedAt);
 
         assertEquals(task, result);
-        verify(adminDao).getAdminById(supervisorId.toString());
-        verify(workerDao).getWorkerById(workerId.toString());
+        verify(adminDao).getAdminById(supervisorId);
+        verify(workerDao).getWorkerById(workerId);
         verify(maintenanceService).getReportById(reportId);
         verify(taskDao).createTask(any(Task.class));
     }
@@ -456,7 +456,7 @@ public class AdminServiceTest {
         MaintenanceStatus status = MaintenanceStatus.Assigned;
         Instant AssignedAt = Instant.now();
 
-        when(adminDao.getAdminById(supervisorId.toString())).thenReturn(null);
+        when(adminDao.getAdminById(supervisorId)).thenReturn(null);
 
         assertThrows(IllegalArgumentException.class,
                 () -> adminService.createTaskForWorker(supervisorId, workerId, reportId, status, AssignedAt));
@@ -471,8 +471,8 @@ public class AdminServiceTest {
         Instant AssignedAt = Instant.now();
 
         Admin supervisor = mock(Admin.class);
-        when(adminDao.getAdminById(supervisorId.toString())).thenReturn(supervisor);
-        when(workerDao.getWorkerById(workerId.toString())).thenReturn(null);
+        when(adminDao.getAdminById(supervisorId)).thenReturn(supervisor);
+        when(workerDao.getWorkerById(workerId)).thenReturn(null);
 
         assertThrows(IllegalArgumentException.class,
                 () -> adminService.createTaskForWorker(supervisorId, workerId, reportId, status, AssignedAt));
@@ -489,8 +489,8 @@ public class AdminServiceTest {
         Admin supervisor = mock(Admin.class);
         Worker worker = mock(Worker.class);
 
-        when(adminDao.getAdminById(supervisorId.toString())).thenReturn(supervisor);
-        when(workerDao.getWorkerById(workerId.toString())).thenReturn(worker);
+        when(adminDao.getAdminById(supervisorId)).thenReturn(supervisor);
+        when(workerDao.getWorkerById(workerId)).thenReturn(worker);
         when(maintenanceService.getReportById(reportId)).thenReturn(null);
 
         assertThrows(IllegalArgumentException.class,

@@ -4,22 +4,38 @@ import java.util.List;
 
 import com.smartvend.app.model.maintenance.MaintenanceStatus;
 import com.smartvend.app.model.maintenance.Task;
+import com.smartvend.app.model.user.Worker;
 import com.smartvend.app.services.TaskService;
-import com.smartvend.app.services.UserService;
 import com.smartvend.app.services.WorkerService;
 
-public class WorkerController extends UserController {
+public class WorkerController {
     private WorkerService workerService;
     private TaskService taskService;
 
-    public WorkerController(UserService userService, WorkerService workerService, TaskService taskService) {
-        super(userService);
-
+    public WorkerController(WorkerService workerService, TaskService taskService) {
         if (workerService == null) {
             throw new IllegalArgumentException("WorkerService cannot be null");
         }
         this.workerService = workerService;
         this.taskService = taskService;
+    }
+
+    public Worker login(String email, String password) {
+        if (email == null || email.trim().isEmpty()) {
+            throw new IllegalArgumentException("Email cannot be null or empty");
+        }
+        if (password == null || password.trim().isEmpty()) {
+            throw new IllegalArgumentException("Password cannot be null or empty");
+        }
+        return workerService.logIn(email, password);
+    }
+
+    public Worker signUp(Worker worker) {
+        if (worker == null) {
+            throw new IllegalArgumentException("Worker cannot be null");
+        }
+        return workerService.signUp(worker.getUser().getEmail(), worker.getUser().getName(),
+                worker.getUser().getSurname(), worker.getUser().getPassword());
     }
 
     public List<Task> getTasks(long workerId) {
