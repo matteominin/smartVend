@@ -9,6 +9,10 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.contains;
 import static org.mockito.ArgumentMatchers.eq;
@@ -25,22 +29,28 @@ import com.smartvend.app.model.user.User;
 import com.smartvend.app.model.user.Worker;
 
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityManagerFactory;
+import jakarta.persistence.EntityTransaction;
 import jakarta.persistence.TypedQuery;
 
 class TaskDaoImplTest {
 
-    private TaskDaoImpl taskDao;
+    @Mock
+    private EntityManagerFactory entityManagerFactory;
+    @Mock
     private EntityManager entityManager;
+    @Mock
+    private EntityTransaction transaction;
+
+    @InjectMocks
+    private TaskDaoImpl taskDao;
 
     @BeforeEach
-    void setUp() throws Exception {
-        entityManager = mock(EntityManager.class);
-        taskDao = new TaskDaoImpl();
+    void setUp() {
+        MockitoAnnotations.openMocks(this);
 
-        // Reflection per settare entityManager privato
-        var field = TaskDaoImpl.class.getDeclaredField("entityManager");
-        field.setAccessible(true);
-        field.set(taskDao, entityManager);
+        when(entityManagerFactory.createEntityManager()).thenReturn(entityManager);
+        when(entityManager.getTransaction()).thenReturn(transaction);
     }
 
     @Test
@@ -73,13 +83,12 @@ class TaskDaoImplTest {
     @Test
     void createTask_persistsTask() {
         Task task = new Task(
-            0L,
-            new Worker(new User(null, null, null, null)),
-            new Admin(new User(null, null, null, null)),
-            MaintenanceStatus.Assigned,
-            Instant.now(),
-            new MaintenanceReport("description", Instant.now(), null)
-        );
+                0L,
+                new Worker(new User(null, null, null, null)),
+                new Admin(new User(null, null, null, null)),
+                MaintenanceStatus.Assigned,
+                Instant.now(),
+                new MaintenanceReport("description", Instant.now(), null));
         Task result = taskDao.createTask(task);
         verify(entityManager).persist(task);
         assertEquals(task, result);

@@ -4,52 +4,106 @@ import com.smartvend.app.dao.UserDao;
 import com.smartvend.app.model.user.User;
 
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
-import jakarta.transaction.Transactional;
+import jakarta.persistence.EntityManagerFactory;
+
+import java.util.List;
 
 public class UserDaoImpl implements UserDao {
 
-    @PersistenceContext
-    private EntityManager entityManager;
+    private final EntityManagerFactory emf;
 
-    @Override
-    public User getUserByEmail(String email) {
-        return entityManager.createQuery(
-                "SELECT u FROM User u WHERE u.email = :email", User.class)
-                .setParameter("email", email)
-                .getSingleResult();
+    public UserDaoImpl(EntityManagerFactory entityManagerFactory) {
+        this.emf = entityManagerFactory;
     }
 
     @Override
-    @Transactional
+    public User getUserByEmail(String email) {
+        EntityManager em = emf.createEntityManager();
+        try {
+            // Removed the try-catch for NoResultException to allow it to propagate
+            return em.createQuery(
+                    "SELECT u FROM User u WHERE u.email = :email", User.class)
+                    .setParameter("email", email)
+                    .getSingleResult();
+        } finally {
+            em.close();
+        }
+    }
+
+    @Override
     public User createUser(User user) {
-        entityManager.persist(user);
-        return user;
+        EntityManager em = emf.createEntityManager();
+        try {
+            em.getTransaction().begin();
+            em.persist(user);
+            em.getTransaction().commit();
+            return user;
+        } catch (Exception e) {
+            if (em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            throw e;
+        } finally {
+            em.close();
+        }
     }
 
     @Override
     public User getUserById(Long userId) {
-        return entityManager.find(User.class, userId);
+        EntityManager em = emf.createEntityManager();
+        try {
+            return em.find(User.class, userId);
+        } finally {
+            em.close();
+        }
     }
 
     @Override
-    public java.util.List<User> findAll() {
-        return entityManager.createQuery("SELECT u FROM User u", User.class)
-                .getResultList();
+    public List<User> findAll() {
+        EntityManager em = emf.createEntityManager();
+        try {
+            return em.createQuery("SELECT u FROM User u", User.class)
+                    .getResultList();
+        } finally {
+            em.close();
+        }
     }
 
     @Override
-    @Transactional
     public User updateUser(User user) {
-        return entityManager.merge(user);
+        EntityManager em = emf.createEntityManager();
+        try {
+            em.getTransaction().begin();
+            User merged = em.merge(user);
+            em.getTransaction().commit();
+            return merged;
+        } catch (Exception e) {
+            if (em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            throw e;
+        } finally {
+            em.close();
+        }
     }
 
     @Override
-    @Transactional
     public void deleteUser(Long userId) {
-        User user = entityManager.find(User.class, userId);
-        if (user != null) {
-            entityManager.remove(user);
+        EntityManager em = emf.createEntityManager();
+        try {
+            em.getTransaction().begin();
+            User user = em.find(User.class, userId);
+            if (user != null) {
+                em.remove(user);
+            }
+            em.getTransaction().commit();
+        } catch (Exception e) {
+            if (em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            throw e;
+        } finally {
+            em.close();
         }
     }
 }

@@ -3,34 +3,41 @@ package com.smartvend.app.dao;
 import com.smartvend.app.dao.impl.TransactionDaoImpl;
 import com.smartvend.app.model.transaction.Transaction;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityManagerFactory;
+import jakarta.persistence.EntityTransaction;
 import jakarta.persistence.TypedQuery;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 
 import java.util.Collections;
 import java.util.List;
 
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 class TransactionDaoImplTest {
-
+    @Mock
+    private EntityManagerFactory entityManagerFactory;
+    @Mock
     private EntityManager entityManager;
+    @Mock
+    private EntityTransaction transaction;
+
+    @InjectMocks
     private TransactionDaoImpl transactionDao;
 
     @BeforeEach
     void setUp() {
-        entityManager = mock(EntityManager.class);
-        transactionDao = new TransactionDaoImpl();
-        // Reflection to inject the mock
-        try {
-            var field = TransactionDaoImpl.class.getDeclaredField("entityManager");
-            field.setAccessible(true);
-            field.set(transactionDao, entityManager);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        MockitoAnnotations.openMocks(this);
+
+        when(entityManagerFactory.createEntityManager()).thenReturn(entityManager);
+        when(entityManager.getTransaction()).thenReturn(transaction);
     }
 
     @Test
