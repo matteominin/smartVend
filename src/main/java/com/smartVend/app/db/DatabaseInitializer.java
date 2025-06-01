@@ -14,10 +14,6 @@ public class DatabaseInitializer {
 
             EntityManager em = emf.createEntityManager();
             em.getTransaction().begin();
-
-            System.out.println("Database initialized successfully!");
-            System.out.println("Tables should be created automatically.");
-
             em.getTransaction().commit();
             em.close();
 

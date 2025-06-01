@@ -172,4 +172,44 @@ public class CustomerService {
 
         return transactionService.createTransaction(transaction);
     }
+
+    public Customer getCustomerByUserId(long userId) {
+        Customer customer = customerDao.getCustomerByUserId(userId);
+        if (customer == null) {
+            throw new IllegalArgumentException("Customer not found");
+        }
+        return customer;
+    }
+
+    public Customer getCustomerById(long customerId) {
+        Customer customer = customerDao.getCustomerById(customerId);
+        if (customer == null) {
+            throw new IllegalArgumentException("Customer not found");
+        }
+        return customer;
+    }
+
+    public Transaction rechargeBalance(long customerId, double amount) {
+        Customer customer = customerDao.getCustomerById(customerId);
+        if (customer == null) {
+            throw new IllegalArgumentException("Customer not found");
+        }
+        if (amount <= 0) {
+            throw new IllegalArgumentException("Amount must be positive");
+        }
+
+        double initialBalance = customer.getBalance();
+        double finalBalance = initialBalance + amount;
+        customer.setBalance(finalBalance);
+        customerDao.updateCustomer(customer);
+
+        Transaction transaction = new Transaction(
+                customer,
+                PaymentMethod.Wallet,
+                initialBalance,
+                finalBalance,
+                new ArrayList<>());
+
+        return transactionService.createTransaction(transaction);
+    }
 }

@@ -19,7 +19,7 @@ public class Customer implements Serializable {
     private Long id;
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    User user;
     @Column(nullable = false)
     private double balance;
 

@@ -68,7 +68,7 @@ class CustomerControllerTest {
 
         customerController.rechargeBalance(customerId, amount);
 
-        verify(customerService).updateBalance(customerId, amount);
+        verify(customerService).rechargeBalance(customerId, amount);
     }
 
     @Test

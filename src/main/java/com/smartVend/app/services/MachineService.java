@@ -3,6 +3,8 @@ package com.smartvend.app.services;
 import com.smartvend.app.dao.impl.ItemDaoImpl;
 
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.smartvend.app.dao.impl.ConcreteVendingMachineDaoImpl;
 import com.smartvend.app.dao.impl.MaintenanceDaoImpl;
@@ -88,5 +90,19 @@ public class MachineService {
         MachineStatus status = machine.getStatus();
 
         return status;
+    }
+
+    public List<String> getAllAvailableMachines() {
+        if (machineDao == null) {
+            throw new IllegalStateException("MachineDao is not initialized");
+        }
+        List<ConcreteVendingMachine> machines = machineDao.findAll();
+        List<String> availableMachineIds = new ArrayList<>();
+        for (ConcreteVendingMachine machine : machines) {
+            if (machine.getStatus() == MachineStatus.Operative) {
+                availableMachineIds.add(machine.getId());
+            }
+        }
+        return availableMachineIds;
     }
 }

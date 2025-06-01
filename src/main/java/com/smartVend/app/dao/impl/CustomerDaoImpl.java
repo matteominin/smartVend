@@ -15,6 +15,21 @@ public class CustomerDaoImpl implements CustomerDao {
     }
 
     @Override
+    public Customer getCustomerByUserId(long userId) {
+        EntityManager em = emf.createEntityManager();
+        try {
+            return em.createQuery(
+                    "SELECT c FROM Customer c WHERE c.user.id = :userId", Customer.class)
+                    .setParameter("userId", userId)
+                    .getResultStream()
+                    .findFirst()
+                    .orElse(null);
+        } finally {
+            em.close();
+        }
+    }
+
+    @Override
     public Customer getCustomerById(long customerId) {
         EntityManager em = emf.createEntityManager();
         try {

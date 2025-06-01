@@ -1,6 +1,8 @@
 package com.smartvend.app.controllers;
 
 import com.smartvend.app.model.connection.Connection;
+import com.smartvend.app.model.transaction.Transaction;
+import com.smartvend.app.model.user.Customer;
 import com.smartvend.app.model.vendingmachine.Item;
 import com.smartvend.app.services.CustomerService;
 import com.smartvend.app.services.UserService;
@@ -20,6 +22,10 @@ public class CustomerController extends UserController {
         return customerService.connect(userId, machineId);
     }
 
+    public Customer getCustomerByUserId(long userId) {
+        return customerService.getCustomerByUserId(userId);
+    }
+
     public List<Item> getInventory(Connection connection) {
         return customerService.getInvenotry(connection);
     }
@@ -29,7 +35,15 @@ public class CustomerController extends UserController {
     }
 
     public void rechargeBalance(long customerId, double amount) {
-        customerService.updateBalance(customerId, amount);
+        customerService.rechargeBalance(customerId, amount);
+    }
+
+    public List<Transaction> getTransactionHistory(long customerId) {
+        Customer customer = customerService.getCustomerById(customerId);
+        if (customer == null) {
+            throw new IllegalArgumentException("User not found");
+        }
+        return customerService.getTransactionHistory(customerId);
     }
 
     public void disconnect(Connection connection) {

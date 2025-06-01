@@ -26,7 +26,7 @@ public class TransactionItem implements Serializable {
     private Item item;
 
     @Column(nullable = false)
-    private int amount;
+    private double amount;
 
     // Add this ManyToOne relationship to link back to Transaction
     @ManyToOne
@@ -44,10 +44,9 @@ public class TransactionItem implements Serializable {
     }
 
     // You might also want to add a constructor that includes the transaction
-    public TransactionItem(ConcreteVendingMachine machine, Item item, int amount, Transaction transaction) {
+    public TransactionItem(ConcreteVendingMachine machine, Item item, int price, Transaction transaction) {
         this.machine = machine;
         this.item = item;
-        this.amount = amount;
         this.transaction = transaction;
     }
 
@@ -75,7 +74,7 @@ public class TransactionItem implements Serializable {
         this.item = item;
     }
 
-    public int getAmount() {
+    public double getAmount() {
         return amount;
     }
 

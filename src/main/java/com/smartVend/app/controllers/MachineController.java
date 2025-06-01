@@ -1,6 +1,9 @@
 package com.smartvend.app.controllers;
 
 import com.smartvend.app.services.MachineService;
+
+import java.util.List;
+
 import com.smartvend.app.model.maintenance.MaintenanceReport;
 import com.smartvend.app.model.vendingmachine.MachineStatus;
 
@@ -23,5 +26,9 @@ public class MachineController {
     public MaintenanceReport runDiagnostic(String machineId) {
         boolean hasIssue = Math.random() < 0.1;
         return machineService.runSelfDiagnostic(machineId, hasIssue);
+    }
+
+    public List<String> getAllAvailableMachines() {
+        return machineService.getAllAvailableMachines();
     }
 }

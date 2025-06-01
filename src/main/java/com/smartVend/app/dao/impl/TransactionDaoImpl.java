@@ -36,14 +36,15 @@ public class TransactionDaoImpl implements TransactionDao {
 
     @Override
     public List<Transaction> getTransactionsByCustomer(Long customerId) {
-        EntityManager em = emf.createEntityManager(); // Create EntityManager
+        EntityManager em = emf.createEntityManager();
         try {
             return em.createQuery(
-                    "SELECT t FROM Transaction t WHERE t.customer.id = :customerId", Transaction.class)
+                    "SELECT t FROM Transaction t LEFT JOIN FETCH t.transactionItems WHERE t.customer.id = :customerId",
+                    Transaction.class)
                     .setParameter("customerId", customerId)
                     .getResultList();
         } finally {
-            em.close(); // Close EntityManager
+            em.close();
         }
     }
 }

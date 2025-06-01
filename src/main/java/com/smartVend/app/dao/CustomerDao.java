@@ -7,6 +7,8 @@ import com.smartvend.app.model.user.Customer;
 public interface CustomerDao {
     Customer getCustomerById(long customerId);
 
+    Customer getCustomerByUserId(long userId);
+
     Customer updateCustomer(Customer customer);
 
     List<Customer> findAll();

@@ -27,8 +27,11 @@ echo "✅ PostgreSQL is ready."
 
 # Run the Java application
 echo "▶️ Running Java app..."
-mvn clean compile exec:java \
+
+mvn -q clean compile exec:java \
   -Dexec.mainClass="com.smartvend.app.Main" \
   -DDB_URL=$DB_URL \
   -DDB_USER=$DB_USER \
-  -DDB_PASS=$DB_PASS
+  -DDB_PASS=$DB_PASS \
+  -Dorg.slf4j.simpleLogger.defaultLogLevel=off \
+  -Djava.util.logging.config.file=logging.properties

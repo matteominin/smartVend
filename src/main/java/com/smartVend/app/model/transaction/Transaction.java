@@ -38,6 +38,7 @@ public class Transaction implements Serializable {
     private double updatedBalance;
     @OneToMany(mappedBy = "transaction", cascade = CascadeType.ALL)
     private List<TransactionItem> transactionItems;
+
     public Transaction() {
         // Default constructor for JPA
         this.date = Instant.now();
@@ -123,5 +124,9 @@ public class Transaction implements Serializable {
     public void setTransactionItems(List<TransactionItem> transactionItems) {
         this.transactionItems = transactionItems;
     }
-    
+
+    public double getTotalAmout() {
+        return updatedBalance - initialBalance;
+    }
+
 }
