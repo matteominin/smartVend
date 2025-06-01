@@ -9,6 +9,10 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
@@ -22,25 +26,27 @@ import com.smartvend.app.model.user.Customer;
 import com.smartvend.app.model.user.User;
 
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityManagerFactory;
+import jakarta.persistence.EntityTransaction;
 import jakarta.persistence.TypedQuery;
 
 class CustomerDaoImplTest {
-
+    @Mock
+    private EntityManagerFactory entityManagerFactory;
+    @Mock
     private EntityManager entityManager;
+    @Mock
+    private EntityTransaction transaction;
+
+    @InjectMocks
     private CustomerDaoImpl customerDao;
 
     @BeforeEach
     void setUp() {
-        entityManager = mock(EntityManager.class);
-        customerDao = new CustomerDaoImpl();
+        MockitoAnnotations.openMocks(this);
 
-        try {
-            var field = CustomerDaoImpl.class.getDeclaredField("entityManager");
-            field.setAccessible(true);
-            field.set(customerDao, entityManager);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        when(entityManagerFactory.createEntityManager()).thenReturn(entityManager);
+        when(entityManager.getTransaction()).thenReturn(transaction);
     }
 
     @Test

@@ -5,6 +5,9 @@ import com.smartvend.app.model.vendingmachine.ConcreteVendingMachine;
 import com.smartvend.app.model.vendingmachine.MachineStatus;
 import jakarta.persistence.*;
 import org.junit.jupiter.api.*;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 
 import java.time.Instant;
 import java.util.Collections;
@@ -16,137 +19,137 @@ import static org.mockito.Mockito.*;
 
 class ConcreteVendingMachineDaoImplTest {
 
-    // ──────────────────────────────── UNIT TESTS (Mockito) ────────────────────────────────
-    private EntityManagerFactory emfMock;
-    private EntityManager emMock;
-    private EntityTransaction txMock;
-    private ConcreteVendingMachineDaoImpl dao;
+    // ─────────────── UNIT TESTS (Mockito) ───────────────
+    @Mock
+    private EntityManagerFactory entityManagerFactory;
+    @Mock
+    private EntityManager entityManager;
+    @Mock
+    private EntityTransaction transaction;
 
-    @Nested
-    class Unit {
-        @BeforeEach
-        void init() {
-            emfMock = mock(EntityManagerFactory.class);
-            emMock  = mock(EntityManager.class);
-            txMock  = mock(EntityTransaction.class);
+    @InjectMocks
+    private ConcreteVendingMachineDaoImpl vendingMachineDao;
 
-            when(emfMock.createEntityManager()).thenReturn(emMock);
-            when(emMock.getTransaction()).thenReturn(txMock);
+    @BeforeEach
+    void setUp() {
+        MockitoAnnotations.openMocks(this);
 
-            dao = new ConcreteVendingMachineDaoImpl(emfMock);
-        }
+        when(entityManagerFactory.createEntityManager()).thenReturn(entityManager);
+        when(entityManager.getTransaction()).thenReturn(transaction);
 
-        @Test  void findAll_empty() {
-            @SuppressWarnings("unchecked")
-            TypedQuery<ConcreteVendingMachine> q = (TypedQuery<ConcreteVendingMachine>) mock(TypedQuery.class);
-            when(emMock.createQuery(anyString(), eq(ConcreteVendingMachine.class))).thenReturn(q);
-            when(q.getResultList()).thenReturn(Collections.emptyList());
-
-            List<ConcreteVendingMachine> res = dao.findAll();
-            assertTrue(res.isEmpty());
-            verify(emMock).close();
-        }
-
-        @Test  void findAll_oneItem() {
-            @SuppressWarnings("unchecked")
-            TypedQuery<ConcreteVendingMachine> q = (TypedQuery<ConcreteVendingMachine>) mock(TypedQuery.class);
-            ConcreteVendingMachine m = mock(ConcreteVendingMachine.class);
-            when(emMock.createQuery(anyString(), eq(ConcreteVendingMachine.class))).thenReturn(q);
-            when(q.getResultList()).thenReturn(List.of(m));
-
-            List<ConcreteVendingMachine> res = dao.findAll();
-            assertEquals(1, res.size());
-            assertSame(m, res.get(0));
-            verify(emMock).close();
-        }
-
-        @Test  void findById_found() {
-            ConcreteVendingMachine m = mock(ConcreteVendingMachine.class);
-            when(emMock.find(ConcreteVendingMachine.class, "ID123")).thenReturn(m);
-
-            assertSame(m, dao.findById("ID123"));
-            verify(emMock).close();
-        }
-
-        @Test  void findById_notFound() {
-            when(emMock.find(ConcreteVendingMachine.class, "ID999")).thenReturn(null);
-
-            assertNull(dao.findById("ID999"));
-            verify(emMock).close();
-        }
-
-        @Test  void createMachine_persists() {
-            ConcreteVendingMachine m = mock(ConcreteVendingMachine.class);
-            ConcreteVendingMachine res = dao.createMachine(m);
-
-            verify(txMock).begin();
-            verify(emMock).persist(m);
-            verify(txMock).commit();
-            verify(emMock).close();
-            assertSame(m, res);
-        }
-
-        @Test  void updateMachine_merges() {
-            ConcreteVendingMachine m = mock(ConcreteVendingMachine.class);
-            ConcreteVendingMachine merged = mock(ConcreteVendingMachine.class);
-            when(emMock.merge(m)).thenReturn(merged);
-
-            ConcreteVendingMachine res = dao.updateMachine(m);
-
-            verify(txMock).begin();
-            verify(emMock).merge(m);
-            verify(txMock).commit();
-            verify(emMock).close();
-            assertSame(merged, res);
-        }
-
-        @Test  void deleteMachine_exists() {
-            ConcreteVendingMachine m = mock(ConcreteVendingMachine.class);
-            when(emMock.find(ConcreteVendingMachine.class, "DEL")).thenReturn(m);
-
-            dao.deleteMachine("DEL");
-
-            verify(txMock).begin();
-            verify(emMock).remove(m);
-            verify(txMock).commit();
-            verify(emMock).close();
-        }
-
-        @Test  void deleteMachine_notExists() {
-            when(emMock.find(ConcreteVendingMachine.class, "NONE")).thenReturn(null);
-
-            dao.deleteMachine("NONE");
-
-            verify(txMock).begin();
-            verify(emMock, never()).remove(any());
-            verify(txMock).commit();
-            verify(emMock).close();
-        }
-
-        @Test  void findByStatus() {
-            @SuppressWarnings("unchecked")
-            TypedQuery<ConcreteVendingMachine> q = (TypedQuery<ConcreteVendingMachine>) mock(TypedQuery.class);
-            when(emMock.createQuery(contains("WHERE v.status = :status"), eq(ConcreteVendingMachine.class))).thenReturn(q);
-            when(q.setParameter(eq("status"), any())).thenReturn(q);
-            when(q.getResultList()).thenReturn(List.of(mock(ConcreteVendingMachine.class)));
-
-            assertFalse(dao.findByStatus(MachineStatus.Operative).isEmpty());
-            verify(emMock).close();
-        }
-
-        @Test  void findByLocation() {
-            @SuppressWarnings("unchecked")
-            TypedQuery<ConcreteVendingMachine> q = (TypedQuery<ConcreteVendingMachine>) mock(TypedQuery.class);
-            when(emMock.createQuery(contains("WHERE v.location = :location"), eq(ConcreteVendingMachine.class))).thenReturn(q);
-            when(q.setParameter(eq("location"), any())).thenReturn(q);
-            when(q.getResultList()).thenReturn(List.of(mock(ConcreteVendingMachine.class)));
-
-            assertFalse(dao.findByLocation("TestPlace").isEmpty());
-            verify(emMock).close();
-        }
+        vendingMachineDao = new ConcreteVendingMachineDaoImpl(entityManagerFactory);
     }
 
-    // ──────────────────────────────── INTEGRATION TESTS (H2) ────────────────────────────────
+    @Test void findAll_empty() {
+        @SuppressWarnings("unchecked")
+        TypedQuery<ConcreteVendingMachine> q = (TypedQuery<ConcreteVendingMachine>) mock(TypedQuery.class);
+        when(entityManager.createQuery(anyString(), eq(ConcreteVendingMachine.class))).thenReturn(q);
+        when(q.getResultList()).thenReturn(Collections.emptyList());
+
+        List<ConcreteVendingMachine> res = vendingMachineDao.findAll();
+        assertTrue(res.isEmpty());
+        verify(entityManager).close();
+    }
+
+    @Test void findAll_oneItem() {
+        @SuppressWarnings("unchecked")
+        TypedQuery<ConcreteVendingMachine> q = (TypedQuery<ConcreteVendingMachine>) mock(TypedQuery.class);
+        ConcreteVendingMachine m = mock(ConcreteVendingMachine.class);
+        when(entityManager.createQuery(anyString(), eq(ConcreteVendingMachine.class))).thenReturn(q);
+        when(q.getResultList()).thenReturn(List.of(m));
+
+        List<ConcreteVendingMachine> res = vendingMachineDao.findAll();
+        assertEquals(1, res.size());
+        assertSame(m, res.get(0));
+        verify(entityManager).close();
+    }
+
+    @Test void findById_found() {
+        ConcreteVendingMachine m = mock(ConcreteVendingMachine.class);
+        when(entityManager.find(ConcreteVendingMachine.class, "ID123")).thenReturn(m);
+
+        assertSame(m, vendingMachineDao.findById("ID123"));
+        verify(entityManager).close();
+    }
+
+    @Test void findById_notFound() {
+        when(entityManager.find(ConcreteVendingMachine.class, "ID999")).thenReturn(null);
+
+        assertNull(vendingMachineDao.findById("ID999"));
+        verify(entityManager).close();
+    }
+
+    @Test void createMachine_persists() {
+        ConcreteVendingMachine m = mock(ConcreteVendingMachine.class);
+        ConcreteVendingMachine res = vendingMachineDao.createMachine(m);
+
+        verify(transaction).begin();
+        verify(entityManager).persist(m);
+        verify(transaction).commit();
+        verify(entityManager).close();
+        assertSame(m, res);
+    }
+
+    @Test void updateMachine_merges() {
+        ConcreteVendingMachine m = mock(ConcreteVendingMachine.class);
+        ConcreteVendingMachine merged = mock(ConcreteVendingMachine.class);
+        when(entityManager.merge(m)).thenReturn(merged);
+
+        ConcreteVendingMachine res = vendingMachineDao.updateMachine(m);
+
+        verify(transaction).begin();
+        verify(entityManager).merge(m);
+        verify(transaction).commit();
+        verify(entityManager).close();
+        assertSame(merged, res);
+    }
+
+    @Test void deleteMachine_exists() {
+        ConcreteVendingMachine m = mock(ConcreteVendingMachine.class);
+        when(entityManager.find(ConcreteVendingMachine.class, "DEL")).thenReturn(m);
+
+        vendingMachineDao.deleteMachine("DEL");
+
+        verify(transaction).begin();
+        verify(entityManager).remove(m);
+        verify(transaction).commit();
+        verify(entityManager).close();
+    }
+
+    @Test void deleteMachine_notExists() {
+        when(entityManager.find(ConcreteVendingMachine.class, "NONE")).thenReturn(null);
+
+        vendingMachineDao.deleteMachine("NONE");
+
+        verify(transaction).begin();
+        verify(entityManager, never()).remove(any());
+        verify(transaction).commit();
+        verify(entityManager).close();
+    }
+
+    @Test void findByStatus() {
+        @SuppressWarnings("unchecked")
+        TypedQuery<ConcreteVendingMachine> q = (TypedQuery<ConcreteVendingMachine>) mock(TypedQuery.class);
+        when(entityManager.createQuery(contains("WHERE v.status = :status"), eq(ConcreteVendingMachine.class))).thenReturn(q);
+        when(q.setParameter(eq("status"), any())).thenReturn(q);
+        when(q.getResultList()).thenReturn(List.of(mock(ConcreteVendingMachine.class)));
+
+        assertFalse(vendingMachineDao.findByStatus(MachineStatus.Operative).isEmpty());
+        verify(entityManager).close();
+    }
+
+    @Test void findByLocation() {
+        @SuppressWarnings("unchecked")
+        TypedQuery<ConcreteVendingMachine> q = (TypedQuery<ConcreteVendingMachine>) mock(TypedQuery.class);
+        when(entityManager.createQuery(contains("WHERE v.location = :location"), eq(ConcreteVendingMachine.class))).thenReturn(q);
+        when(q.setParameter(eq("location"), any())).thenReturn(q);
+        when(q.getResultList()).thenReturn(List.of(mock(ConcreteVendingMachine.class)));
+
+        assertFalse(vendingMachineDao.findByLocation("TestPlace").isEmpty());
+        verify(entityManager).close();
+    }
+
+    // ─────────────── INTEGRATION TESTS (H2) ───────────────
     private static EntityManagerFactory emf;
     private ConcreteVendingMachineDaoImpl intDao;
 

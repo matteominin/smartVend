@@ -5,45 +5,102 @@ import com.smartvend.app.model.vendingmachine.Inventory;
 import com.smartvend.app.model.vendingmachine.Item;
 
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.EntityManagerFactory;
+import jakarta.persistence.NoResultException;
 
 public class InventoryDaoImpl implements InventoryDao {
 
-    @PersistenceContext
-    private EntityManager entityManager;
+    private final EntityManagerFactory emf;
+
+    public InventoryDaoImpl(EntityManagerFactory entityManagerFactory) {
+        this.emf = entityManagerFactory;
+    }
 
     @Override
     public Inventory getMachineInventory(String machineId) {
-        return entityManager.createQuery(
-                "SELECT i FROM Inventory i WHERE i.machine.id = :machineId", Inventory.class)
-                .setParameter("machineId", machineId)
-                .getSingleResult();
+        EntityManager em = emf.createEntityManager();
+        try {
+            return em.createQuery(
+                    "SELECT i FROM Inventory i WHERE i.machine.id = :machineId", Inventory.class)
+                    .setParameter("machineId", machineId)
+                    .getSingleResult();
+        } finally {
+            em.close();
+        }
     }
 
     @Override
     public void removeItemFromInventory(String machineId, Item item) {
-        Inventory inventory = getMachineInventory(machineId);
-        if (inventory != null) {
+        EntityManager em = emf.createEntityManager();
+        try {
+            em.getTransaction().begin();
+            Inventory inventory = em.createQuery(
+                    "SELECT i FROM Inventory i WHERE i.machine.id = :machineId", Inventory.class)
+                    .setParameter("machineId", machineId)
+                    .getSingleResult();
+
             inventory.removeItem(item);
-            entityManager.merge(inventory);
-        } else {
-            throw new IllegalArgumentException("Inventory not found for machine: " + machineId);
+            em.merge(inventory);
+
+            em.getTransaction().commit();
+        } catch (NoResultException e) {
+            if (em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            throw new IllegalArgumentException("Inventory not found for machine: " + machineId, e);
+        } catch (Exception e) {
+            if (em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            throw e;
+        } finally {
+            em.close();
         }
     }
 
     @Override
     public void addItemToInventory(String machineId, Item item) {
-        Inventory inventory = getMachineInventory(machineId);
-        if (inventory != null) {
+        EntityManager em = emf.createEntityManager();
+        try {
+            em.getTransaction().begin();
+            Inventory inventory = em.createQuery(
+                    "SELECT i FROM Inventory i WHERE i.machine.id = :machineId", Inventory.class)
+                    .setParameter("machineId", machineId)
+                    .getSingleResult();
+
             inventory.addItem(item);
-            entityManager.merge(inventory);
-        } else {
-            throw new IllegalArgumentException("Inventory not found for machine: " + machineId);
+            em.merge(inventory);
+
+            em.getTransaction().commit();
+        } catch (NoResultException e) {
+            if (em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            throw new IllegalArgumentException("Inventory not found for machine: " + machineId, e);
+        } catch (Exception e) {
+            if (em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            throw e;
+        } finally {
+            em.close();
         }
     }
 
     @Override
     public void updateItemInInventory(Inventory inventory) {
-        entityManager.merge(inventory);
+        EntityManager em = emf.createEntityManager();
+        try {
+            em.getTransaction().begin();
+            em.merge(inventory);
+            em.getTransaction().commit();
+        } catch (Exception e) {
+            if (em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            throw e;
+        } finally {
+            em.close();
+        }
     }
 }

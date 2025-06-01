@@ -11,6 +11,10 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.contains;
@@ -25,23 +29,28 @@ import com.smartvend.app.dao.impl.UserDaoImpl;
 import com.smartvend.app.model.user.User;
 
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityManagerFactory;
+import jakarta.persistence.EntityTransaction;
 import jakarta.persistence.NoResultException;
 import jakarta.persistence.TypedQuery;
 
 class UserDaoImplTest {
-
+    @Mock
+    private EntityManagerFactory entityManagerFactory;
+    @Mock
     private EntityManager entityManager;
+    @Mock
+    private EntityTransaction transaction;
+
+    @InjectMocks
     private UserDaoImpl userDao;
 
     @BeforeEach
-    void setUp() throws Exception {
-        entityManager = mock(EntityManager.class);
-        userDao = new UserDaoImpl();
+    void setUp() {
+        MockitoAnnotations.openMocks(this);
 
-        // Inject entityManager in the userDao (since field is private)
-        var field = UserDaoImpl.class.getDeclaredField("entityManager");
-        field.setAccessible(true);
-        field.set(userDao, entityManager);
+        when(entityManagerFactory.createEntityManager()).thenReturn(entityManager);
+        when(entityManager.getTransaction()).thenReturn(transaction);
     }
 
     @Test
