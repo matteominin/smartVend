@@ -45,8 +45,8 @@ class AdminDaoImplTest {
         @BeforeEach
         void init() {
             emfMock = mock(EntityManagerFactory.class);
-            emMock  = mock(EntityManager.class);
-            txMock  = mock(EntityTransaction.class);
+            emMock = mock(EntityManager.class);
+            txMock = mock(EntityTransaction.class);
 
             when(emfMock.createEntityManager()).thenReturn(emMock);
             when(emMock.getTransaction()).thenReturn(txMock);
@@ -171,14 +171,15 @@ class AdminDaoImplTest {
 
     @AfterAll
     static void closePU() {
-        if (emf != null) emf.close();
+        if (emf != null)
+            emf.close();
     }
 
     @BeforeEach
     void initDao() {
         intDao = new AdminDaoImpl(emf);
     }
-     
+
     @Test
     void integration_CRUD_flow() {
         // PRIMA: crea e salva l'utente!

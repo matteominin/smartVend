@@ -18,20 +18,27 @@ public class ConcreteVendingMachine implements Serializable {
     @Id
     @Column(nullable = false, unique = true)
     private String serialNumber;
+
     @ManyToOne
     @JoinColumn(name = "vending_machine_model")
     private VendingMachine vendingMachine;
+
     @Column(nullable = false)
     private String location;
+
     @Column(nullable = false)
     private int capacity;
+
     @Column(nullable = false)
     private Instant lastMaintenance;
+
     @Column(nullable = false)
     private Instant createdAt;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private MachineStatus status;
+
     @OneToOne(mappedBy = "machine", cascade = CascadeType.ALL)
     private Inventory inventory;
 

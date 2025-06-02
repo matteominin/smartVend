@@ -15,26 +15,33 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 
 @Entity
 public class Task implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     @ManyToOne
     @JoinColumn(name = "worker_id")
     private Worker worker;
+
     @ManyToOne
     @JoinColumn(name = "supervisor_id")
     private Admin supervisor;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private MaintenanceStatus status;
+
     @Column(nullable = false)
     private Instant assignedAt;
-    @ManyToOne(optional = false)
+
+    @OneToOne(optional = false)
     @JoinColumn(name = "report_id")
     private MaintenanceReport report;
+
     public Task() {
         // Default constructor for JPA
         this.assignedAt = Instant.now();
@@ -110,5 +117,5 @@ public class Task implements Serializable {
     public void setReport(MaintenanceReport report) {
         this.report = report;
     }
-    
+
 }

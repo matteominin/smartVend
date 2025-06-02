@@ -12,9 +12,11 @@ import jakarta.persistence.Id;
 public class VendingMachine implements Serializable {
     @Id
     private String modelNumber;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private MachineType type;
+
     public VendingMachine() {
         // Default constructor for JPA
     }
@@ -40,5 +42,4 @@ public class VendingMachine implements Serializable {
         this.type = type;
     }
 
-    
 }

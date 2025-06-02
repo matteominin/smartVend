@@ -115,11 +115,12 @@ public class CustomerService {
         }
 
         // Get customer
-        long customerId = connection.getUserId();
-        Customer customer = customerDao.getCustomerById(customerId);
+        long userId = connection.getUserId();
+        Customer customer = customerDao.getCustomerByUserId(userId);
         if (customer == null) {
             throw new IllegalArgumentException("Customer not found");
         }
+        long customerId = customer.getId();
 
         // Get machine for transaction items
         ConcreteVendingMachine machine = concreteVendingMachineDao.findById(connection.getMachineId());

@@ -3,11 +3,16 @@ package com.smartvend.app.model.connection;
 import java.io.Serializable;
 import java.time.Instant;
 
+import com.smartvend.app.model.user.User;
+import com.smartvend.app.model.vendingmachine.ConcreteVendingMachine;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToOne;
 
 @Entity
 public class Connection implements Serializable {
@@ -15,11 +20,13 @@ public class Connection implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "user_id", nullable = false)
-    private Long userId;
+    @OneToOne
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 
-    @Column(name = "machine_id", nullable = false)
-    private String machineId;
+    @OneToOne
+    @JoinColumn(name = "machine_id", nullable = false)
+    private ConcreteVendingMachine machine;
 
     @Column(nullable = false)
     private Instant start;
@@ -28,23 +35,41 @@ public class Connection implements Serializable {
         this.start = Instant.now();
     }
 
-    public Connection(Long userId, String machineId, Instant start) {
-        this.userId = userId;
-        this.machineId = machineId;
+    public Connection(User user, ConcreteVendingMachine machine, Instant start) {
+        this.user = user;
+        this.machine = machine;
         this.start = start;
     }
 
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
+    public Long getId() {
+        return id;
+    }
 
-    public Long getUserId() { return userId; }
-    public void setUserId(Long userId) { this.userId = userId; }
+    public void setId(Long id) {
+        this.id = id;
+    }
 
-    public String getMachineId() { return machineId; }
-    public void setMachineId(String machineId) { this.machineId = machineId; }
+    public Long getUserId() {
+        return user.getId();
+    }
 
-    public Instant getConnectionTime() { return start; }
-    public void setConnectionTime(Instant start) { this.start = start; }
+    public void setUserId(User user) {
+        this.user = user;
+    }
 
-    
+    public String getMachineId() {
+        return machine.getId();
+    }
+
+    public void setMachineId(ConcreteVendingMachine machine) {
+        this.machine = machine;
+    }
+
+    public Instant getConnectionTime() {
+        return start;
+    }
+
+    public void setConnectionTime(Instant start) {
+        this.start = start;
+    }
 }

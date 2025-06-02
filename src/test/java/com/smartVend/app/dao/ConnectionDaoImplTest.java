@@ -61,12 +61,12 @@ class ConnectionDaoImplTest {
         User user = new User(id, "test@email.com", "Test", "User", "pwd");
         Customer customer = new Customer(id, user, 12.5);
         ConcreteVendingMachine machine = new ConcreteVendingMachine(
-            "macchinaA", null, "loc", 1, MachineStatus.Operative, null);
+                "macchinaA", null, "loc", 1, MachineStatus.Operative, null);
 
-        when(emMock.find(User.class, id)).thenReturn(user);          // <-- AGGIUNTO
-        when(emMock.find(Customer.class, id)).thenReturn(customer);  // <-- NON cambia
+        when(emMock.find(User.class, id)).thenReturn(user); // <-- AGGIUNTO
+        when(emMock.find(Customer.class, id)).thenReturn(customer); // <-- NON cambia
         when(emMock.find(ConcreteVendingMachine.class, "macchinaA"))
-            .thenReturn(machine);
+                .thenReturn(machine);
 
         Connection conn = daoMocked.createConnection(id, "macchinaA");
 
@@ -76,20 +76,20 @@ class ConnectionDaoImplTest {
         verify(txMock).commit();
     }
 
-
     @Test
     void unit_createConnection_throwsIfUserNotFound() {
         // Mock che restituisce null per Customer non trovato
         when(emMock.find(Customer.class, 123L)).thenReturn(null);
-        
+
         Exception ex = assertThrows(IllegalArgumentException.class, () -> {
             daoMocked.createConnection(123L, "macchinaX");
         });
-        
-        // Verifica che il messaggio contenga una stringa relativa all'utente non trovato
-        assertTrue(ex.getMessage().toLowerCase().contains("user") || 
-                  ex.getMessage().toLowerCase().contains("customer") ||
-                  ex.getMessage().contains("not found"));
+
+        // Verifica che il messaggio contenga una stringa relativa all'utente non
+        // trovato
+        assertTrue(ex.getMessage().toLowerCase().contains("user") ||
+                ex.getMessage().toLowerCase().contains("customer") ||
+                ex.getMessage().contains("not found"));
     }
 
     @Test
@@ -98,27 +98,30 @@ class ConnectionDaoImplTest {
         User user = new User(999L, "test@email.com", "Test", "User", "pwd");
         Customer customer = new Customer(50L, user, 3.2);
         when(emMock.find(Customer.class, 50L)).thenReturn(customer);
-        
+
         // Poi mock che la macchina non esista
         when(emMock.find(ConcreteVendingMachine.class, "idX")).thenReturn(null);
 
         Exception ex = assertThrows(IllegalArgumentException.class, () -> {
             daoMocked.createConnection(50L, "idX");
         });
-        
-        // Verifica che il messaggio contenga una stringa relativa alla macchina non trovata
-        assertTrue(ex.getMessage().toLowerCase().contains("machine") || 
-                  ex.getMessage().toLowerCase().contains("vending") ||
-                  ex.getMessage().contains("not found"));
+
+        // Verifica che il messaggio contenga una stringa relativa alla macchina non
+        // trovata
+        assertTrue(ex.getMessage().toLowerCase().contains("machine") ||
+                ex.getMessage().toLowerCase().contains("vending") ||
+                ex.getMessage().contains("not found"));
     }
 
     @Test
     void unit_deleteConnection_removesIfExists() {
-        Connection c = new Connection(77L, "macchinaZ", Instant.now());
+        User user = mock(User.class);
+        ConcreteVendingMachine machine = mock(ConcreteVendingMachine.class);
+        Connection c = new Connection(user, machine, Instant.now());
         when(emMock.find(Connection.class, 55L)).thenReturn(c);
-        
+
         daoMocked.deleteConnection(55L);
-        
+
         verify(emMock).remove(c);
         verify(txMock).begin();
         verify(txMock).commit();
@@ -127,27 +130,29 @@ class ConnectionDaoImplTest {
     @Test
     void unit_deleteConnection_doesNothingIfNotFound() {
         when(emMock.find(Connection.class, 99L)).thenReturn(null);
-        
+
         daoMocked.deleteConnection(99L);
-        
+
         verify(emMock, never()).remove(any());
         // Se la connessione non esiste, non dovrebbe iniziare nemmeno la transazione
     }
 
     @Test
     void unit_getConnectionById_returnsCorrectly() {
-        Connection c = new Connection(1L, "macchinaY", Instant.now());
+        User user = mock(User.class);
+        ConcreteVendingMachine machine = mock(ConcreteVendingMachine.class);
+        Connection c = new Connection(user, machine, Instant.now());
         when(emMock.find(Connection.class, 44L)).thenReturn(c);
-        
+
         Connection result = daoMocked.getConnectionById(44L);
-        
+
         assertSame(c, result);
     }
 
     @Test
     void unit_getConnectionById_returnsNullIfMissing() {
         when(emMock.find(Connection.class, 222L)).thenReturn(null);
-        
+
         assertNull(daoMocked.getConnectionById(222L));
     }
 
@@ -163,7 +168,8 @@ class ConnectionDaoImplTest {
 
     @AfterAll
     void closeIntegration() {
-        if (emfReal != null) emfReal.close();
+        if (emfReal != null)
+            emfReal.close();
     }
 
     @Test
@@ -176,7 +182,7 @@ class ConnectionDaoImplTest {
         User user = new User("test@email.com", "Test", "User", "pwd");
         em.persist(user);
         em.flush(); // Assicura che l'ID sia generato
-        
+
         Customer customer = new Customer(user, 50);
         em.persist(customer);
         em.flush(); // Assicura che l'ID sia generato
@@ -187,13 +193,12 @@ class ConnectionDaoImplTest {
 
         // Crea la macchina
         ConcreteVendingMachine machine = new ConcreteVendingMachine(
-            "macchinaTest",
-            null,
-            "location",
-            5,
-            MachineStatus.Operative,
-            inventory
-        );
+                "macchinaTest",
+                null,
+                "location",
+                5,
+                MachineStatus.Operative,
+                inventory);
         machine.setLastMaintenance(Instant.now());
         em.persist(machine);
 

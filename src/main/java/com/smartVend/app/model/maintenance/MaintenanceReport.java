@@ -18,13 +18,17 @@ public class MaintenanceReport implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     @Column(nullable = false)
     private String issueDescription;
+
     @Column(nullable = false)
     private Instant issueDate;
+
     @ManyToOne
     @JoinColumn(name = "machine_id")
     private ConcreteVendingMachine machine;
+
     public MaintenanceReport() {
         // Default constructor for JPA
         this.issueDate = Instant.now();
@@ -71,5 +75,5 @@ public class MaintenanceReport implements Serializable {
     public void setMachine(ConcreteVendingMachine machine) {
         this.machine = machine;
     }
-    
+
 }

@@ -27,15 +27,20 @@ public class Transaction implements Serializable {
     @ManyToOne
     @JoinColumn(name = "customer_id")
     private Customer customer;
+
     @Column(nullable = false)
     private Instant date;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private PaymentMethod paymentMethod;
+
     @Column(nullable = false)
     private double initialBalance;
+
     @Column(nullable = false)
     private double updatedBalance;
+
     @OneToMany(mappedBy = "transaction", cascade = CascadeType.ALL)
     private List<TransactionItem> transactionItems;
 

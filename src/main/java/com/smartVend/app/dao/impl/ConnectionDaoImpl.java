@@ -31,7 +31,8 @@ public class ConnectionDaoImpl implements ConnectionDao {
             } else if (machine == null) {
                 throw new IllegalArgumentException("Machine not found with ID: " + machineId);
             }
-            Connection connection = new Connection(userId, machineId, Instant.now());
+
+            Connection connection = new Connection(user, machine, Instant.now());
             em.persist(connection);
 
             em.getTransaction().commit();

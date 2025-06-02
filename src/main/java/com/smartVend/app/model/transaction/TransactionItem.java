@@ -10,6 +10,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 
 @Entity
 public class TransactionItem implements Serializable {
@@ -21,17 +22,16 @@ public class TransactionItem implements Serializable {
     @JoinColumn(name = "machine_id")
     private ConcreteVendingMachine machine;
 
-    @ManyToOne
+    @OneToOne
     @JoinColumn(name = "item_id")
     private Item item;
 
     @Column(nullable = false)
     private double amount;
 
-    // Add this ManyToOne relationship to link back to Transaction
     @ManyToOne
-    @JoinColumn(name = "transaction_id") // This will be the foreign key column in the TransactionItem table
-    private Transaction transaction; // This field is what "mappedBy = "transaction"" refers to in Transaction
+    @JoinColumn(name = "transaction_id")
+    private Transaction transaction;
 
     public TransactionItem() {
         // Default constructor for JPA
