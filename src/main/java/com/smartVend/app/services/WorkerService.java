@@ -6,6 +6,7 @@ import com.smartvend.app.dao.impl.TaskDaoImpl;
 import com.smartvend.app.dao.impl.WorkerDaoImpl;
 import com.smartvend.app.model.maintenance.MaintenanceStatus;
 import com.smartvend.app.model.maintenance.Task;
+import com.smartvend.app.model.user.User;
 import com.smartvend.app.model.user.Worker;
 
 public class WorkerService {
@@ -46,4 +47,14 @@ public class WorkerService {
         Task updatedTask = taskDao.updateTask(task);
         return updatedTask != null;
     }
+    public Worker createWorkerFromUser(User user) {
+        if (user == null) {
+            throw new IllegalArgumentException("User cannot be null");
+        }
+        // Il costruttore imposta già il ruolo e isActive
+        Worker worker = new Worker(user);
+        return workerDao.createWorker(worker);
+    }
+
+
 }

@@ -1,15 +1,8 @@
 package com.smartvend.app;
 
-import com.smartvend.app.db.DatabaseInitializer;
-
 import java.util.List;
 import java.util.Scanner;
 
-import jakarta.persistence.EntityManagerFactory;
-
-import com.smartvend.app.model.connection.Connection;
-import com.smartvend.app.model.maintenance.Task;
-import com.smartvend.app.model.transaction.Transaction;
 import com.smartvend.app.controllers.CustomerController;
 import com.smartvend.app.controllers.MachineController;
 import com.smartvend.app.controllers.UserController;
@@ -24,7 +17,13 @@ import com.smartvend.app.dao.impl.TaskDaoImpl;
 import com.smartvend.app.dao.impl.TransactionDaoImpl;
 import com.smartvend.app.dao.impl.UserDaoImpl;
 import com.smartvend.app.dao.impl.WorkerDaoImpl;
-import com.smartvend.app.model.user.*;
+import com.smartvend.app.db.DatabaseInitializer;
+import com.smartvend.app.model.connection.Connection;
+import com.smartvend.app.model.maintenance.Task;
+import com.smartvend.app.model.transaction.Transaction;
+import com.smartvend.app.model.user.Customer;
+import com.smartvend.app.model.user.User;
+import com.smartvend.app.model.user.Worker;
 import com.smartvend.app.model.vendingmachine.Item;
 import com.smartvend.app.services.CustomerService;
 import com.smartvend.app.services.MachineService;
@@ -33,208 +32,247 @@ import com.smartvend.app.services.TransactionService;
 import com.smartvend.app.services.UserService;
 import com.smartvend.app.services.WorkerService;
 
+import jakarta.persistence.EntityManagerFactory;
+
+
+
 public class Main {
+
+    // ──────────────────────── ʝ Δ ʋ Δ Ƀ ʀ ɘ ʍ ──────────────────────── //
+    private static void printBanner() {
+        System.out.println("\n==========================================");
+        System.out.println("          ☕  Welcome to JavaBrew  ☕       ");
+        System.out.println("==========================================\n");
+    }
+    // ─────────────────────────────────────────────────────────────────── //
+
     public static void main(String[] args) {
         try {
-            System.out.println("SmartVend application started successfully!");
-            // Initialize the database
             EntityManagerFactory emf = DatabaseInitializer.getEntityManagerFactory();
 
-            // Initialize controllers
-            UserService userService = new UserService(new UserDaoImpl(emf));
-            UserController userController = new UserController(userService);
+            /* ---------- DAO & Service wiring ---------- */
+            UserService      userService      = new UserService(new UserDaoImpl(emf));
+            CustomerService  customerService = new CustomerService(
+                    new CustomerDaoImpl(emf),
+                    new ConnectionDaoImpl(emf),
+                    new InventoryDaoImpl(emf),
+                    new ItemDaoImpl(emf),
+                    new ConcreteVendingMachineDaoImpl(emf),
+                    new TransactionService(new TransactionDaoImpl(emf)));
+            WorkerService    workerService   = new WorkerService(
+                    new WorkerDaoImpl(emf),
+                    new TaskDaoImpl(emf));
+
+            UserController   userController   = new UserController(userService);
 
             Scanner scanner = new Scanner(System.in);
+            User    user    = null;
 
-            System.out.println("\nWelcome to SmartVend! Please log in or sign up.");
-            System.out.print("Enter your email: ");
-            String email = scanner.nextLine();
-            System.out.print("Enter your password: ");
-            String password = scanner.nextLine();
+            printBanner();
 
-            User user;
-            try {
-                user = userController.login(email, password);
-            } catch (IllegalArgumentException e) {
-                System.err.println("Login failed: " + e.getMessage());
-                scanner.close();
-                return;
-            }
+            /* ---------- Login / Sign-Up loop ---------- */
+            while (user == null) {
+                System.out.println("1. Login");
+                System.out.println("2. Sign Up");
+                System.out.print("Select an option (1 or 2): ");
+                String choice = scanner.nextLine().trim();
 
-            System.out.println("\nLogin successful! Welcome, " + user.getName() + " " + user.getSurname());
-
-            switch (user.getRole()) {
-                case Admin:
-                    System.out.println("You have admin privileges.\n");
-                    break;
-                case Worker:
-                    System.out.println("You are logged in as a worker.\n");
-
-                    // Initialize WorkerController and services
-                    TaskService taskService = new TaskService(new TaskDaoImpl(emf));
-                    WorkerService workerService = new WorkerService(new WorkerDaoImpl(emf), new TaskDaoImpl(emf));
-                    WorkerController workerController = new WorkerController(workerService, taskService);
-
-                    Worker worker = workerController.getWorkerByUserId(user.getId());
-
-                    List<Task> tasks = workerController.getTasks(worker.getId());
-
-                    System.out.println("Tasks assigned to you:");
-                    if (tasks.isEmpty()) {
-                        System.out.println("No tasks assigned.");
-                    } else {
-                        for (Task task : tasks) {
-                            System.out.println("Task ID: " + task.getId() + ", Description: " + task.getDescription()
-                                    + ", Status: " + task.getStatus());
+                switch (choice) {
+                    case "1" -> {
+                        System.out.print("Email   : ");
+                        String email = scanner.nextLine();
+                        System.out.print("Password: ");
+                        String pwd   = scanner.nextLine();
+                        try {
+                            user = userController.login(email, pwd);
+                        } catch (IllegalArgumentException ex) {
+                            System.out.println("⚠️  " + ex.getMessage() + "\n");
                         }
                     }
+                    case "2" -> {
+                        System.out.print("Name       : ");
+                        String name    = scanner.nextLine();
+                        System.out.print("Surname    : ");
+                        String surname = scanner.nextLine();
+                        System.out.print("Email      : ");
+                        String email   = scanner.nextLine();
+                        System.out.print("Password   : ");
+                        String pwd     = scanner.nextLine();
+                        System.out.print("Role (1 = Customer, 2 = Worker): ");
+                        String rInput  = scanner.nextLine().trim();
 
-                    break;
-                case Customer:
-                    System.out.println("You are logged in as a customer.\n");
-                    // Initialize CustomerController and services if needed
-                    CustomerService customerService = new CustomerService(
-                            new CustomerDaoImpl(emf),
-                            new ConnectionDaoImpl(emf),
-                            new InventoryDaoImpl(emf),
-                            new ItemDaoImpl(emf),
-                            new ConcreteVendingMachineDaoImpl(emf),
-                            new TransactionService(new TransactionDaoImpl(emf)));
-                    CustomerController customerController = new CustomerController(userService, customerService);
+                        User.Role role  = "2".equals(rInput) ? User.Role.Worker : User.Role.Customer;
 
-                    String customerMenuChoice;
+                        try {
+                            User newUser = new User(email, name, surname, pwd);
+                            newUser.setRole(role);
+                            user = userController.signUp(newUser);
+
+                            if (role == User.Role.Customer) {
+                                customerService.createCustomerFromUser(user);
+                            } else {
+                                workerService.createWorkerFromUser(user);
+                            }
+                            System.out.println("\n✅ Account created! Logged in as " + role + ".\n");
+                        } catch (Exception ex) {
+                            System.out.println("⚠️  Registration failed: " + ex.getMessage() + "\n");
+                        }
+                    }
+                    default -> System.out.println("Please choose 1 or 2.\n");
+                }
+            }
+
+            /* ---------- Post-login dispatch ---------- */
+            System.out.printf("Hello %s %s! (%s)%n%n",
+                    user.getName(), user.getSurname(), user.getRole());
+
+            switch (user.getRole()) {
+
+                // ────── ADMIN ───────────────────────────
+                case Admin -> System.out.println("🔧 Admin panel coming soon…\n");
+
+                // ────── WORKER ──────────────────────────
+                case Worker -> {
+                    TaskService     taskService     = new TaskService(new TaskDaoImpl(emf));
+                    WorkerController workerCtrl      = new WorkerController(workerService, taskService);
+                    Worker           worker          = workerCtrl.getWorkerByUserId(user.getId());
+                    List<Task>       tasks           = workerCtrl.getTasks(worker.getId());
+
+                    System.out.println("🛠  Your Tasks:");
+                    if (tasks.isEmpty()) {
+                        System.out.println("   • No tasks assigned.\n");
+                    } else {
+                        tasks.forEach(t -> System.out.printf(
+                                "   • [%d] %s  (%s)%n",
+                                t.getId(), t.getDescription(), t.getStatus()));
+                        System.out.println();
+                    }
+                }
+
+                // ────── CUSTOMER ────────────────────────
+                case Customer -> {
+                    CustomerController custCtrl = new CustomerController(userService, customerService);
+                    String cmd;
+
                     do {
-                        Customer customer = customerController.getCustomerByUserId(user.getId());
-                        System.out.println("\n1. Check balance");
-                        System.out.println("2. Connect to a vending machine");
-                        System.out.println("3. View transaction history");
-                        System.out.println("4. Recharge balance");
-                        System.out.println("5. Exit");
-                        System.out.print("Enter your choice (1, 2, 3, 4 or 5): ");
-                        customerMenuChoice = scanner.nextLine();
+                        Customer cust = custCtrl.getCustomerByUserId(user.getId());
+                        System.out.println("""
+                                1. Check balance
+                                2. Connect to a vending machine
+                                3. View transaction history
+                                4. Recharge balance
+                                5. Exit""");
+                        System.out.print("Choose (1-5): ");
+                        cmd = scanner.nextLine().trim();
 
-                        switch (customerMenuChoice) {
-                            case "1":
-                                System.out.println("\nYour current balance is: " + customer.getBalance() + "€");
-                                break;
-                            case "2":
-                                MachineService machineService = new MachineService(
+                        switch (cmd) {
+                            case "1" -> System.out.printf("%n💰 Balance: %.2f €%n%n", cust.getBalance());
+
+                            case "2" -> {
+                                MachineService machService = new MachineService(
                                         new ItemDaoImpl(emf),
                                         new ConcreteVendingMachineDaoImpl(emf),
                                         new MaintenanceDaoImpl(emf));
-                                MachineController machineController = new MachineController(machineService);
-                                List<String> machineIds = machineController.getAllAvailableMachines();
-                                System.out.println("\nAvailable vending machines:");
-                                for (String machineId : machineIds) {
-                                    System.out.println("Machine ID: " + machineId);
-                                }
-                                if (machineIds.isEmpty()) {
-                                    System.out.println("No available vending machines.");
+                                MachineController machCtrl = new MachineController(machService);
+
+                                List<String> machines = machCtrl.getAllAvailableMachines();
+                                if (machines.isEmpty()) {
+                                    System.out.println("\nNo machines available.\n");
                                     break;
                                 }
 
-                                System.out.print("\nEnter the ID of the vending machine you want to connect to: ");
-                                String machineId = scanner.nextLine();
+                                System.out.println("\nAvailable machines:");
+                                machines.forEach(mid -> System.out.println("   • " + mid));
+                                System.out.print("Enter machine ID: ");
+                                String mId = scanner.nextLine().trim();
 
-                                if (!machineIds.contains(machineId)) {
-                                    System.out.println("Invalid machine ID. Please try again.");
-                                    continue;
+                                if (!machines.contains(mId)) {
+                                    System.out.println("Invalid ID.\n");
+                                    break;
                                 }
 
-                                // Connect to the vending machine
-                                Connection connection = customerController.connect(machineId, customer.getId());
-                                System.out.println("Connected to vending machine with ID: " + machineId);
-
-                                // Display items in the machine
-                                System.out.println("Loading items from the machine...\n");
-                                List<Item> items = customerController.getInventory(connection);
+                                Connection conn = custCtrl.connect(mId, cust.getId());
+                                List<Item> items = custCtrl.getInventory(conn);
                                 if (items.isEmpty()) {
-                                    System.out.println("No items available in this machine.");
-                                    continue;
-                                }
-                                System.out.println("Items available in the machine:");
-                                for (Item item : items) {
-                                    System.out.println("Item ID: " + item.getId() + ", Name: " + item.getName()
-                                            + ", Price: " + item.getPrice() + " €");
+                                    System.out.println("Machine empty.\n");
+                                    custCtrl.disconnect(conn);
+                                    break;
                                 }
 
-                                System.out.print("\nEnter the IDs of items you want to buy (comma separated): ");
-                                String itemIdsInput = scanner.nextLine();
-                                String[] itemIdsArray = itemIdsInput.split(",");
-                                List<Long> itemIds = new java.util.ArrayList<>();
-                                for (String id : itemIdsArray) {
-                                    try {
-                                        itemIds.add(Long.parseLong(id.trim()));
-                                    } catch (NumberFormatException e) {
-                                        System.out.println("Invalid item ID: " + id);
-                                    }
-                                }
-                                if (itemIds.isEmpty()) {
-                                    System.out.println("No valid item IDs provided.");
-                                    continue;
+                                System.out.println("\nItems:");
+                                items.forEach(it -> System.out.printf(
+                                        "   • [%d] %s – %.2f €%n",
+                                        it.getId(), it.getName(), it.getPrice()));
+
+                                System.out.print("Item IDs to buy (comma): ");
+                                String[] idsStr  = scanner.nextLine().split(",");
+                                List<Long> ids   = new java.util.ArrayList<>();
+                                for (String s : idsStr) {
+                                    try { ids.add(Long.parseLong(s.trim())); }
+                                    catch (NumberFormatException ignore) {}
                                 }
 
-                                // Buy items
+                                if (ids.isEmpty()) {
+                                    System.out.println("No valid IDs.\n");
+                                    custCtrl.disconnect(conn);
+                                    break;
+                                }
+
                                 try {
-                                    customerController.buyItem(connection.getId(), itemIds);
-                                    System.out.println("Items purchased successfully!");
-                                } catch (IllegalArgumentException e) {
-                                    System.out.println("Purchase failed: " + e.getMessage());
+                                    custCtrl.buyItem(conn.getId(), ids);
+                                    System.out.println("✅ Purchase successful!\n");
+                                } catch (Exception ex) {
+                                    System.out.println("⚠️  " + ex.getMessage() + "\n");
+                                } finally {
+                                    custCtrl.disconnect(conn);
                                 }
-                                // Disconnect from the machine
-                                customerController.disconnect(connection);
-                                System.out.println("Disconnected from vending machine with ID: " + machineId);
-                                break;
-                            case "3":
-                                List<Transaction> transactions = customerController
-                                        .getTransactionHistory(customer.getId());
-                                System.out.println("\nTransaction history:");
-                                if (transactions.isEmpty()) {
-                                    System.out.println("No transactions found.");
-                                } else {
-                                    for (Transaction transaction : transactions) {
-                                        System.out.println("Transaction ID: " + transaction.getId()
-                                                + ", Amount: " + transaction.getTotalAmout() + " €, Date: "
-                                                + transaction.getDate());
-                                    }
-                                }
-                                break;
-                            case "4":
-                                System.out.println("Your current balance is: " + customer.getBalance() + "€");
-                                System.out.print("Enter the amount to recharge: ");
-                                double rechargeAmount = scanner.nextDouble();
-                                scanner.nextLine();
-                                if (rechargeAmount <= 0) {
-                                    System.out.println("Invalid recharge amount. Please try again.");
-                                    continue;
-                                }
-                                customerController.rechargeBalance(customer.getId(), rechargeAmount);
-                                customer = customerController.getCustomerByUserId(user.getId());
-                                System.out.println("Balance recharged successfully! New balance: "
-                                        + customer.getBalance() + "€");
-                                break;
-                            case "5":
-                                System.out.println("Exiting customer menu.");
-                                break;
-                            default:
-                                System.out.println("Invalid choice.");
-                                break;
-                        }
-                    } while (!customerMenuChoice.equals("5"));
+                            }
 
-                    break;
-                case User:
-                    System.out.println("You are logged in as a user.");
-                    break;
+                            case "3" -> {
+                                List<Transaction> txs = custCtrl.getTransactionHistory(cust.getId());
+                                if (txs.isEmpty()) {
+                                    System.out.println("\nNo transactions.\n");
+                                } else {
+                                    System.out.println();
+                                    txs.forEach(t -> System.out.printf(
+                                            "   • [%d] %.2f € on %s%n",
+                                            t.getId(), t.getTotalAmout(), t.getDate()));
+                                    System.out.println();
+                                }
+                            }
+
+                            case "4" -> {
+                                System.out.printf("Current balance: %.2f €%n", cust.getBalance());
+                                System.out.print("Amount to add: ");
+                                String in = scanner.nextLine();
+                                try {
+                                    double amt = Double.parseDouble(in);
+                                    custCtrl.rechargeBalance(cust.getId(), amt);
+                                    System.out.println("✅ Balance updated!\n");
+                                } catch (NumberFormatException ex) {
+                                    System.out.println("Invalid number.\n");
+                                } catch (Exception ex) {
+                                    System.out.println("⚠️  " + ex.getMessage() + "\n");
+                                }
+                            }
+
+                            case "5" -> System.out.println("\nGoodbye!\n");
+                            default  -> System.out.println("Choose 1-5.\n");
+                        }
+                    } while (!"5".equals(cmd));
+                }
+
+                // ────── GENERIC USER ────────────────────
+                default -> System.out.println("Standard user menu coming soon…\n");
             }
 
             scanner.close();
-        } catch (Exception e) {
-            System.err.println("Application failed to start: " + e.getMessage());
-            e.printStackTrace();
+        } catch (Exception ex) {
+            System.err.println("Fatal: " + ex.getMessage());
+            ex.printStackTrace();
         } finally {
-            System.out.println("Main application logic finished.\n");
             DatabaseInitializer.shutdown();
+            System.out.println("☕  JavaBrew terminated.");
         }
     }
 }
