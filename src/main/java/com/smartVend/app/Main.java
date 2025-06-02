@@ -34,14 +34,12 @@ import com.smartvend.app.services.WorkerService;
 
 import jakarta.persistence.EntityManagerFactory;
 
-
-
 public class Main {
 
     // ──────────────────────── ʝ Δ ʋ Δ Ƀ ʀ ɘ ʍ ──────────────────────── //
     private static void printBanner() {
         System.out.println("\n==========================================");
-        System.out.println("          ☕  Welcome to JavaBrew  ☕       ");
+        System.out.println("          ☕️  Welcome to JavaBrew  ☕️       ");
         System.out.println("==========================================\n");
     }
     // ─────────────────────────────────────────────────────────────────── //
@@ -51,22 +49,22 @@ public class Main {
             EntityManagerFactory emf = DatabaseInitializer.getEntityManagerFactory();
 
             /* ---------- DAO & Service wiring ---------- */
-            UserService      userService      = new UserService(new UserDaoImpl(emf));
-            CustomerService  customerService = new CustomerService(
+            UserService userService = new UserService(new UserDaoImpl(emf));
+            CustomerService customerService = new CustomerService(
                     new CustomerDaoImpl(emf),
                     new ConnectionDaoImpl(emf),
                     new InventoryDaoImpl(emf),
                     new ItemDaoImpl(emf),
                     new ConcreteVendingMachineDaoImpl(emf),
                     new TransactionService(new TransactionDaoImpl(emf)));
-            WorkerService    workerService   = new WorkerService(
+            WorkerService workerService = new WorkerService(
                     new WorkerDaoImpl(emf),
                     new TaskDaoImpl(emf));
 
-            UserController   userController   = new UserController(userService);
+            UserController userController = new UserController(userService);
 
             Scanner scanner = new Scanner(System.in);
-            User    user    = null;
+            User user = null;
 
             printBanner();
 
@@ -82,7 +80,7 @@ public class Main {
                         System.out.print("Email   : ");
                         String email = scanner.nextLine();
                         System.out.print("Password: ");
-                        String pwd   = scanner.nextLine();
+                        String pwd = scanner.nextLine();
                         try {
                             user = userController.login(email, pwd);
                         } catch (IllegalArgumentException ex) {
@@ -91,17 +89,17 @@ public class Main {
                     }
                     case "2" -> {
                         System.out.print("Name       : ");
-                        String name    = scanner.nextLine();
+                        String name = scanner.nextLine();
                         System.out.print("Surname    : ");
                         String surname = scanner.nextLine();
                         System.out.print("Email      : ");
-                        String email   = scanner.nextLine();
+                        String email = scanner.nextLine();
                         System.out.print("Password   : ");
-                        String pwd     = scanner.nextLine();
+                        String pwd = scanner.nextLine();
                         System.out.print("Role (1 = Customer, 2 = Worker): ");
-                        String rInput  = scanner.nextLine().trim();
+                        String rInput = scanner.nextLine().trim();
 
-                        User.Role role  = "2".equals(rInput) ? User.Role.Worker : User.Role.Customer;
+                        User.Role role = "2".equals(rInput) ? User.Role.Worker : User.Role.Customer;
 
                         try {
                             User newUser = new User(email, name, surname, pwd);
@@ -133,10 +131,10 @@ public class Main {
 
                 // ────── WORKER ──────────────────────────
                 case Worker -> {
-                    TaskService     taskService     = new TaskService(new TaskDaoImpl(emf));
-                    WorkerController workerCtrl      = new WorkerController(workerService, taskService);
-                    Worker           worker          = workerCtrl.getWorkerByUserId(user.getId());
-                    List<Task>       tasks           = workerCtrl.getTasks(worker.getId());
+                    TaskService taskService = new TaskService(new TaskDaoImpl(emf));
+                    WorkerController workerCtrl = new WorkerController(workerService, taskService);
+                    Worker worker = workerCtrl.getWorkerByUserId(user.getId());
+                    List<Task> tasks = workerCtrl.getTasks(worker.getId());
 
                     System.out.println("🛠  Your Tasks:");
                     if (tasks.isEmpty()) {
@@ -205,11 +203,13 @@ public class Main {
                                         it.getId(), it.getName(), it.getPrice()));
 
                                 System.out.print("Item IDs to buy (comma): ");
-                                String[] idsStr  = scanner.nextLine().split(",");
-                                List<Long> ids   = new java.util.ArrayList<>();
+                                String[] idsStr = scanner.nextLine().split(",");
+                                List<Long> ids = new java.util.ArrayList<>();
                                 for (String s : idsStr) {
-                                    try { ids.add(Long.parseLong(s.trim())); }
-                                    catch (NumberFormatException ignore) {}
+                                    try {
+                                        ids.add(Long.parseLong(s.trim()));
+                                    } catch (NumberFormatException ignore) {
+                                    }
                                 }
 
                                 if (ids.isEmpty()) {
@@ -257,7 +257,7 @@ public class Main {
                             }
 
                             case "5" -> System.out.println("\nGoodbye!\n");
-                            default  -> System.out.println("Choose 1-5.\n");
+                            default -> System.out.println("Choose 1-5.\n");
                         }
                     } while (!"5".equals(cmd));
                 }
@@ -272,7 +272,7 @@ public class Main {
             ex.printStackTrace();
         } finally {
             DatabaseInitializer.shutdown();
-            System.out.println("☕  JavaBrew terminated.");
+            System.out.println("☕️  JavaBrew terminated.");
         }
     }
 }
