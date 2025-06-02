@@ -1,32 +1,35 @@
 package com.smartvend.app.services;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import java.time.Instant;
+import java.util.Collection;
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
-
-import java.time.Instant;
-import java.util.Collection;
-import java.util.List;
-
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import com.smartvend.app.dao.impl.TaskDaoImpl;
+import com.smartvend.app.dao.impl.WorkerDaoImpl;
 import com.smartvend.app.model.maintenance.MaintenanceReport;
 import com.smartvend.app.model.maintenance.MaintenanceStatus;
-import com.smartvend.app.dao.impl.TaskDaoImpl;
-import com.smartvend.app.model.vendingmachine.ConcreteVendingMachine;
-import com.smartvend.app.model.user.*;
 import com.smartvend.app.model.maintenance.Task;
+import com.smartvend.app.model.user.Admin;
+import com.smartvend.app.model.user.User;
+import com.smartvend.app.model.user.Worker;
+import com.smartvend.app.model.vendingmachine.ConcreteVendingMachine;
 
 public class WorkerServiceTest {
     @Mock
@@ -158,4 +161,44 @@ public class WorkerServiceTest {
         verify(taskDao, times(1)).getTaskById(task.getId());
         verifyNoMoreInteractions(taskDao);
     }
+
+    @Test
+    @DisplayName("createWorkerFromUser: crea Worker da User valido")
+    void testCreateWorkerFromUser() {
+        // Arrange
+        User user = new User(42L, "worker@javabrew.it", "Test", "Worker", "pw");
+        Worker expected = new Worker(user);
+
+        WorkerDaoImpl workerDaoMock = mock(WorkerDaoImpl.class);
+        WorkerService localWorkerService = new WorkerService(workerDaoMock, taskDao);
+
+        when(workerDaoMock.createWorker(org.mockito.ArgumentMatchers.any(Worker.class))).thenReturn(expected);
+
+        // Act
+        Worker created = localWorkerService.createWorkerFromUser(user);
+
+        // Assert
+        assertNotNull(created);
+        assertEquals(user, created.getUser());
+        assertEquals(User.Role.Worker, created.getUser().getRole());
+        assertTrue(created.isActive());
+
+        verify(workerDaoMock, times(1)).createWorker(org.mockito.ArgumentMatchers.any(Worker.class));
+    }
+
+    @Test
+    @DisplayName("createWorkerFromUser: se User null -> IllegalArgumentException")
+    void testCreateWorkerFromUserNull() {
+        WorkerDaoImpl workerDaoMock = mock(WorkerDaoImpl.class);
+        WorkerService localWorkerService = new WorkerService(workerDaoMock, taskDao);
+
+        assertThrows(IllegalArgumentException.class, () -> {
+            localWorkerService.createWorkerFromUser(null);
+        });
+
+        verify(workerDaoMock, org.mockito.Mockito.never()).createWorker(org.mockito.ArgumentMatchers.any());
+    }
+
+
+    
 }

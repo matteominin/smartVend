@@ -13,6 +13,7 @@ import com.smartvend.app.model.transaction.PaymentMethod;
 import com.smartvend.app.model.transaction.Transaction;
 import com.smartvend.app.model.transaction.TransactionItem;
 import com.smartvend.app.model.user.Customer;
+import com.smartvend.app.model.user.User;
 import com.smartvend.app.model.vendingmachine.ConcreteVendingMachine;
 import com.smartvend.app.model.vendingmachine.Inventory;
 import com.smartvend.app.model.vendingmachine.Item;
@@ -213,4 +214,14 @@ public class CustomerService {
 
         return transactionService.createTransaction(transaction);
     }
+
+    public Customer createCustomerFromUser(User user) {
+        if (user == null) {
+            throw new IllegalArgumentException("User cannot be null");
+        }
+        // Imposta il ruolo, ma il costruttore già lo fa!
+        Customer customer = new Customer(user, 0.0); // balance parte da zero
+        return customerDao.createCustomer(customer);
+    }
+
 }
