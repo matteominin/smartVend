@@ -50,14 +50,13 @@ public class ConcreteVendingMachine implements Serializable {
     }
 
     public ConcreteVendingMachine(String serialNumber, VendingMachine vendingMachine, String location, int capacity,
-            MachineStatus status, Inventory inventory) {
+            MachineStatus status) {
         this.serialNumber = serialNumber;
         this.vendingMachine = vendingMachine;
         this.location = location;
         this.capacity = capacity;
         this.createdAt = Instant.now();
         this.status = status;
-        this.inventory = inventory;
     }
 
     public String getId() {

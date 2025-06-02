@@ -35,12 +35,12 @@ public class Task implements Serializable {
     @Column(nullable = false)
     private MaintenanceStatus status;
 
-    @Column(nullable = false)
-    private Instant assignedAt;
-
     @OneToOne(optional = false)
     @JoinColumn(name = "report_id")
     private MaintenanceReport report;
+
+    @Column(nullable = false)
+    private Instant assignedAt;
 
     public Task() {
         // Default constructor for JPA

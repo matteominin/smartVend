@@ -233,7 +233,7 @@ class InventoryDaoImplTest {
             em.getTransaction().begin();
 
             ConcreteVendingMachine machine = new ConcreteVendingMachine(
-                    "ABC123", null, "Milano", 30, MachineStatus.Operative, null);
+                    "ABC123", null, "Milano", 30, MachineStatus.Operative);
             // Aggiungi lastMaintenance (obbligatorio!)
             machine.setLastMaintenance(java.time.Instant.now());
             em.persist(machine);

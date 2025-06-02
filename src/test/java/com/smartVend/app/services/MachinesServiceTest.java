@@ -74,7 +74,7 @@ public class MachinesServiceTest {
         MaintenanceReport report = new MaintenanceReport(
                 "Issue description",
                 null,
-                new ConcreteVendingMachine("SN123", null, "Main Hall", 50, null, null));
+                new ConcreteVendingMachine("SN123", null, "Main Hall", 50, null));
 
         when(maintenanceDao.createReport(report)).thenReturn(report);
 
@@ -93,7 +93,7 @@ public class MachinesServiceTest {
     @Test
     @DisplayName("Test runSelfDiagnostic with valid machine ID")
     public void testRunSelfDiagnosticWithValidMachineId() {
-        ConcreteVendingMachine machine = new ConcreteVendingMachine("SN123", null, "Main Hall", 50, null, null);
+        ConcreteVendingMachine machine = new ConcreteVendingMachine("SN123", null, "Main Hall", 50, null);
         when(machineDao.findById("SN123")).thenReturn(machine);
 
         MaintenanceReport result = machineService.runSelfDiagnostic("SN123", false);
@@ -105,7 +105,7 @@ public class MachinesServiceTest {
     @DisplayName("Test runSelfDiagnostic with valid machine ID")
     public void testRunSelfDiagnosticWithIssue() {
         ConcreteVendingMachine machine = new ConcreteVendingMachine("SN123", null,
-                "Main Hall", 50, null, null);
+                "Main Hall", 50, null);
         when(machineDao.findById("SN123")).thenReturn(machine);
 
         MaintenanceReport result = machineService.runSelfDiagnostic("SN123", true);
@@ -116,7 +116,7 @@ public class MachinesServiceTest {
     @DisplayName("Test getStatus with valid machine ID")
     public void testGetStatusWithValidMachineId() {
         ConcreteVendingMachine machine = new ConcreteVendingMachine("123", null, "Location A", 50,
-                MachineStatus.Operative, null);
+                MachineStatus.Operative);
         when(machineDao.findById("123")).thenReturn(machine);
         MachineStatus status = machineService.getStatus("123");
         assertEquals(MachineStatus.Operative, status);
@@ -125,12 +125,10 @@ public class MachinesServiceTest {
     @Test
     @DisplayName("Test getAllAvailableMachines returns only operative machines")
     public void testGetAllAvailableMachinesReturnsOperative() {
-        ConcreteVendingMachine machine1 = new ConcreteVendingMachine("M1", null, "Loc1", 10, MachineStatus.Operative,
-                null);
-        ConcreteVendingMachine machine2 = new ConcreteVendingMachine("M2", null, "Loc2", 20, MachineStatus.OutOfService,
-                null);
-        ConcreteVendingMachine machine3 = new ConcreteVendingMachine("M3", null, "Loc3", 30, MachineStatus.Operative,
-                null);
+        ConcreteVendingMachine machine1 = new ConcreteVendingMachine("M1", null, "Loc1", 10, MachineStatus.Operative);
+        ConcreteVendingMachine machine2 = new ConcreteVendingMachine("M2", null, "Loc2", 20,
+                MachineStatus.OutOfService);
+        ConcreteVendingMachine machine3 = new ConcreteVendingMachine("M3", null, "Loc3", 30, MachineStatus.Operative);
 
         when(machineDao.findAll()).thenReturn(java.util.Arrays.asList(machine1, machine2, machine3));
 

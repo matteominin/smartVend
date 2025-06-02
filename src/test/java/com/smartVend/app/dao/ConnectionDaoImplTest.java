@@ -24,7 +24,6 @@ import com.smartvend.app.model.connection.Connection;
 import com.smartvend.app.model.user.Customer;
 import com.smartvend.app.model.user.User;
 import com.smartvend.app.model.vendingmachine.ConcreteVendingMachine;
-import com.smartvend.app.model.vendingmachine.Inventory;
 import com.smartvend.app.model.vendingmachine.MachineStatus;
 
 import jakarta.persistence.EntityManager;
@@ -61,7 +60,7 @@ class ConnectionDaoImplTest {
         User user = new User(id, "test@email.com", "Test", "User", "pwd");
         Customer customer = new Customer(id, user, 12.5);
         ConcreteVendingMachine machine = new ConcreteVendingMachine(
-                "macchinaA", null, "loc", 1, MachineStatus.Operative, null);
+                "macchinaA", null, "loc", 1, MachineStatus.Operative);
 
         when(emMock.find(User.class, id)).thenReturn(user); // <-- AGGIUNTO
         when(emMock.find(Customer.class, id)).thenReturn(customer); // <-- NON cambia
@@ -185,11 +184,6 @@ class ConnectionDaoImplTest {
 
         Customer customer = new Customer(user, 50);
         em.persist(customer);
-        em.flush(); // Assicura che l'ID sia generato
-
-        // Crea Inventory
-        Inventory inventory = new Inventory();
-        em.persist(inventory);
 
         // Crea la macchina
         ConcreteVendingMachine machine = new ConcreteVendingMachine(
@@ -197,8 +191,7 @@ class ConnectionDaoImplTest {
                 null,
                 "location",
                 5,
-                MachineStatus.Operative,
-                inventory);
+                MachineStatus.Operative);
         machine.setLastMaintenance(Instant.now());
         em.persist(machine);
 

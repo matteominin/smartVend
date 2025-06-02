@@ -229,7 +229,7 @@ class WorkerDaoImplTest {
             assertNotNull(worker.getId());
 
             // READ by id & email
-            Worker byId = intDao.getWorkerByUserId(worker.getId());
+            Worker byId = intDao.getWorkerByUserId(worker.getUser().getId());
             assertNotNull(byId);
             assertEquals("worker@email.com", byId.getUser().getEmail());
 

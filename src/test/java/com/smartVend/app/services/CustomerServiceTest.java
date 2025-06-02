@@ -78,8 +78,7 @@ public class CustomerServiceTest {
                                 baseVendingMachine,
                                 "Location",
                                 30,
-                                MachineStatus.Operative,
-                                null);
+                                MachineStatus.Operative);
 
                 mockItem1 = new Item(
                                 30L,
