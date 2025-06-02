@@ -1,49 +1,47 @@
 package com.smartvend.app.services;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.never;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
-
 import java.time.Instant;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
 import org.mockito.MockitoAnnotations;
 
+import com.smartvend.app.dao.impl.ConcreteVendingMachineDaoImpl;
 import com.smartvend.app.dao.impl.ConnectionDaoImpl;
+import com.smartvend.app.dao.impl.CustomerDaoImpl;
 import com.smartvend.app.dao.impl.InventoryDaoImpl;
 import com.smartvend.app.dao.impl.ItemDaoImpl;
-import com.smartvend.app.dao.impl.CustomerDaoImpl;
-import com.smartvend.app.dao.impl.ConcreteVendingMachineDaoImpl;
-
+import com.smartvend.app.model.connection.Connection;
+import com.smartvend.app.model.transaction.PaymentMethod;
+import com.smartvend.app.model.transaction.Transaction;
+import com.smartvend.app.model.user.Customer;
 import com.smartvend.app.model.user.User;
 import com.smartvend.app.model.vendingmachine.ConcreteVendingMachine;
 import com.smartvend.app.model.vendingmachine.Inventory;
+import com.smartvend.app.model.vendingmachine.Item;
+import com.smartvend.app.model.vendingmachine.ItemType;
 import com.smartvend.app.model.vendingmachine.MachineStatus;
 import com.smartvend.app.model.vendingmachine.MachineType;
 import com.smartvend.app.model.vendingmachine.VendingMachine;
-import com.smartvend.app.model.user.Customer;
-import com.smartvend.app.model.connection.Connection;
-import com.smartvend.app.model.vendingmachine.Item;
-import com.smartvend.app.model.vendingmachine.ItemType;
-import com.smartvend.app.model.transaction.PaymentMethod;
-import com.smartvend.app.model.transaction.Transaction;
 
 public class CustomerServiceTest {
     @Mock
@@ -786,4 +784,31 @@ public class CustomerServiceTest {
         verify(customerDao, times(1)).updateCustomer(mockCustomer); // Called in updateBalance with amount 0.0
         verify(transactionService, times(1)).createTransaction(any(Transaction.class));
     }
+
+    @Test
+    @DisplayName("createCustomerFromUser: crea Customer da User valido")
+    void testCreateCustomerFromUser() {
+        User user = new User(1L, "mail@javabrew.it", "Anna", "Brew", "pw");
+        Customer expected = new Customer(user, 0.0);
+
+        when(customerDao.createCustomer(any(Customer.class))).thenReturn(expected);
+
+        Customer created = customerService.createCustomerFromUser(user);
+
+        assertNotNull(created);
+        assertEquals(user, created.getUser());
+        assertEquals(0.0, created.getBalance());
+        assertEquals(User.Role.Customer, created.getUser().getRole());
+        verify(customerDao, times(1)).createCustomer(any(Customer.class));
+    }
+
+    @Test
+    @DisplayName("createCustomerFromUser: se User null -> IllegalArgumentException")
+    void testCreateCustomerFromUserNull() {
+        assertThrows(IllegalArgumentException.class, () -> {
+            customerService.createCustomerFromUser(null);
+        });
+        verify(customerDao, never()).createCustomer(any());
+    }
+
 }
