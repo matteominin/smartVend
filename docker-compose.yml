@@ -12,7 +12,18 @@ services:
       - postgres_data:/var/lib/postgresql/data
       - ./db/:/docker-entrypoint-initdb.d
 
-  # (opzionale) Adminer per DB browser
+  app:
+    build: .
+    depends_on:
+      - db
+    environment:
+      DB_URL: jdbc:postgresql://db:5432/${DB_NAME}
+      DB_USER: ${DB_USER}
+      DB_PASS: ${DB_PASS}
+    # esponi la porta della tua app Java solo se serve:
+    # ports:
+    #   - "8080:8080"
+
   adminer:
     image: adminer
     restart: always

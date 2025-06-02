@@ -1,16 +1,27 @@
 package com.smartvend.app.db;
 
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.EntityManagerFactory;
-import org.junit.jupiter.api.*;
-import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
-
 import java.lang.reflect.Field;
 
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.AfterAll;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
+import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
+
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityManagerFactory;
 
 @TestMethodOrder(OrderAnnotation.class)
 public class DatabaseInitializerTest {
+
+    private static final String TEST_UNIT = "test-pu";
 
     private static void resetEmf() {
         try {
@@ -40,7 +51,8 @@ public class DatabaseInitializerTest {
     void testInitializeDatabase() {
         assertNull(getStaticEmf(), "EMF should be null before initialization.");
 
-        DatabaseInitializer.initializeDatabase();
+        // Usa la nuova versione parametrica!
+        DatabaseInitializer.initializeDatabase(TEST_UNIT);
 
         EntityManagerFactory emf = getStaticEmf();
         assertNotNull(emf, "EntityManagerFactory should not be null after initialization.");
@@ -63,8 +75,10 @@ public class DatabaseInitializerTest {
     void testGetEntityManagerFactoryInitializesIfNull() {
         assertNull(getStaticEmf(), "EMF should be null before calling getEntityManagerFactory.");
 
-        EntityManagerFactory emf = DatabaseInitializer.getEntityManagerFactory();
+        // Inizializza la persistence unit test, se non già fatto
+        DatabaseInitializer.initializeDatabase(TEST_UNIT);
 
+        EntityManagerFactory emf = DatabaseInitializer.getEntityManagerFactory();
         assertNotNull(emf, "EntityManagerFactory should not be null.");
         assertTrue(emf.isOpen(), "EntityManagerFactory should be open.");
 
@@ -83,7 +97,8 @@ public class DatabaseInitializerTest {
     @Test
     @Order(3)
     void testGetEntityManagerFactoryReturnsExistingInstance() {
-        DatabaseInitializer.initializeDatabase();
+        // Assicura che l'unit test sia già inizializzata
+        DatabaseInitializer.initializeDatabase(TEST_UNIT);
         EntityManagerFactory initialEmf = DatabaseInitializer.getEntityManagerFactory();
         assertNotNull(initialEmf, "Initial EMF should not be null.");
         assertTrue(initialEmf.isOpen(), "Initial EMF should be open.");
@@ -98,7 +113,7 @@ public class DatabaseInitializerTest {
     @Test
     @Order(4)
     void testShutdown() {
-        DatabaseInitializer.initializeDatabase();
+        DatabaseInitializer.initializeDatabase(TEST_UNIT);
         EntityManagerFactory emfBeforeShutdown = getStaticEmf();
         assertNotNull(emfBeforeShutdown, "EMF should be initialized before shutdown.");
         assertTrue(emfBeforeShutdown.isOpen(), "EMF should be open before shutdown.");

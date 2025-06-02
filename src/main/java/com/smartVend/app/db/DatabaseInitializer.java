@@ -1,17 +1,25 @@
 package com.smartvend.app.db;
 
+import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
-import jakarta.persistence.EntityManager;
 
 public class DatabaseInitializer {
 
     private static EntityManagerFactory emf;
 
+    // DEFAULT: production
+    private static final String DEFAULT_UNIT = "smartvendPU";
+
+    // Sovraccarico per test
     public static void initializeDatabase() {
+        initializeDatabase(DEFAULT_UNIT);
+    }
+
+    // Versione parametrica
+    public static void initializeDatabase(String persistenceUnitName) {
         try {
-            // Modificato il nome della persistence unit da "smartvendPU" a "test-pu"
-            emf = Persistence.createEntityManagerFactory("test-pu");
+            emf = Persistence.createEntityManagerFactory(persistenceUnitName);
 
             EntityManager em = emf.createEntityManager();
             em.getTransaction().begin();
@@ -21,7 +29,6 @@ public class DatabaseInitializer {
         } catch (Exception e) {
             System.err.println("Database initialization failed: " + e.getMessage());
             e.printStackTrace();
-            // Rilancia l'eccezione per rendere più visibili gli errori nei test
             throw new RuntimeException("Failed to initialize database persistence unit.", e);
         }
     }
