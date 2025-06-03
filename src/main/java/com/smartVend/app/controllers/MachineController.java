@@ -8,7 +8,6 @@ import com.smartvend.app.model.maintenance.MaintenanceReport;
 import com.smartvend.app.model.vendingmachine.MachineStatus;
 
 public class MachineController {
-
     private MachineService machineService;
 
     public MachineController(MachineService machineService) {

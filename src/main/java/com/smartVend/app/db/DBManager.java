@@ -4,19 +4,15 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
 
-public class DatabaseInitializer {
+public class DBManager {
 
     private static EntityManagerFactory emf;
-
-    // DEFAULT: production
     private static final String DEFAULT_UNIT = "smartvendPU";
 
-    // Sovraccarico per test
-    public static void initializeDatabase() {
+    public static void init() {
         initializeDatabase(DEFAULT_UNIT);
     }
 
-    // Versione parametrica
     public static void initializeDatabase(String persistenceUnitName) {
         try {
             emf = Persistence.createEntityManagerFactory(persistenceUnitName);
@@ -35,7 +31,7 @@ public class DatabaseInitializer {
 
     public static EntityManagerFactory getEntityManagerFactory() {
         if (emf == null) {
-            initializeDatabase();
+            init();
         }
         return emf;
     }

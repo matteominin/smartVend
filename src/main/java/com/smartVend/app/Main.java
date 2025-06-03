@@ -17,7 +17,7 @@ import com.smartvend.app.dao.impl.TaskDaoImpl;
 import com.smartvend.app.dao.impl.TransactionDaoImpl;
 import com.smartvend.app.dao.impl.UserDaoImpl;
 import com.smartvend.app.dao.impl.WorkerDaoImpl;
-import com.smartvend.app.db.DatabaseInitializer;
+import com.smartvend.app.db.DBManager;
 import com.smartvend.app.model.connection.Connection;
 import com.smartvend.app.model.maintenance.Task;
 import com.smartvend.app.model.transaction.Transaction;
@@ -46,7 +46,7 @@ public class Main {
 
     public static void main(String[] args) {
         try {
-            EntityManagerFactory emf = DatabaseInitializer.getEntityManagerFactory();
+            EntityManagerFactory emf = DBManager.getEntityManagerFactory();
 
             /* ---------- DAO & Service wiring ---------- */
             UserService userService = new UserService(new UserDaoImpl(emf));
@@ -271,7 +271,7 @@ public class Main {
             System.err.println("Fatal: " + ex.getMessage());
             ex.printStackTrace();
         } finally {
-            DatabaseInitializer.shutdown();
+            DBManager.shutdown();
             System.out.println("☕️  JavaBrew terminated.");
         }
     }
