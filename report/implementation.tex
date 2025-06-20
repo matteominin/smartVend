@@ -1,0 +1,236 @@
+\documentclass{article}
+
+% --- PACCHETTI NECESSARI ---
+\usepackage{graphicx} % Per inserire immagini
+\usepackage{xcolor} % Necessario per definire i colori
+\usepackage{listings} % Il pacchetto principale per il codice
+\usepackage{geometry} % Per gestire i margini della pagina
+\usepackage[T1]{fontenc} % Per una corretta codifica dei font
+\usepackage{times} % Usa il font Times New Roman
+
+% Se compili con XeLaTeX o LuaLaTeX per i caratteri cinesi nel nome
+% \usepackage{xeCJK} 
+
+% --- IMPOSTAZIONI PAGINA ---
+\geometry{a4paper, margin=2.5cm}
+
+% --- DEFINIZIONE COLORI E STILE PER IL CODICE (TEMA CHIARO) ---
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{codeblue}{rgb}{0,0,0.6}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.95} % Sfondo grigio molto chiaro
+
+% --- DEFINIZIONE DELLO STILE PER IL CODICE ---
+\lstdefinestyle{vscode_light_style}{
+    backgroundcolor=\color{backcolour},   
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{codeblue},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\fontfamily{pcr}\selectfont\color{black}\small, % Testo nero su sfondo chiaro
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=10pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=2,
+    frame=single, % Aggiunge una cornice attorno al blocco di codice
+    framerule=0pt,
+    framexleftmargin=5pt,
+    framexrightmargin=5pt,
+    framextopmargin=5pt,
+    framexbottommargin=5pt,
+    aboveskip=1.5\baselineskip,
+    belowskip=1.5\baselineskip
+}
+
+
+\begin{document}
+
+
+\section{Implementazione e Testing}
+
+Questa sezione descrive le scelte implementative, le tecnologie e le strategie di testing adottate per lo sviluppo dell'applicazione \textbf{JavaBrew}. L'implementazione si basa sui modelli di progettazione definiti in fase di analisi, come illustrato dai diagrammi UML, e utilizza un insieme di tecnologie moderne per garantire robustezza, manutenibilità e testabilità del software.
+
+\subsection{Architettura e Strumenti di Sviluppo}
+
+Il progetto è stato sviluppato in \textbf{Java 17} e gestito tramite \textbf{Apache Maven} come build automation tool. L'architettura del software segue un approccio a più livelliTier, che garantisce una netta separazione delle responsabilità  tra i vari componenti del sistema. I livelli principali, come documentato dai diagrammi UML, sono:
+\begin{itemize}
+    \item \textbf{Livello Controller:} Il punto di ingresso dell'applicazione, responsabile della gestione delle richieste degli utenti e dell'invocazione della logica di business.
+    \item \textbf{Livello Service:} Contiene la logica di business principale dell'applicazione. Orchestra le operazioni, elabora i dati e interagisce con il livello di persistenza.
+    \item \textbf{Livello DAO (Data Access Object):} Responsabile dell'interazione con il database, astraendo completamente i dettagli della persistenza dati dal resto dell'applicazione.
+    \item \textbf{Livello Model:} Definisce le entità del dominio che rappresentano i dati strutturati del sistema.
+\end{itemize}
+
+\subsection{Livello di Persistenza: DAO e ORM Hibernate}
+
+La persistenza dei dati è gestita tramite il pattern \textbf{Data Access Object (DAO)}, che prevede un'interfaccia (es. \texttt{UserDao}) e una sua implementazione concreta (es. \texttt{UserDaoImpl}). Questo approccio disaccoppia la logica di business dalle tecnologie di persistenza specifiche.
+
+Per l'interazione con il database, è stato utilizzato \textbf{Hibernate ORM} (versione 6.5.2), un potente framework di Object-Relational Mapping. Grazie a Hibernate e all'API standard \textbf{Jakarta Persistence (JPA)}, si è evitato di scrivere codice SQL nativo, mappando direttamente gli oggetti Java del nostro modello su tabelle di un database relazionale. Il database di produzione scelto è \textbf{PostgreSQL}.
+
+La gestione delle connessioni al database è centralizzata nella classe \texttt{DBManager}. Questa classe agisce come un gestore statico che fornisce un punto di accesso globale e unico all'\texttt{EntityManagerFactory}, l'oggetto responsabile della creazione di \texttt{EntityManager} per interagire con il database.
+
+\begin{lstlisting}[language=Java, style=vscode_light_style, caption={La classe \texttt{DBManager} che gestisce l'accesso all'EntityManagerFactory di JPA.}]
+package com.smartvend.app.db;
+
+import jakarta.persistence.EntityManagerFactory;
+import jakarta.persistence.Persistence;
+
+public class DBManager {
+    private static EntityManagerFactory emf;
+    private static final String DEFAULT_UNIT = "smartvendPU";
+
+    public static void init() {
+        initializeDatabase(DEFAULT_UNIT);
+    }
+
+    public static void initializeDatabase(String persistenceUnitName) {
+        try {
+            emf = Persistence.createEntityManagerFactory(persistenceUnitName);
+        } catch (Exception e) {
+            System.err.println("Database initialization failed: " + e.getMessage());
+            e.printStackTrace();
+            throw new RuntimeException("Failed to initialize database persistence unit.", e);
+        }
+    }
+
+    public static EntityManagerFactory getEntityManagerFactory() {
+        if (emf == null) {
+            init();
+        }
+        return emf;
+    }
+    
+    public static void shutdown() {
+        if (emf != null && emf.isOpen()) {
+            emf.close();
+        }
+    }
+}
+\end{lstlisting}
+
+\subsection{Livello di Logica di Business (Service)}
+
+Il livello Service contiene il nucleo della logica applicativa. Ogni servizio, come \texttt{CustomerService}, dipende dalle interfacce dei DAO per accedere ai dati, seguendo il principio di \textbf{Inversione delle Dipendenze}. Il metodo \texttt{buyItem} è un esempio emblematico di come il servizio orchestra diverse operazioni: recupera le entità, applica regole di business (controllo del saldo e della disponibilità dei prodotti), aggiorna lo stato del sistema (quantità e saldo) e infine registra la transazione.
+
+\begin{lstlisting}[language=Java, style=vscode_light_style, caption={Estratto del metodo \texttt{buyItem} da \texttt{CustomerService}.}]
+public Transaction buyItem(long connectionId, List<Long> itemIds) {
+    // 1. Recupera la connessione e il cliente
+    Connection connection = connectionDao.getConnectionById(connectionId);
+    if (connection == null) {
+        throw new IllegalArgumentException("Connection not found");
+    }
+    Customer customer = customerDao.getCustomerByUserId(connection.getUserId());
+    if (customer == null) {
+        throw new IllegalArgumentException("Customer not found");
+    }
+
+    // 2. Calcola il prezzo totale e valida la disponibilita' degli articoli
+    double totalPrice = 0.0;
+    List<Item> itemsToUpdate = new ArrayList<>();
+    for (Long itemId : itemIds) {
+        Item item = itemDao.getItemById(itemId);
+        if (item == null || item.getQuantity() <= 0) {
+            throw new IllegalArgumentException("Item not found or not available");
+        }
+        totalPrice += item.getPrice();
+        itemsToUpdate.add(item);
+    }
+
+    // 3. Controlla il saldo del cliente PRIMA di ogni modifica
+    double initialBalance = checkBalance(customer.getId(), totalPrice);
+
+    // 4. Se il saldo e' sufficiente, aggiorna lo stato del sistema
+    for (Item item : itemsToUpdate) {
+        item.setQuantity(item.getQuantity() - 1);
+        itemDao.updateItem(item);
+    }
+    updateBalance(customer.getId(), totalPrice);
+
+    // 5. Crea e registra la transazione
+    Transaction transaction = new Transaction(
+            customer, PaymentMethod.Wallet, initialBalance, 
+            initialBalance - totalPrice, createTransactionItems(itemsToUpdate));
+
+    return transactionService.createTransaction(transaction);
+}
+\end{lstlisting}
+
+\subsection{Ambiente di Esecuzione con Docker}
+
+Per garantire un ambiente di sviluppo e di esecuzione coerente e riproducibile, il database \textbf{PostgreSQL} è stato containerizzato tramite \textbf{Docker}. La containerizzazione, in questo contesto, offre vantaggi cruciali. In primo luogo, garantisce la \textbf{parità tra gli ambienti} di sviluppo, test e produzione, eliminando la classica problematica del "funziona sulla mia macchina". Ogni sviluppatore esegue la stessa versione di PostgreSQL con la stessa configurazione. In secondo luogo, \textbf{isola le dipendenze}: il database e le sue librerie sono racchiusi nel container e non interferiscono con altri servizi o software installati sulla macchina host. Infine, l'utilizzo di un file \texttt{docker-compose.yml} per definire il servizio agisce come "Infrastructure as Code", documentando e versionando l'ambiente necessario per eseguire l'applicazione e semplificando drasticamente il setup per i nuovi membri del team.
+
+\subsection{Strategia di Testing}
+La qualità del software è stata garantita attraverso una solida e completa strategia di test, che ha previsto sia \textbf{test di unità} sia \textbf{test di integrazione}. Questa strategia a più livelli è fondamentale perché permette di verificare il sistema da diverse prospettive: la correttezza logica dei singoli componenti e la loro corretta collaborazione all'interno dell'architettura complessiva. Gli strumenti utilizzati, come definiti nel \texttt{pom.xml}, hanno permesso di automatizzare e validare il corretto funzionamento del codice a diversi livelli.
+
+\subsubsection{Test di Unità e Mocking}
+I test di unità sono stati scritti utilizzando \textbf{JUnit 5} per verificare la correttezza dei singoli componenti in isolamento. Per testare il livello Service senza dipendere dal livello di persistenza, è stato utilizzato intensivamente il framework di mocking \textbf{Mockito}. Questo ha permesso di simulare il comportamento dei DAO (tramite l'annotazione \texttt{@Mock}) e di iniettarli nel servizio da testare (tramite \texttt{@InjectMocks}), concentrando i test esclusivamente sulla logica di business. Questo isolamento è vitale: permette di eseguire centinaia di test in pochi secondi, senza la latenza di un database, e di verificare ogni singolo percorso logico e caso limite del servizio in modo deterministico.
+
+\begin{lstlisting}[language=Java, style=vscode_light_style, caption={Test unitario per il metodo \texttt{buyItem} con JUnit 5 e Mockito.}]
+public class CustomerServiceTest {
+    @Mock
+    private CustomerDaoImpl customerDao;
+    @Mock
+    private ConnectionDaoImpl connectionDao;
+    @Mock
+    private ItemDaoImpl itemDao;
+    @Mock
+    private TransactionService transactionService;
+    // ... altri mock ...
+
+    @InjectMocks
+    private CustomerService customerService;
+
+    // Oggetti mock preparati nel metodo @BeforeEach
+    private Customer mockCustomer;
+    private Item mockItem1;
+
+    @BeforeEach
+    public void setUp() {
+        MockitoAnnotations.openMocks(this);
+        // ... inizializzazione di mockCustomer, mockItem1, etc.
+        mockCustomer = new Customer(2L, new User(1L, "...", "Jhon", "Doe", "..."), 100.0);
+        mockItem1 = new Item(30L, "Soda", "...", 1, 10, 1.50, 3, ItemType.Bottle);
+    }
+    
+    @Test
+    @DisplayName("Test buyItem method success with single item")
+    void testBuyItemSuccessSingleItem() {
+        // Arrange: Prepara i dati e il comportamento dei mock
+        Connection mockConnection = new Connection(mockCustomer.getUser(), ...);
+        Transaction expectedTransaction = new Transaction(mockCustomer, ...);
+
+        when(connectionDao.getConnectionById(anyLong())).thenReturn(mockConnection);
+        when(customerDao.getCustomerByUserId(anyLong())).thenReturn(mockCustomer);
+        when(itemDao.getItemById(30L)).thenReturn(mockItem1);
+        when(transactionService.createTransaction(any(Transaction.class)))
+            .thenReturn(expectedTransaction);
+
+        // Act: Esegui il metodo da testare
+        Transaction result = customerService.buyItem(1L, List.of(30L));
+
+        // Assert: Verifica il risultato e le interazioni con i mock
+        assertNotNull(result);
+        assertEquals(expectedTransaction, result);
+        assertEquals(9, mockItem1.getQuantity()); // Verifica decremento quantita'
+        
+        verify(itemDao, times(1)).updateItem(mockItem1);
+        verify(customerDao, times(1)).updateCustomer(mockCustomer);
+        verify(transactionService, times(1)).createTransaction(any(Transaction.class));
+    }
+}
+\end{lstlisting}
+
+\subsubsection{Test di Integrazione}
+I test di integrazione sono stati realizzati per verificare la corretta collaborazione tra i diversi livelli dell'applicazione, in particolare tra il Service Layer, il DAO Layer e il database. Per questi test, è stato utilizzato un database in-memory \textbf{H2}, che ha permesso di eseguire l'intero stack di persistenza in un ambiente veloce e controllato. Questi test sono cruciali per individuare errori che i test di unità non possono cogliere, come problemi nelle annotazioni di mapping di JPA, errori nella gestione delle transazioni, o query che potrebbero non essere compatibili con il dialetto SQL specifico di PostgreSQL. Validare queste interazioni in un ambiente controllato, prima del deployment, è un passo fondamentale per garantire la robustezza del sistema.
+
+\subsubsection{Analisi della Copertura del Codice}
+Per monitorare l'efficacia e la completezza della suite di test, è stato integrato il plugin \textbf{JaCoCo} in Maven. L'esecuzione combinata dei test di unità e di integrazione ha permesso di raggiungere e mantenere una \textbf{copertura del codice superiore all'80\%}. Questo risultato quantitativo fornisce una metrica oggettiva della qualità del software, dimostrando che la maggior parte della logica implementata è stata verificata da test automatici. Inoltre, l'analisi della copertura aiuta a identificare il "codice morto" (parti di codice mai eseguite) e a garantire che i percorsi logici critici, specialmente quelli relativi alla gestione degli errori, siano stati adeguatamente testati, guidando così il miglioramento continuo della qualità.
+
+\end{document}
+

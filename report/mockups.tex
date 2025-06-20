@@ -1,54 +1,87 @@
 \section{Mockups}
 
-In questa sezione vengono presentati i principali mockup dell’interfaccia utente di \textbf{JavaBrew}, la nostra applicazione dedicata alla gestione smart delle macchinette del caffè. Ogni mockup qui riportato mostra non solo il design grafico, ma anche le funzioni pratiche che i diversi tipi di utenti possono utilizzare. L’obiettivo è fornire un’anteprima chiara ed esaustiva dell’esperienza reale all’interno dell’app, dalla registrazione fino alle operazioni di amministrazione, manutenzione o acquisto.
+In questa sezione viene illustrata la progettazione dell'interfaccia utente (UI) per l'applicazione \textbf{JavaBrew}, dedicata alla gestione delle macchine da caffè intelligenti. I mockup presentati di seguito non si limitano a definire l'estetica del sistema, ma rappresentano l'architettura dell'interazione uomo-macchina (HCI), dettagliando i flussi operativi previsti per ciascun attore identificato in fase di analisi: Amministratore, Tecnico Manutentore (Worker) e Cliente (Customer). L'obiettivo è fornire una chiara visualizzazione dell'esperienza utente (UX), dimostrando come il design supporti le funzionalità del sistema in modo intuitivo ed efficiente.
 
-\subsection{Login}
+\subsection{Flusso di Accesso e Registrazione}
+
+L'accesso al sistema è gestito da una schermata di \textbf{login} minimale e funzionale, che costituisce il primo punto di contatto con l'applicazione. L'interfaccia richiede le credenziali standard (email e password) e include funzionalità essenziali come il recupero della password (procedura di \textit{“Forgot password?”}). Per i nuovi utenti, un chiaro invito all'azione (\textit{Call to Action}) tramite il pulsante “Create Account” li guida verso il modulo di registrazione.
+
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.5\textwidth]{./assets/login.png}
     \caption{Schermata di login.}
 \end{figure}
-La prima schermata che si incontra aprendo JavaBrew è la pagina di \textbf{login}, semplice ed essenziale. Qui l’utente inserisce la propria email e password per accedere all’account. È presente anche la funzione \emph{“Forgot password?”} per il recupero delle credenziali in caso di smarrimento. Per chi non avesse ancora un profilo, viene subito proposta la possibilità di crearne uno nuovo tramite il pulsante “Create Account”.
 
-\subsection{Registrazione}
+Il processo di \textbf{registrazione} è stato ingegnerizzato per ridurre al minimo l'attrito per l'utente. Il modulo richiede solo le informazioni strettamente necessarie, ottimizzando i tempi di onboarding. La sicurezza e la conformità normativa sono garantite dalla richiesta esplicita di accettazione dei Termini di Servizio e della Privacy Policy, un requisito fondamentale per la gestione dei dati utente.
+
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.5\textwidth]{./assets/Create_acoount.png}
     \caption{Schermata di registrazione.}
 \end{figure}
-Se l’utente sceglie di registrarsi, viene reindirizzato a una schermata molto intuitiva. In questa fase basta inserire email, scegliere una password e confermare i dati. Il processo di registrazione è stato progettato per essere il più veloce e trasparente possibile: bastano pochi click e si può subito iniziare a usare JavaBrew. Non manca la spunta obbligatoria per l’accettazione dei Termini di Servizio e della Privacy Policy, a tutela della sicurezza e della trasparenza.
 
-\subsection{Dashboard Admin}
+\subsection{Dashboard Amministratore}
+
+La dashboard dell'Amministratore è concepita come un centro di controllo strategico. La parte superiore dell'interfaccia presenta una serie di \textbf{widget di riepilogo} che offrono una visione aggregata e immediata dello stato del sistema: numero di utenti, macchine attive e personale operativo. La sezione principale è organizzata in \textbf{moduli funzionali} ben distinti, che permettono un accesso granulare alle operazioni di:
+\begin{itemize}
+    \item \textbf{Gestione Utenze:} Creazione, modifica e supervisione dei profili (Admin, Customer, Worker).
+    \item \textbf{Gestione Macchine:} Configurazione, monitoraggio dello stato e assegnazione delle macchine sul territorio.
+    \item \textbf{Gestione Prodotti:} Aggiornamento del catalogo dei prodotti erogabili.
+    \item \textbf{Reporting e Analisi:} Accesso a report di vendita e dati analitici per supportare le decisioni di business.
+\end{itemize}
+
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.5\textwidth]{./assets/admin.png}
-    \caption{Dashboard amministratore.}
+    \caption{Dashboard dell'Amministratore.}
 \end{figure}
-Gli amministratori hanno accesso a una dashboard dedicata, ricca di informazioni e strumenti avanzati. Nella parte superiore si trovano subito le statistiche principali: numero di utenti attivi, macchinette online, staff operativo e altri amministratori. Sotto, il pannello di amministrazione è suddiviso in sezioni colorate e ben organizzate, per una gestione completa: dalla modifica e supervisione dei profili utente (admin, clienti, lavoratori) fino al controllo e alla configurazione delle macchine e dei prodotti disponibili. Inoltre, la sezione “Reports \& Analytics” consente di tenere sotto controllo le performance di vendita e il funzionamento generale del sistema in tempo reale.
 
-\subsection{Customer Dashboard}
+\subsection{Dashboard Cliente}
+
+L'interfaccia per l'utente finale è progettata con un approccio \textit{user-centric}, finalizzato a massimizzare la semplicità d'uso e la rapidità delle operazioni. La dashboard mette in primo piano l'informazione più rilevante per il cliente: il \textbf{saldo disponibile}. Le azioni principali sono accessibili tramite pulsanti \textit{Call to Action} di grandi dimensioni, che consentono di:
+\begin{itemize}
+    \item Ricaricare il proprio credito.
+    \item Associare una macchina da caffè tramite QR code o altro identificativo.
+    \item Consultare lo storico delle transazioni.
+\end{itemize}
+Questo design essenziale riduce il carico cognitivo e garantisce un'esperienza fluida.
+
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.4\textwidth]{./assets/customer.png}
-    \caption{Dashboard utente standard (customer).}
+    \caption{Dashboard del Cliente (Customer).}
 \end{figure}
-La dashboard per l’utente finale (customer) è pensata per offrire una gestione semplice del proprio saldo e delle operazioni principali. In alto, viene sempre mostrato il saldo attuale. Subito sotto, le azioni rapide permettono con un solo tap di consultare il saldo, collegare una macchinetta, controllare la cronologia delle transazioni oppure ricaricare il credito. L’interfaccia è essenziale, con pulsanti grandi e chiari per garantire un’esperienza piacevole anche agli utenti meno esperti.
 
-\subsection{Worker Dashboard}
+\subsection{Dashboard Tecnico Manutentore}
+
+La dashboard del tecnico manutentore è uno strumento operativo, progettato per ottimizzare la gestione delle attività di manutenzione sul campo. La schermata è strutturata per fornire informazioni chiave in modo immediato:
+\begin{itemize}
+    \item \textbf{Indicatori di Performance (KPI):} La parte superiore mostra contatori numerici per i task pendenti, quelli in corso, il totale delle attività completate nella giornata e le ore lavorate. Questo permette al tecnico e ai suoi supervisori di avere una misura quantitativa del carico di lavoro e della produttività.
+    \item \textbf{Coda di Lavoro (Task List):} La sezione inferiore presenta una lista dettagliata dei compiti assegnati. Ogni elemento della lista è un componente informativo che specifica:
+    \begin{itemize}
+        \item \textbf{Titolo e ID Macchina} (es. "Clean Coffee Machine \#03").
+        \item \textbf{Livello di Priorità} (es. HIGH, MEDIUM), per aiutare a decidere l'ordine di esecuzione.
+        \item \textbf{Descrizione} dettagliata dell'intervento richiesto.
+        \item \textbf{Stato in tempo reale} (es. Pending, In Progress), che si aggiorna man mano che il tecnico interagisce con l'app.
+    \end{itemize}
+\end{itemize}
+Questa interfaccia trasforma l'app in un vero e proprio sistema di gestione dei task, migliorando l'efficienza operativa e la tracciabilità degli interventi.
+
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.4\textwidth]{./assets/worker.png}
-    \caption{Dashboard per lavoratore.}
+    \caption{Dashboard del Tecnico Manutentore (Worker).}
 \end{figure}
-Il lavoratore, o tecnico addetto alla manutenzione, trova nella propria dashboard tutte le informazioni operative di cui ha bisogno. La schermata mostra a colpo d’occhio il numero di task in sospeso, quelli in corso, il totale di attività completate e le ore lavorate nella giornata. Nella parte inferiore vengono elencati nel dettaglio tutti i compiti assegnati: ad esempio pulizia, ricarica dei chicchi o sostituzione di filtri, ognuno con priorità, descrizione e stato aggiornato in tempo reale. In questo modo la gestione della manutenzione diventa organizzata, trasparente e monitorabile.
 
-\subsection{Items}
+\subsection{Catalogo Prodotti}
+
+La schermata di selezione dei prodotti funziona come un \textbf{catalogo digitale interattivo}. Ogni articolo è presentato con un'immagine rappresentativa, una breve descrizione e il prezzo. L'utente può facilmente regolare la quantità desiderata prima di aggiungere il prodotto al carrello virtuale. Il design pulito e visuale guida l'utente attraverso un processo di selezione e acquisto fluido, progettato per essere completato in pochi e semplici passaggi.
+
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.4\textwidth]{./assets/items.png}
-    \caption{Selezione prodotti e aggiunta al carrello.}
+    \caption{Schermata di selezione dei prodotti.}
 \end{figure}
-Nella schermata degli articoli, ogni utente può vedere l’elenco dei prodotti disponibili (ad esempio espresso, doppio espresso, ecc.), ognuno con foto, descrizione, prezzo e possibilità di selezionare la quantità desiderata. In pochi secondi, grazie a una grafica intuitiva e moderna, è possibile aggiungere al carrello il proprio caffè preferito e completare l’acquisto direttamente dall’app.
 
 \bigskip
-Nel complesso, questi mockup mostrano un’interfaccia pensata per essere **user-friendly**, moderna ed estremamente funzionale. Ogni tipologia di utente (admin, lavoratore, customer) trova subito quello che cerca e può svolgere tutte le operazioni chiave in modo rapido, sicuro e intuitivo.
+In sintesi, i mockup presentati dimostrano come la progettazione dell'interfaccia di \textbf{JavaBrew} sia stata guidata dai requisiti funzionali e dalle necessità specifiche di ogni attore. Il risultato è un sistema la cui User Experience è al contempo funzionale, coerente e differenziata per ruolo, garantendo che ogni utente possa raggiungere i propri obiettivi con la massima efficienza e semplicità.
