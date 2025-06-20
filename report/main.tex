@@ -1,9 +1,8 @@
 % ===================================================================
-% DOCUMENTO PRINCIPALE (main.tex) - Versione con Sezioni
-% Compila questo file per generare l'intera relazione.
+% DOCUMENTO PRINCIPALE (main.tex)
 % ===================================================================
 
-\documentclass[12pt, a4paper]{article} % Usa la classe 'article' per documenti basati su sezioni
+\documentclass[12pt, a4paper]{article}
 
 % --- PACCHETTI GLOBALI NECESSARI ---
 \usepackage[utf8]{inputenc}
@@ -14,23 +13,22 @@
 \usepackage{geometry}
 \usepackage{times}
 \usepackage{caption}
-\usepackage[italian]{babel} % Imposta la lingua italiana per sillabazione e nomi
-\usepackage{float} % Per un miglior controllo del posizionamento delle figure [H]
-\usepackage{tabularx} % Aggiunto per le tabelle con larghezza definita
-\usepackage{hyperref} % Rende i riferimenti e l'indice cliccabili
+\usepackage{subcaption} 
+\usepackage[italian]{babel}
+\usepackage{float}
+\usepackage{tabularx}
+\usepackage{tikz} % Pacchetto fondamentale per i bordi arrotondati
+\usepackage{hyperref}
 
 % --- IMPOSTAZIONI DI PAGINA E STILE ---
 \geometry{a4paper, top=3cm, bottom=3cm, left=2.5cm, right=2.5cm}
-\setlength{\parindent}{0pt} % Rimuove l'indentazione all'inizio dei paragrafi
-\setlength{\parskip}{1.5ex} % Aggiunge spazio verticale tra i paragrafi
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{1.5ex}
 
 % --- IMPOSTAZIONE PER I COLLEGAMENTI IPERTESTUALI ---
 \hypersetup{
-    colorlinks=true,
-    linkcolor=black,
-    filecolor=magenta,      
-    urlcolor=blue,
-    citecolor=black,
+    colorlinks=true, linkcolor=black, filecolor=magenta,      
+    urlcolor=blue, citecolor=black,
     pdftitle={Relazione Progetto Ingegneria del Software - JavaBrew},
     pdfpagemode=FullScreen,
 }
@@ -43,55 +41,42 @@
 \definecolor{backcolour}{rgb}{0.95,0.95,0.95}
 
 \lstdefinestyle{vscode_light_style}{
-    backgroundcolor=\color{backcolour},   
-    commentstyle=\color{codegreen},
-    keywordstyle=\color{codeblue},
-    numberstyle=\tiny\color{codegray},
-    stringstyle=\color{codepurple},
-    basicstyle=\fontfamily{pcr}\selectfont\color{black}\small,
-    breakatwhitespace=false,         
-    breaklines=true,                 
-    captionpos=b,                    
-    keepspaces=true,                 
-    numbers=left,                    
-    numbersep=10pt,                  
-    showspaces=false,                
-    showstringspaces=false,
-    showtabs=false,                  
-    tabsize=2,
-    frame=single,
-    framerule=0pt,
-    framexleftmargin=5pt,
-    framexrightmargin=5pt,
-    framextopmargin=5pt,
-    framexbottommargin=5pt,
-    aboveskip=1.5\baselineskip,
-    belowskip=1.5\baselineskip
+    backgroundcolor=\color{backcolour}, commentstyle=\color{codegreen},
+    keywordstyle=\color{codeblue}, numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple}, basicstyle=\fontfamily{pcr}\selectfont\color{black}\small,
+    breaklines=true, captionpos=b, keepspaces=true, numbers=left,                    
+    numbersep=10pt, showspaces=false, showstringspaces=false,
+    showtabs=false, tabsize=2, frame=single, framerule=0pt,
+    framexleftmargin=5pt, framexrightmargin=5pt, framextopmargin=5pt, framexbottommargin=5pt,
+    aboveskip=1.5\baselineskip, belowskip=1.5\baselineskip
 }
+
+% --- COMANDO PERSONALIZZATO PER IMMAGINI CON BORDI ARROTONDATI (ROBUSTO) ---
+% Questo comando usa un 'savebox' per misurare l'immagine prima di disegnarla,
+% rendendolo piu' stabile e affidabile. Modifica il valore '12pt' qui sotto
+% per cambiare la rotondita' dei bordi.
+\newsavebox{\imagebox}
+\newcommand{\screenshot}[2][]{\begin{lrbox}{\imagebox}%
+    \includegraphics[#1]{#2}%
+\end{lrbox}%
+\begin{tikzpicture}%
+    \clip[rounded corners=12pt] (0,0) rectangle (\wd\imagebox, \ht\imagebox);
+    \node[inner sep=0] at (0.5\wd\imagebox, 0.5\ht\imagebox) {\usebox{\imagebox}};
+\end{tikzpicture}}
 
 % ===================================================================
 % INIZIO DEL DOCUMENTO
 % ===================================================================
 \begin{document}
 
-% --- INCLUSIONE DEL FRONTESPIZIO ---
-% Il file titlePage.tex conterra' \maketitle e le informazioni del titolo/autore
 \input{titlePage.tex}
-
-% --- INDICE DEI CONTENUTI ---
-% Questo comando genera automaticamente l'indice basandosi sui comandi \section e \subsection
 \tableofcontents
 \newpage
-
-% --- INCLUSIONE DELLE SEZIONI ---
-% Ogni sezione e' in un file separato.
-% Assicurati che ogni file .tex inizi con \section{...}
-
-% Ordine richiesto:
 \input{introduction.tex}
 \input{useCases.tex}
 \input{db.tex} 
 \input{mockups.tex}
 \input{implementation.tex}
+
 
 \end{document}
