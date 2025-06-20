@@ -1,21 +1,97 @@
-\documentclass{article}
+% ===================================================================
+% DOCUMENTO PRINCIPALE (main.tex) - Versione con Sezioni
+% Compila questo file per generare l'intera relazione.
+% ===================================================================
+
+\documentclass[12pt, a4paper]{article} % Usa la classe 'article' per documenti basati su sezioni
+
+% --- PACCHETTI GLOBALI NECESSARI ---
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
 \usepackage{graphicx}
-\usepackage{tabularx}
+\usepackage{xcolor}
+\usepackage{listings}
+\usepackage{geometry}
+\usepackage{times}
 \usepackage{caption}
-\usepackage{float}
-\usepackage[colorlinks=false]{hyperref}
+\usepackage[italian]{babel} % Imposta la lingua italiana per sillabazione e nomi
+\usepackage{float} % Per un miglior controllo del posizionamento delle figure [H]
+\usepackage{tabularx} % Aggiunto per le tabelle con larghezza definita
+\usepackage{hyperref} % Rende i riferimenti e l'indice cliccabili
 
+% --- IMPOSTAZIONI DI PAGINA E STILE ---
+\geometry{a4paper, top=3cm, bottom=3cm, left=2.5cm, right=2.5cm}
+\setlength{\parindent}{0pt} % Rimuove l'indentazione all'inizio dei paragrafi
+\setlength{\parskip}{1.5ex} % Aggiunge spazio verticale tra i paragrafi
 
+% --- IMPOSTAZIONE PER I COLLEGAMENTI IPERTESTUALI ---
+\hypersetup{
+    colorlinks=true,
+    linkcolor=black,
+    filecolor=magenta,      
+    urlcolor=blue,
+    citecolor=black,
+    pdftitle={Relazione Progetto Ingegneria del Software - JavaBrew},
+    pdfpagemode=FullScreen,
+}
+
+% --- DEFINIZIONE DELLO STILE PER IL CODICE (TEMA CHIARO) ---
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{codeblue}{rgb}{0,0,0.6}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.95}
+
+\lstdefinestyle{vscode_light_style}{
+    backgroundcolor=\color{backcolour},   
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{codeblue},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\fontfamily{pcr}\selectfont\color{black}\small,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=10pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=2,
+    frame=single,
+    framerule=0pt,
+    framexleftmargin=5pt,
+    framexrightmargin=5pt,
+    framextopmargin=5pt,
+    framexbottommargin=5pt,
+    aboveskip=1.5\baselineskip,
+    belowskip=1.5\baselineskip
+}
+
+% ===================================================================
+% INIZIO DEL DOCUMENTO
+% ===================================================================
 \begin{document}
+
+% --- INCLUSIONE DEL FRONTESPIZIO ---
+% Il file titlePage.tex conterra' \maketitle e le informazioni del titolo/autore
 \input{titlePage.tex}
+
+% --- INDICE DEI CONTENUTI ---
+% Questo comando genera automaticamente l'indice basandosi sui comandi \section e \subsection
 \tableofcontents
 \newpage
 
+% --- INCLUSIONE DELLE SEZIONI ---
+% Ogni sezione e' in un file separato.
+% Assicurati che ogni file .tex inizi con \section{...}
+
+% Ordine richiesto:
 \input{introduction.tex}
-\newpage
 \input{useCases.tex}
-\newpage
+\input{db.tex} 
 \input{mockups.tex}
-\newpage
+\input{implementation.tex}
 
 \end{document}

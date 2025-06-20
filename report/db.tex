@@ -1,25 +1,6 @@
-\documentclass{article}
-
-% --- PACCHETTI NECESSARI ---
-\usepackage{graphicx} % Per inserire immagini
-\usepackage{xcolor} % Necessario per definire i colori
-\usepackage{listings} % Il pacchetto principale per il codice
-\usepackage{geometry} % Per gestire i margini della pagina
-\usepackage[T1]{fontenc} % Per una corretta codifica dei font
-\usepackage{times} % Usa il font Times New Roman
-\usepackage{caption} % Per una migliore gestione delle didascalie
-
-% --- IMPOSTAZIONI PAGINA ---
-\geometry{a4paper, margin=2.5cm}
-
-\title{\textbf{Relazione Progetto di Ingegneria del Software\\ \large Appendice A: Modello del Database}}
-\author{Simone ...} % Sostituisci con il tuo nome
-\date{Giugno 2025}
-
-\begin{document}
-
-% In un documento completo, questa sezione sarebbe un capitolo o un'appendice.
-% Per un file separato, possiamo usare \maketitle o semplicemente iniziare con \section.
+% --- INIZIO SEZIONE DATABASE ---
+% Questo file contiene solo il contenuto per questa sezione
+% e viene incluso dal file main.tex
 
 \section{Progettazione del Database}
 
@@ -77,5 +58,3 @@ La progettazione del database è stata guidata da due principi chiave: la \textb
     \item \textbf{Normalizzazione}: Lo schema è stato progettato per raggiungere almeno la Terza Forma Normale (3NF), riducendo al minimo la ridondanza dei dati. Ad esempio, le informazioni di un utente sono memorizzate una sola volta nella tabella \texttt{app\_user}, evitando duplicazioni.
     \item \textbf{Integrità Referenziale}: L'uso estensivo di chiavi esterne (foreign key) garantisce che le relazioni tra le tabelle siano sempre valide. Ad esempio, non è possibile creare una transazione per un cliente che non esiste, o assegnare un compito a un tecnico non presente nel sistema. Questi vincoli, imposti a livello di database, proteggono i dati da inconsistenze e sono fondamentali per la robustezza dell'intera applicazione.
 \end{itemize}
-
-\end{document}

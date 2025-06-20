@@ -1,57 +1,6 @@
-\documentclass{article}
-
-% --- PACCHETTI NECESSARI ---
-\usepackage{graphicx} % Per inserire immagini
-\usepackage{xcolor} % Necessario per definire i colori
-\usepackage{listings} % Il pacchetto principale per il codice
-\usepackage{geometry} % Per gestire i margini della pagina
-\usepackage[T1]{fontenc} % Per una corretta codifica dei font
-\usepackage{times} % Usa il font Times New Roman
-
-% Se compili con XeLaTeX o LuaLaTeX per i caratteri cinesi nel nome
-% \usepackage{xeCJK} 
-
-% --- IMPOSTAZIONI PAGINA ---
-\geometry{a4paper, margin=2.5cm}
-
-% --- DEFINIZIONE COLORI E STILE PER IL CODICE (TEMA CHIARO) ---
-\definecolor{codegreen}{rgb}{0,0.6,0}
-\definecolor{codegray}{rgb}{0.5,0.5,0.5}
-\definecolor{codepurple}{rgb}{0.58,0,0.82}
-\definecolor{codeblue}{rgb}{0,0,0.6}
-\definecolor{backcolour}{rgb}{0.95,0.95,0.95} % Sfondo grigio molto chiaro
-
-% --- DEFINIZIONE DELLO STILE PER IL CODICE ---
-\lstdefinestyle{vscode_light_style}{
-    backgroundcolor=\color{backcolour},   
-    commentstyle=\color{codegreen},
-    keywordstyle=\color{codeblue},
-    numberstyle=\tiny\color{codegray},
-    stringstyle=\color{codepurple},
-    basicstyle=\fontfamily{pcr}\selectfont\color{black}\small, % Testo nero su sfondo chiaro
-    breakatwhitespace=false,         
-    breaklines=true,                 
-    captionpos=b,                    
-    keepspaces=true,                 
-    numbers=left,                    
-    numbersep=10pt,                  
-    showspaces=false,                
-    showstringspaces=false,
-    showtabs=false,                  
-    tabsize=2,
-    frame=single, % Aggiunge una cornice attorno al blocco di codice
-    framerule=0pt,
-    framexleftmargin=5pt,
-    framexrightmargin=5pt,
-    framextopmargin=5pt,
-    framexbottommargin=5pt,
-    aboveskip=1.5\baselineskip,
-    belowskip=1.5\baselineskip
-}
-
-
-\begin{document}
-
+% --- INIZIO SEZIONE IMPLEMENTAZIONE E TESTING ---
+% Questo file contiene solo il contenuto per questa sezione
+% e viene incluso dal file main.tex
 
 \section{Implementazione e Testing}
 
@@ -59,7 +8,7 @@ Questa sezione descrive le scelte implementative, le tecnologie e le strategie d
 
 \subsection{Architettura e Strumenti di Sviluppo}
 
-Il progetto è stato sviluppato in \textbf{Java 17} e gestito tramite \textbf{Apache Maven} come build automation tool. L'architettura del software segue un approccio a più livelliTier, che garantisce una netta separazione delle responsabilità  tra i vari componenti del sistema. I livelli principali, come documentato dai diagrammi UML, sono:
+Il progetto è stato sviluppato in \textbf{Java 17} e gestito tramite \textbf{Apache Maven} come build automation tool. L'architettura del software segue un approccio a più livelli, che garantisce una netta separazione delle responsabilità tra i vari componenti del sistema. I livelli principali, come documentato dai diagrammi UML, sono:
 \begin{itemize}
     \item \textbf{Livello Controller:} Il punto di ingresso dell'applicazione, responsabile della gestione delle richieste degli utenti e dell'invocazione della logica di business.
     \item \textbf{Livello Service:} Contiene la logica di business principale dell'applicazione. Orchestra le operazioni, elabora i dati e interagisce con il livello di persistenza.
@@ -231,6 +180,3 @@ I test di integrazione sono stati realizzati per verificare la corretta collabor
 
 \subsubsection{Analisi della Copertura del Codice}
 Per monitorare l'efficacia e la completezza della suite di test, è stato integrato il plugin \textbf{JaCoCo} in Maven. L'esecuzione combinata dei test di unità e di integrazione ha permesso di raggiungere e mantenere una \textbf{copertura del codice superiore all'80\%}. Questo risultato quantitativo fornisce una metrica oggettiva della qualità del software, dimostrando che la maggior parte della logica implementata è stata verificata da test automatici. Inoltre, l'analisi della copertura aiuta a identificare il "codice morto" (parti di codice mai eseguite) e a garantire che i percorsi logici critici, specialmente quelli relativi alla gestione degli errori, siano stati adeguatamente testati, guidando così il miglioramento continuo della qualità.
-
-\end{document}
-
