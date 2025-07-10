@@ -4,27 +4,29 @@
 
 \section{Implementazione e Testing}
 
-Questa sezione descrive le scelte implementative, le tecnologie e le strategie di testing adottate per lo sviluppo dell'applicazione \textbf{JavaBrew}. L'implementazione si basa sui modelli di progettazione definiti in fase di analisi, come illustrato dai diagrammi UML, e utilizza un insieme di tecnologie moderne per garantire robustezza, manutenibilità e testabilità del software.
+La presente sezione illustra le scelte implementative, le tecnologie adottate e le strategie di testing impiegate per lo sviluppo dell'applicazione \textbf{JavaBrew}. L'implementazione ha seguito i modelli di progettazione delineati nella fase di analisi, come evidenziato dai diagrammi UML, e si è avvalsa di un insieme di tecnologie mature per garantire robustezza, manutenibilità e testabilità del sistema software.
 
-\subsection{Architettura e Strumenti di Sviluppo}
+\subsection{Architettura del Sistema e Stack Tecnologico}
 
-Il progetto è stato sviluppato in \textbf{Java 17} e gestito tramite \textbf{Apache Maven} come build automation tool. L'architettura del software segue un approccio a più livelli, che garantisce una netta separazione delle responsabilità tra i vari componenti del sistema. I livelli principali, come documentato dai diagrammi UML, sono:
+Il progetto è stato sviluppato utilizzando \textbf{Java 17} e gestito tramite \textbf{Apache Maven} per l'automazione del build process. L'architettura software è stata strutturata in un approccio a livelli, promuovendo una chiara separazione delle responsabilità tra i componenti. I livelli principali, conformemente alla documentazione UML, comprendono:
 \begin{itemize}
-    \item \textbf{Livello Controller:} Il punto di ingresso dell'applicazione, responsabile della gestione delle richieste degli utenti e dell'invocazione della logica di business.
-    \item \textbf{Livello Service:} Contiene la logica di business principale dell'applicazione. Orchestra le operazioni, elabora i dati e interagisce con il livello di persistenza.
-    \item \textbf{Livello DAO (Data Access Object):} Responsabile dell'interazione con il database, astraendo completamente i dettagli della persistenza dati dal resto dell'applicazione.
-    \item \textbf{Livello Model:} Definisce le entità del dominio che rappresentano i dati strutturati del sistema.
+\item \textbf{Livello Controller:} Interfaccia diretta con l'utente, responsabile della gestione delle richieste e dell'invocazione della logica di business.
+\item \textbf{Livello Service:} Contiene la logica di business primaria dell'applicazione. Orchestrazione delle operazioni, elaborazione dei dati e interazione con il livello di persistenza.
+\item \textbf{Livello DAO (Data Access Object):} Gestisce l'interazione con il database, fornendo un'astrazione completa dei dettagli di persistenza dei dati.
+\item \textbf{Livello Model:} Definisce le entità del dominio, rappresentando la struttura dei dati all'interno del sistema.
 \end{itemize}
 
-\subsection{Livello di Persistenza: DAO e ORM Hibernate}
+---
 
-La persistenza dei dati è gestita tramite il pattern \textbf{Data Access Object (DAO)}, che prevede un'interfaccia (es. \texttt{UserDao}) e una sua implementazione concreta (es. \texttt{UserDaoImpl}). Questo approccio disaccoppia la logica di business dalle tecnologie di persistenza specifiche.
+\subsection{Livello di Persistenza: Pattern DAO e ORM Hibernate}
 
-Per l'interazione con il database, è stato utilizzato \textbf{Hibernate ORM} (versione 6.5.2), un potente framework di Object-Relational Mapping. Grazie a Hibernate e all'API standard \textbf{Jakarta Persistence (JPA)}, si è evitato di scrivere codice SQL nativo, mappando direttamente gli oggetti Java del nostro modello su tabelle di un database relazionale. Il database di produzione scelto è \textbf{PostgreSQL}.
+La persistenza dei dati è stata implementata adottando il pattern \textbf{Data Access Object (DAO)}. Tale approccio prevede la definizione di interfacce (es. \texttt{UserDao}) e relative implementazioni concrete (es. \texttt{UserDaoImpl}), consentendo il disaccoppiamento della logica di business dalle specifiche tecnologie di persistenza.
 
-La gestione delle connessioni al database è centralizzata nella classe \texttt{DBManager}. Questa classe agisce come un gestore statico che fornisce un punto di accesso globale e unico all'\texttt{EntityManagerFactory}, l'oggetto responsabile della creazione di \texttt{EntityManager} per interagire con il database.
+Per l'interazione con il database relazionale, è stato utilizzato \textbf{Hibernate ORM} (versione 6.5.2), un framework per l'Object-Relational Mapping. L'adozione di Hibernate, in congiunzione con l'API standard \textbf{Jakarta Persistence (JPA)}, ha permesso di astrarre la scrittura di codice SQL nativo, facilitando il mapping diretto degli oggetti Java del modello su tabelle del database. Il database di produzione selezionato è \textbf{PostgreSQL}.
 
-\begin{lstlisting}[language=Java, style=vscode_light_style, caption={La classe \texttt{DBManager} che gestisce l'accesso all'EntityManagerFactory di JPA.}]
+La gestione delle connessioni al database è centralizzata nella classe \texttt{DBManager}. Questa classe opera come un singleton statico, fornendo un punto di accesso globale e univoco all'\texttt{EntityManagerFactory}, l'oggetto responsabile della creazione di \texttt{EntityManager} per le operazioni sul database.
+
+\begin{lstlisting}[language=Java, style=vscode_light_style, caption={La classe \texttt{DBManager} per la gestione dell'accesso all'EntityManagerFactory di JPA.}]
 package com.smartvend.app.db;
 
 import jakarta.persistence.EntityManagerFactory;
@@ -32,61 +34,38 @@ import jakarta.persistence.Persistence;
 
 public class DBManager {
     private static EntityManagerFactory emf;
-    private static final String DEFAULT_UNIT = "smartvendPU";
-
-    public static void init() {
-        initializeDatabase(DEFAULT_UNIT);
-    }
-
-    public static void initializeDatabase(String persistenceUnitName) {
-        try {
-            emf = Persistence.createEntityManagerFactory(persistenceUnitName);
-        } catch (Exception e) {
-            System.err.println("Database initialization failed: " + e.getMessage());
-            e.printStackTrace();
-            throw new RuntimeException("Failed to initialize database persistence unit.", e);
-        }
-    }
-
+    // ... Altri campi e metodi ...
+    
     public static EntityManagerFactory getEntityManagerFactory() {
         if (emf == null) {
-            init();
+            init(); % Assicura che l'EMF sia inizializzato se richiesto
         }
         return emf;
     }
-    
-    public static void shutdown() {
-        if (emf != null && emf.isOpen()) {
-            emf.close();
-        }
-    }
+    // ... Metodo shutdown ...
 }
 \end{lstlisting}
 
-\subsection{Livello di Logica di Business (Service)}
+---
 
-Il livello Service contiene il nucleo della logica applicativa. Ogni servizio, come \texttt{CustomerService}, dipende dalle interfacce dei DAO per accedere ai dati, seguendo il principio di \textbf{Inversione delle Dipendenze}. Il metodo \texttt{buyItem} è un esempio emblematico di come il servizio orchestra diverse operazioni: recupera le entità, applica regole di business (controllo del saldo e della disponibilità dei prodotti), aggiorna lo stato del sistema (quantità e saldo) e infine registra la transazione.
+\subsection{Livello di Logica di Business (Service Layer)}
 
-\begin{lstlisting}[language=Java, style=vscode_light_style, caption={Estratto del metodo \texttt{buyItem} da \texttt{CustomerService}.}]
+Il livello Service incapsula la logica applicativa core. Ciascun servizio (es. \texttt{CustomerService}) dipende dalle interfacce DAO per l'accesso ai dati, aderendo al principio di \textbf{Inversione delle Dipendenze}. Il metodo \texttt{buyItem} esemplifica l'orchestrazione delle operazioni di business: recupero delle entità, applicazione delle regole di business (validazione del saldo e della disponibilità dei prodotti), aggiornamento dello stato del sistema (quantità e saldo) e registrazione della transazione.
+
+\begin{lstlisting}[language=Java, style=vscode_light_style, caption={Estratto del metodo \texttt{buyItem} dalla classe \texttt{CustomerService}.}]
 public Transaction buyItem(long connectionId, List<Long> itemIds) {
     // 1. Recupera la connessione e il cliente
     Connection connection = connectionDao.getConnectionById(connectionId);
-    if (connection == null) {
-        throw new IllegalArgumentException("Connection not found");
-    }
+    // ... controlli null ...
     Customer customer = customerDao.getCustomerByUserId(connection.getUserId());
-    if (customer == null) {
-        throw new IllegalArgumentException("Customer not found");
-    }
+    // ... controlli null ...
 
     // 2. Calcola il prezzo totale e valida la disponibilita' degli articoli
     double totalPrice = 0.0;
     List<Item> itemsToUpdate = new ArrayList<>();
     for (Long itemId : itemIds) {
         Item item = itemDao.getItemById(itemId);
-        if (item == null || item.getQuantity() <= 0) {
-            throw new IllegalArgumentException("Item not found or not available");
-        }
+        // ... controlli disponibilità ...
         totalPrice += item.getPrice();
         itemsToUpdate.add(item);
     }
@@ -110,39 +89,35 @@ public Transaction buyItem(long connectionId, List<Long> itemIds) {
 }
 \end{lstlisting}
 
+---
+
 \subsection{Ambiente di Esecuzione con Docker}
 
-Per garantire un ambiente di sviluppo e di esecuzione coerente e riproducibile, il database \textbf{PostgreSQL} è stato containerizzato tramite \textbf{Docker}. La containerizzazione, in questo contesto, offre vantaggi cruciali. In primo luogo, garantisce la \textbf{parità tra gli ambienti} di sviluppo, test e produzione, eliminando la classica problematica del "funziona sulla mia macchina". Ogni sviluppatore esegue la stessa versione di PostgreSQL con la stessa configurazione. In secondo luogo, \textbf{isola le dipendenze}: il database e le sue librerie sono racchiusi nel container e non interferiscono con altri servizi o software installati sulla macchina host. Infine, l'utilizzo di un file \texttt{docker-compose.yml} per definire il servizio agisce come "Infrastructure as Code", documentando e versionando l'ambiente necessario per eseguire l'applicazione e semplificando drasticamente il setup per i nuovi membri del team.
+Per assicurare un ambiente di sviluppo e di esecuzione riproducibile e consistente, il database \textbf{PostgreSQL} è stato containerizzato tramite \textbf{Docker}. La containerizzazione, in questo contesto, offre diversi vantaggi: garantisce la \textbf{parità tra gli ambienti} di sviluppo, test e produzione, mitigando le problematiche di "funzionamento solo sulla macchina locale". Inoltre, \textbf{isola le dipendenze}, racchiudendo il database e le relative librerie all'interno del container, prevenendo interferenze con altri servizi o software sull'host. L'impiego di un file \texttt{docker-compose.yml} per la definizione del servizio funge da "Infrastructure as Code", documentando e versionando l'ambiente necessario per l'applicazione e semplificando la configurazione per i nuovi membri del team.
+
+---
 
 \subsection{Strategia di Testing}
-La qualità del software è stata garantita attraverso una solida e completa strategia di test, che ha previsto sia \textbf{test di unità} sia \textbf{test di integrazione}. Questa strategia a più livelli è fondamentale perché permette di verificare il sistema da diverse prospettive: la correttezza logica dei singoli componenti e la loro corretta collaborazione all'interno dell'architettura complessiva. Gli strumenti utilizzati, come definiti nel \texttt{pom.xml}, hanno permesso di automatizzare e validare il corretto funzionamento del codice a diversi livelli.
+
+La qualità del software è stata validata attraverso una strategia di testing strutturata, che ha incluso sia \textbf{test di unità} sia \textbf{test di integrazione}. Questo approccio a livelli è essenziale per verificare il sistema da diverse prospettive: la correttezza logica dei singoli componenti e la loro corretta interazione all'interno dell'architettura. Gli strumenti configurati nel file \texttt{pom.xml} hanno permesso di automatizzare e validare il funzionamento del codice a vari livelli.
 
 \subsubsection{Test di Unità e Mocking}
-I test di unità sono stati scritti utilizzando \textbf{JUnit 5} per verificare la correttezza dei singoli componenti in isolamento. Per testare il livello Service senza dipendere dal livello di persistenza, è stato utilizzato intensivamente il framework di mocking \textbf{Mockito}. Questo ha permesso di simulare il comportamento dei DAO (tramite l'annotazione \texttt{@Mock}) e di iniettarli nel servizio da testare (tramite \texttt{@InjectMocks}), concentrando i test esclusivamente sulla logica di business. Questo isolamento è vitale: permette di eseguire centinaia di test in pochi secondi, senza la latenza di un database, e di verificare ogni singolo percorso logico e caso limite del servizio in modo deterministico.
 
-\begin{lstlisting}[language=Java, style=vscode_light_style, caption={Test unitario per il metodo \texttt{buyItem} con JUnit 5 e Mockito.}]
+I test di unità sono stati sviluppati con \textbf{JUnit 5} per verificare l'isolamento e la correttezza funzionale dei singoli componenti. Per testare il livello Service in assenza di dipendenza dal livello di persistenza, è stato utilizzato il framework di mocking \textbf{Mockito}. Questo ha consentito di simulare il comportamento dei DAO (tramite l'annotazione \texttt{@Mock}) e di iniettarli nel servizio sotto test (tramite \texttt{@InjectMocks}), focalizzando l'analisi esclusivamente sulla logica di business. Tale isolamento è cruciale per l'esecuzione rapida dei test (centinaia di test in pochi secondi, senza latenza del database) e per la verifica deterministica di ogni percorso logico e caso limite del servizio.
+
+\begin{lstlisting}[language=Java, style=vscode_light_style, caption={Esempio semplificato di test unitario per il metodo \texttt{buyItem} con JUnit 5 e Mockito.}]
 public class CustomerServiceTest {
-    @Mock
-    private CustomerDaoImpl customerDao;
-    @Mock
-    private ConnectionDaoImpl connectionDao;
-    @Mock
-    private ItemDaoImpl itemDao;
-    @Mock
-    private TransactionService transactionService;
-    // ... altri mock ...
+    @Mock private CustomerDaoImpl customerDao;
+    @Mock private ItemDaoImpl itemDao;
+    @Mock private TransactionService transactionService;
+    @InjectMocks private CustomerService customerService;
 
-    @InjectMocks
-    private CustomerService customerService;
-
-    // Oggetti mock preparati nel metodo @BeforeEach
     private Customer mockCustomer;
     private Item mockItem1;
 
     @BeforeEach
     public void setUp() {
         MockitoAnnotations.openMocks(this);
-        // ... inizializzazione di mockCustomer, mockItem1, etc.
         mockCustomer = new Customer(2L, new User(1L, "...", "Jhon", "Doe", "..."), 100.0);
         mockItem1 = new Item(30L, "Soda", "...", 1, 10, 1.50, 3, ItemType.Bottle);
     }
@@ -151,23 +126,16 @@ public class CustomerServiceTest {
     @DisplayName("Test buyItem method success with single item")
     void testBuyItemSuccessSingleItem() {
         // Arrange: Prepara i dati e il comportamento dei mock
-        Connection mockConnection = new Connection(mockCustomer.getUser(), ...);
-        Transaction expectedTransaction = new Transaction(mockCustomer, ...);
-
-        when(connectionDao.getConnectionById(anyLong())).thenReturn(mockConnection);
-        when(customerDao.getCustomerByUserId(anyLong())).thenReturn(mockCustomer);
+        % ... definizione mockConnection e expectedTransaction (commentate perché non direttamente nel codice) ...
         when(itemDao.getItemById(30L)).thenReturn(mockItem1);
-        when(transactionService.createTransaction(any(Transaction.class)))
-            .thenReturn(expectedTransaction);
+        when(transactionService.createTransaction(any(Transaction.class))).thenReturn(expectedTransaction);
 
         // Act: Esegui il metodo da testare
         Transaction result = customerService.buyItem(1L, List.of(30L));
 
         // Assert: Verifica il risultato e le interazioni con i mock
         assertNotNull(result);
-        assertEquals(expectedTransaction, result);
-        assertEquals(9, mockItem1.getQuantity()); // Verifica decremento quantita'
-        
+        assertEquals(9, mockItem1.getQuantity()); 
         verify(itemDao, times(1)).updateItem(mockItem1);
         verify(customerDao, times(1)).updateCustomer(mockCustomer);
         verify(transactionService, times(1)).createTransaction(any(Transaction.class));
@@ -176,7 +144,18 @@ public class CustomerServiceTest {
 \end{lstlisting}
 
 \subsubsection{Test di Integrazione}
-I test di integrazione sono stati realizzati per verificare la corretta collaborazione tra i diversi livelli dell'applicazione, in particolare tra il Service Layer, il DAO Layer e il database. Per questi test, è stato utilizzato un database in-memory \textbf{H2}, che ha permesso di eseguire l'intero stack di persistenza in un ambiente veloce e controllato. Questi test sono cruciali per individuare errori che i test di unità non possono cogliere, come problemi nelle annotazioni di mapping di JPA, errori nella gestione delle transazioni, o query che potrebbero non essere compatibili con il dialetto SQL specifico di PostgreSQL. Validare queste interazioni in un ambiente controllato, prima del deployment, è un passo fondamentale per garantire la robustezza del sistema.
+
+I test di integrazione sono stati implementati per verificare la corretta interazione tra i vari livelli dell'applicazione, in particolare tra il Service Layer, il DAO Layer e il database. Per questi test, è stato impiegato un database in-memory \textbf{H2}, che ha permesso l'esecuzione dell'intero stack di persistenza in un ambiente controllato e ad alta velocità. Questi test sono fondamentali per identificare problematiche non rilevabili dai test di unità, quali errori nelle annotazioni di mapping JPA, gestione delle transazioni, o incompatibilità con il dialetto SQL specifico di PostgreSQL. La validazione di tali interazioni in un ambiente controllato, prima del deployment, costituisce un passaggio critico per la robustezza del sistema.
 
 \subsubsection{Analisi della Copertura del Codice}
-Per monitorare l'efficacia e la completezza della suite di test, è stato integrato il plugin \textbf{JaCoCo} in Maven. L'esecuzione combinata dei test di unità e di integrazione ha permesso di raggiungere e mantenere una \textbf{copertura del codice superiore all'80\%}. Questo risultato quantitativo fornisce una metrica oggettiva della qualità del software, dimostrando che la maggior parte della logica implementata è stata verificata da test automatici. Inoltre, l'analisi della copertura aiuta a identificare il "codice morto" (parti di codice mai eseguite) e a garantire che i percorsi logici critici, specialmente quelli relativi alla gestione degli errori, siano stati adeguatamente testati, guidando così il miglioramento continuo della qualità.
+
+Per monitorare l'efficacia e la completezza della suite di test, è stato integrato il plugin \textbf{JaCoCo} in Maven. L'esecuzione congiunta dei test di unità e di integrazione ha permesso di conseguire e mantenere una \textbf{copertura del codice superiore all'80\%}. Questo risultato quantitativo fornisce una metrica oggettiva della qualità del software, attestando che la maggior parte della logica implementata è stata verificata tramite test automatici. L'analisi della copertura, inoltre, supporta l'identificazione di "codice morto" (porzioni di codice mai eseguite) e assicura che i percorsi logici critici, inclusi quelli relativi alla gestione degli errori, siano stati adeguatamente testati, contribuendo al miglioramento continuo della qualità.
+
+\begin{figure}[h!]
+    \centering % Centra l'immagine nella pagina
+    \includegraphics[width=0.8\textwidth]{assets/coverage.png} % Specifica il percorso e il nome del file immagine
+    % 'width=0.8\textwidth' imposta la larghezza all'80% della larghezza del testo. Regola se necessario.
+    \caption{Riepilogo della copertura del codice per package (generato da JaCoCo).} % Didascalia dell'immagine
+    \label{fig:jacoco_coverage} % Etichetta per riferimenti incrociati nel testo (es. "come mostrato in Figura \ref{fig:jacoco_coverage}")
+\end{figure}
+% --- Fine del codice per l'immagine del coverage ---
