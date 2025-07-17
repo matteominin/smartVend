@@ -1,4 +1,4 @@
-# 🚀 JavaBrew
+# :coffee JavaBrew
 
 ## Quick Start (Cross-platform: Windows, macOS, Linux)
 
